@@ -1,7 +1,13 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Project Management App</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer Fixed="true">
+    <MudPaper Height="400px" Width="100%" Square="true" Class="pa-4">
+        <h1>Project Management App</h1>
 
-Welcome to your new app.
+        This is a demo app; see <a href="https://github.com/JoelWakefield/ProjectManagementApp">source code</a> for details.
+    </MudPaper>
+</MudContainer>

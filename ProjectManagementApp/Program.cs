@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Components;
 using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
