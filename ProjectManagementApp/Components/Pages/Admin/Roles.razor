@@ -1,0 +1,33 @@
+﻿@page "/admin/roles"
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Identity
+@using MudBlazor.Examples.Data.Models
+@inject HttpClient httpClient
+@attribute [Authorize(Roles = "Admin,Manager")]
+
+
+<PageTitle>Roles</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Roles</MudText>
+
+<MudTable Items="@Elements.Take(10)" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Users</MudTh>
+        <MudTh>Update</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Users">@context.Users</MudTd>
+        <MudTd DataLabel="Update">Update</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private IEnumerable<Element> Elements = new List<Element>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
+    }
+}
