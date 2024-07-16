@@ -22,3 +22,13 @@ dotnet ef migrations add <migration name>
 ```
 dotnet ef database update 
 ```
+
+## Adding Roles
+> NOTE: When using `AddIdentityCore`, it's important to call the `AddRoles` before `AddEntityFrameworkStores`.
+```
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+```

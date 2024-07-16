@@ -1,0 +1,60 @@
+﻿@page "/admin/users"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Users</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Users</MudText>
+
+<MudTable Items="@UsersWithRoles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>UserName</MudTh>
+        <MudTh>Roles</MudTh>
+        <MudTh>Update</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="UserName">@context.User?.UserName</MudTd>
+        <MudTd DataLabel="Roles">@context.Roles</MudTd>
+        <MudTd DataLabel="Update">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => UpdateUser(context.User?.Id!))">Update</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    public IEnumerable<UserWithRoles>? UsersWithRoles { get; set; }
+
+    public class UserWithRoles
+    {
+        public ApplicationUser? User { get; set; }
+        public string? Roles { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var users = new List<UserWithRoles>();
+
+        foreach (var user in UserManager.Users)
+        {
+            users.Add(new UserWithRoles{
+                User = user
+            });
+        }
+
+        foreach (var user in users)
+        {
+            user.Roles = String.Join(", ", await UserManager.GetRolesAsync(user.User!));
+        }
+
+        UsersWithRoles = users.AsEnumerable();
+    }
+
+    public void UpdateUser(string id) => NavigationManager.NavigateTo($"/admin/users/{id}");
+}

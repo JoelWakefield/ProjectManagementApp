@@ -1,0 +1,72 @@
+﻿@page "/admin/roles/create"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Create Role</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
+
+<EditForm Model="Model" OnValidSubmit="Create">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@if (Errors != null)
+{
+    <MudPaper Class="pa-8">
+        <MudList T="string">
+            @foreach(IdentityError error in Errors)
+            {
+                <MudListItem Text="@error.Code" SecondaryText="@error.Description" Icon="@Icons.Material.Filled.Warning" />
+            }
+        </MudList>
+    </MudPaper>
+}
+
+
+@code {
+    RegisterRoleForm Model = new RegisterRoleForm();
+    private IEnumerable<IdentityError>? Errors { get; set; }
+
+    public class RegisterRoleForm
+    {
+        [Required]
+        [StringLength(256, ErrorMessage = "Name length can't be more than 256 characters.")]
+        public string? Name { get; set; }
+    }
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private async void Create(EditContext context)
+    {
+        if (context?.Model == null)
+            return;
+
+        string? name = ((RegisterRoleForm)context?.Model!).Name;
+
+        if (name != null)
+        {
+            IdentityResult result = await RoleManager.CreateAsync(new IdentityRole(name));
+
+            if (result.Succeeded)
+            {   
+                NavigationManager.NavigateTo($"/admin/roles");
+                StateHasChanged();
+            } else
+            {
+                Errors = result.Errors;
+            }
+        }
+    }
+}

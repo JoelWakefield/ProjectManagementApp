@@ -1,33 +1,28 @@
 ﻿@page "/admin/roles"
-@using System.Net.Http.Json
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@using MudBlazor.Examples.Data.Models
-@inject HttpClient httpClient
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize]
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
 
 
 <PageTitle>Roles</PageTitle>
 
 <MudText Typo="Typo.h1" Class="px-6">Roles</MudText>
 
-<MudTable Items="@Elements.Take(10)" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Role</MudButton>
+
+<MudTable Items="@RoleManager.Roles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
-        <MudTh>Users</MudTh>
-        <MudTh>Update</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Users">@context.Users</MudTd>
-        <MudTd DataLabel="Update">Update</MudTd>
     </RowTemplate>
 </MudTable>
 
-@code {
-    private IEnumerable<Element> Elements = new List<Element>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        Elements = await httpClient.GetFromJsonAsync<List<Element>>("webapi/periodictable");
-    }
+@code {
+    public void CreateNew() => NavigationManager.NavigateTo("/admin/roles/create");
 }
