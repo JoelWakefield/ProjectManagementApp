@@ -6,6 +6,7 @@ using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
 using ProjectManagementApp.Models;
+using ProjectManagementApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,8 +37,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-//builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
 builder.Services.AddMudServices();
 
 var app = builder.Build();
@@ -54,13 +53,8 @@ else
     app.UseHsts();
 }
 
-using var serviceScope = app.Services.GetService<IServiceScopeFactory>()!.CreateScope();
-//var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-if (roleManager.RoleExistsAsync(Roles.Admin).Result == false)
-{
-    roleManager.CreateAsync(new IdentityRole(Roles.Admin)).Wait();
-}
+// Setup initial data for the projects 
+await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 
