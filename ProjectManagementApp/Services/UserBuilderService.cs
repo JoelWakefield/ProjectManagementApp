@@ -10,7 +10,7 @@ namespace ProjectManagementApp.Services
         {
             using var serviceScope = app.Services.GetService<IServiceScopeFactory>()!.CreateScope();
             
-            // Create an initial roles (other roles can be added later in the app)
+            // Create initial roles
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             if (roleManager.RoleExistsAsync(Roles.Admin).Result == false)
                 roleManager.CreateAsync(new IdentityRole(Roles.Admin)).Wait();
@@ -21,7 +21,7 @@ namespace ProjectManagementApp.Services
             if (roleManager.RoleExistsAsync(Roles.Member).Result == false)
                 roleManager.CreateAsync(new IdentityRole(Roles.Member)).Wait();
 
-            // Create initial roles
+            // Create initial users
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             if (userManager.Users.Any(u => u.UserName == Users.Bert.UserName) == false)
                 await userManager.CreateAsync(Users.Bert);
