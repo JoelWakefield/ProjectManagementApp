@@ -1,0 +1,44 @@
+﻿@page "/projects"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject IDbContextFactory<ProjectDbContext> ProjectFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Projects</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Projects</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Project</MudButton>
+
+<MudTable Items="ProjectList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    private IEnumerable<Project>? ProjectList { get; set; }
+
+    private void OnInitialize()
+    {
+        using var context = ProjectFactory.CreateDbContext();
+        var query = context.Projects?.AsQueryable();
+
+        if (query is not null)
+        {
+            // Run the query to load the current page.
+            ProjectList = query.AsEnumerable();
+        }
+    }
+
+    public void CreateNew() => NavigationManager.NavigateTo("/projects/create");
+}
