@@ -1,0 +1,28 @@
+﻿@page "/admin/roles"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize]
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Roles</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Roles</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Role</MudButton>
+
+<MudTable Items="@RoleManager.Roles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    public void CreateNew() => NavigationManager.NavigateTo("/admin/roles/create");
+}

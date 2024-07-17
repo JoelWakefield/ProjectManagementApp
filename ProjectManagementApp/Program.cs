@@ -5,6 +5,8 @@ using ProjectManagementApp.Components;
 using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
+using ProjectManagementApp.Models;
+using ProjectManagementApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,12 +31,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
-
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddMudServices();
 
@@ -51,6 +52,9 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// Setup initial data for the projects 
+await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 

@@ -1,0 +1,86 @@
+﻿@page "/admin/users/{UserId}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Edit User</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Edit User</MudText>
+
+<MudPaper Class="pa-8">
+    <MudText Typo="Typo.h2" Class="py-8">Details</MudText>
+    <MudText Typo="Typo.body1" Class="pa-4">@User?.UserName</MudText>
+
+    <MudText Typo="Typo.h2" Class="py-4">Roles</MudText>
+    <MudList T="string">
+        @if (AllRoles != null)
+        {
+            @foreach (string key in AllRoles?.Keys!)
+            {
+                <MudCheckBox @onclick="@(() => ToggleRole(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
+            }
+        }
+    </MudList>
+</MudPaper>
+
+
+@code {
+    [Parameter]
+    public string? UserId { get; set; }
+
+    public ApplicationUser? ApplicationUser { get; set; }
+    public UserWithRoles? User { get; set; }
+    public Dictionary<string, bool>? AllRoles { get; set; }
+
+    public class UserWithRoles
+    {
+        public string? UserName { get; set; }
+        public IEnumerable<string>? Roles { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ApplicationUser = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
+
+        if (ApplicationUser == null)
+        {
+            NavigationManager.NavigateTo("/admin/users");
+        } 
+        else
+        {
+            User = new UserWithRoles
+            {
+                UserName = ApplicationUser?.UserName,
+                Roles = await UserManager.GetRolesAsync(ApplicationUser!)
+            };
+
+            AllRoles = RoleManager.Roles.ToDictionary(
+                identityRole => identityRole.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{identityRole.Id}"), 
+                identityRole => User.Roles.Contains(identityRole.Name)
+            );
+        }
+    }
+
+    public async Task ToggleRole(string role)
+    {
+        if (User != null)
+        {
+            if (User.Roles!.Contains(role))
+                await UserManager.RemoveFromRoleAsync(ApplicationUser!, role);
+            else
+                await UserManager.AddToRoleAsync(ApplicationUser!, role);
+            
+            User.Roles = await UserManager.GetRolesAsync(ApplicationUser!);
+        }
+        else
+        {
+            throw new Exception("User should be redirected if no 'User' data is present.");
+        }
+    }
+}
