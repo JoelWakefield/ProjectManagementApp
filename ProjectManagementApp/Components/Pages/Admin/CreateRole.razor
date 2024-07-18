@@ -10,18 +10,6 @@
 
 <MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
 
-<EditForm Model="Model" OnValidSubmit="Create">
-    <DataAnnotationsValidator />
-    <MudCard>
-        <MudCardContent>
-            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
-        </MudCardActions>
-    </MudCard>
-</EditForm>
-
 @if (Errors != null)
 {
     <MudPaper Class="pa-8">
@@ -33,6 +21,18 @@
         </MudList>
     </MudPaper>
 }
+
+<EditForm Model="Model" OnValidSubmit="Create">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
 
 
 @code {
