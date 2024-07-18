@@ -1,0 +1,36 @@
+﻿@page "/projects/details/{Id}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>@Project?.Name - Details</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
+
+<MudPaper Class="my-6 pa-8">
+    <MudText Typo="Typo.body1" Class="pa-2">@Project?.Description</MudText>
+    <MudText Typo="Typo.body1" Class="pa-2">@Project?.ProjectedStart</MudText>
+    <MudText Typo="Typo.body1" Class="pa-2">@Project?.ProjectedEnd</MudText>
+</MudPaper>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id!))">Update</MudButton>
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    public Project? Project { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
+    }
+
+    public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");
+}

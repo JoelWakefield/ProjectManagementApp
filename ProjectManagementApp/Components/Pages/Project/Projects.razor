@@ -1,11 +1,10 @@
 ﻿@page "/projects"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Data
 @attribute [Authorize]
-@inject IDbContextFactory<ProjectDbContext> ProjectFactory
+@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 
 
@@ -15,12 +14,22 @@
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Project</MudButton>
 
-<MudTable Items="ProjectList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+<MudTable Items="@ProjectList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Projected Start</MudTh>
+        <MudTh>Projected End</MudTh>
+        <MudTh>Update</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Projected Start">@context.ProjectedStart.ToLocalTime()</MudTd>
+        <MudTd DataLabel="Projected End">@context.ProjectedEnd.ToLocalTime()</MudTd>
+        <MudTd DataLabel="Update">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Details(context.Id!))">Details</MudButton>
+        </MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -28,17 +37,11 @@
 @code {
     private IEnumerable<Project>? ProjectList { get; set; }
 
-    private void OnInitialize()
+    protected override void OnInitialized()
     {
-        using var context = ProjectFactory.CreateDbContext();
-        var query = context.Projects?.AsQueryable();
-
-        if (query is not null)
-        {
-            // Run the query to load the current page.
-            ProjectList = query.AsEnumerable();
-        }
+        ProjectList = DbContext.Projects;
     }
 
     public void CreateNew() => NavigationManager.NavigateTo("/projects/create");
+    public void Details(string id) => NavigationManager.NavigateTo($"/projects/details/{id}");
 }

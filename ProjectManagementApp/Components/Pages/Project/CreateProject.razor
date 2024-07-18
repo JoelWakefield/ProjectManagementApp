@@ -1,0 +1,40 @@
+﻿@page "/projects/create"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Create Project</PageTitle>
+@* 
+<MudText Typo="Typo.h1" Class="px-6">Create Project</MudText>
+
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
+
+
+@code {
+    public Project? Project { get; set; } = new Project();
+    public string? Errors { get; set; } = null;
+
+    public void Create() {
+        try
+        {
+            DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo($"/projects/details/{Project?.Id}");
+        }
+        catch (Exception ex)
+        {
+            Errors = ex.Message;
+        }
+    }
+} *@
