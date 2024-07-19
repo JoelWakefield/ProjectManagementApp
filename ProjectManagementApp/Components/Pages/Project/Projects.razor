@@ -41,6 +41,6 @@
         ProjectList = DbContext.Projects;
     }
 
-    public void CreateNew() => NavigationManager.NavigateTo("/projects/create");
-    public void Details(string id) => NavigationManager.NavigateTo($"/projects/details/{id}");
+    public void CreateNew() => NavigationManager.NavigateTo("/projects/create", true);
+    public void Details(string id) => NavigationManager.NavigateTo($"/projects/details/{id}", true);
 }

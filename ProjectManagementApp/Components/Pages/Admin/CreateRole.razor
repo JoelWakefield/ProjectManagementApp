@@ -60,7 +60,7 @@
 
             if (result.Succeeded)
             {   
-                NavigationManager.NavigateTo($"/admin/roles");
+                NavigationManager.NavigateTo($"/admin/roles", true);
                 StateHasChanged();
             } else
             {

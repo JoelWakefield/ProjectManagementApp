@@ -51,7 +51,7 @@
         try
         {
             DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/projects/{id}");
+            NavigationManager.NavigateTo("/projects/{id}", true);
         }
         catch (Exception ex)
         {
