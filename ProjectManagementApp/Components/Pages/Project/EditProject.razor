@@ -22,14 +22,12 @@
 <MudPaper Class="pa-8">
     <ProjectDetailsForm Project="@Project" />
 
-    <MudHidden Breakpoint="@Breakpoint.Sm">
-        <MudPaper Class="my-6 pa-8">
-            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="px-6">these values are auto-filled upon project completion</MudText>
-        </MudPaper>
-        <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualStart</MudText>
-        <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualEnd</MudText>
-        <MudText Typo="Typo.body1" Class="px-6">@Project?.TotalWorkHours</MudText>
-    </MudHidden>
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="px-6">these values are auto-filled upon project completion</MudText>
+    </MudPaper>
+    <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualStart</MudText>
+    <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualEnd</MudText>
+    <MudText Typo="Typo.body1" Class="px-6">@Project?.TotalWorkHours</MudText>
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Save">Save</MudButton>
