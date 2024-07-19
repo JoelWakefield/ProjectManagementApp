@@ -1,0 +1,43 @@
+﻿@using ProjectManagementApp.Data
+
+
+<MudTextField Label="Name" Value="@Project?.Name" T="string" Required="true" RequiredError="A project must have a name." />
+<MudTextField Label="Description" Value="@Project?.Description" T="string" Required="true" RequiredError="A project must have a description." />
+<MudDatePicker Label="Projected Start Date" @bind-Date="@_projectedStartDate" ShowToolbar="false" Required="true" HelperText="The date the project is estimated to begin." />
+<MudTimePicker Label="Projected Start Time" @bind-Date="@_projectedStartTime" AmPm="true" Required="true" />
+<MudDatePicker Label="Projected End Date" @bind-Time="@_projectedEndDate" ShowToolbar="false" HelperText="The date the project is estimated to end." />
+<MudTimePicker Label="Projected End Time" @bind-Time="@_projectedEndTime" AmPm="true" />
+
+
+@code {
+    [Parameter]
+    public Project? Project { get; set; }
+
+    private DateTime? _projectedStartDate;
+    private TimeSpan? _projectedStartTime;
+    private DateTime? _projectedEndDate;
+    private TimeSpan? _projectedEndTime;
+
+    protected override void OnInitialized()
+    {
+        if (Project?.ProjectedStart == null)
+        {
+            DateTime localTime = DateTime.UtcNow.ToLocalTime();
+            _projectedStartDate = DateTime.UtcNow;
+            _projectedStartTime = new TimeSpan(localTime.Hour,localTime.Minute,localTime.Second);
+        } 
+        else
+        {
+            _projectedStartDate = Project.ProjectedStart.Date;
+            _projectedStartTime = Project.ProjectedStart.TimeOfDay;
+            _projectedEndDate = Project.ProjectedEnd.Date;
+            _projectedEndTime = Project.ProjectedEnd.TimeOfDay;
+        }
+    }
+
+    private void DateChanged()
+    {
+        Project!.ProjectedStart = _projectedStartDate!.Value.Add(_projectedStartTime!.Value);
+        Project!.ProjectedEnd = _projectedEndDate!.Value.Add(_projectedEndTime!.Value);
+    }
+}

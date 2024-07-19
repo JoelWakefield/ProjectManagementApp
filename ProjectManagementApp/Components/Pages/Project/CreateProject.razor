@@ -1,7 +1,20 @@
 ﻿@page "/projects/create"
+
+
+<MudDatePicker Label="Basic example" @bind-Date="_date" />
+<MudTimePicker Label="12 hours" AmPm="true" @bind-Time="_time" />
+
+@code {
+    private DateTime? _date = DateTime.Today;
+    private TimeSpan? _time = new TimeSpan(00, 45, 00);
+}
+
+
+@* 
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Components.Pages.Project.Shared
 @using ProjectManagementApp.Data
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
@@ -19,11 +32,15 @@
     </MudPaper>
 }
 
+<MudPaper Class="pa-8">
+    <ProjectDetailsForm Project="@Project" />
+</MudPaper>
+
+
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
 
-
 @code {
-    public Project? Project { get; set; } = new Project();
+    public Project? Project { get; set; }
     public string? Errors { get; set; } = null;
 
     public void Create() {
@@ -37,4 +54,4 @@
             Errors = ex.Message;
         }
     }
-}
+} *@

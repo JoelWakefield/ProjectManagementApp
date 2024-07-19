@@ -20,14 +20,14 @@
         <MudTh>Description</MudTh>
         <MudTh>Projected Start</MudTh>
         <MudTh>Projected End</MudTh>
-        <MudTh>Update</MudTh>
+        <MudTh>Details</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Description">@context.Description</MudTd>
         <MudTd DataLabel="Projected Start">@context.ProjectedStart.ToLocalTime()</MudTd>
         <MudTd DataLabel="Projected End">@context.ProjectedEnd.ToLocalTime()</MudTd>
-        <MudTd DataLabel="Update">
+        <MudTd DataLabel="Details">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Details(context.Id!))">Details</MudButton>
         </MudTd>
     </RowTemplate>
