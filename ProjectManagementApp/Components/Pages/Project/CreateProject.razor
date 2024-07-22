@@ -1,7 +1,6 @@
 ﻿@page "/projects/create"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@using ProjectManagementApp.Components.Pages.Project.Shared
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @attribute [Authorize]
@@ -25,8 +24,8 @@
         <MudTextField Label="Name" @bind-Value="Project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
         <MudTextField Label="Description" @bind-Value="Project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
     </MudContainer>
-    <DateTimePicker OnDateTimeChanged="ProjectedStartChanged" />
-    <DateTimePicker OnDateTimeChanged="ProjectedEndChanged" />
+    <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
+    <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>

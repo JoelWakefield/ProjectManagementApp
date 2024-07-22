@@ -1,6 +1,7 @@
 ﻿@page "/projects/details/{Id}"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
@@ -12,9 +13,9 @@
 <MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
 
 <MudPaper Class="my-6 pa-8">
-    <MudText Typo="Typo.body1" Class="pa-2">@Project?.Description</MudText>
-    <MudText Typo="Typo.body1" Class="pa-2">@Project?.ProjectedStart</MudText>
-    <MudText Typo="Typo.body1" Class="pa-2">@Project?.ProjectedEnd</MudText>
+    <LabeledText Label="Description" Text="@Project!.Description" />
+    <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
+    <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id!))">Update</MudButton>

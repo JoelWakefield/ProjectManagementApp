@@ -1,7 +1,7 @@
 ﻿@page "/projects/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@using ProjectManagementApp.Components.Pages.Project.Shared
+@using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
@@ -20,13 +20,18 @@
 }
 
 <MudPaper Class="pa-8">
-
-    <MudPaper Class="my-6 pa-8">
-        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="px-6">these values are auto-filled upon project completion</MudText>
-    </MudPaper>
-    <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualStart</MudText>
-    <MudText Typo="Typo.body1" Class="px-6">@Project?.ActualEnd</MudText>
-    <MudText Typo="Typo.body1" Class="px-6">@Project?.TotalWorkHours</MudText>
+    <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Editable Values</MudText>
+    <MudContainer Class="pa-4 align-start">
+        <MudTextField Label="Name" @bind-Value="Project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
+        <MudTextField Label="Description" @bind-Value="Project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
+    </MudContainer>
+    <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
+    <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+    <MudDivider />
+    <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Auto-Filled Values</MudText>
+    <LabeledText Label="Actual Start Date" Text="@Project?.ActualStart.ToString()" />
+    <LabeledText Label="Actual End Date" Text="@Project?.ActualEnd.ToString()" />
+    <LabeledText Label="Total Work Hours" Text="@Project?.TotalWorkHours.ToString()" />
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Save">Save</MudButton>
@@ -39,16 +44,24 @@
     public Project? Project { get; set; }
     public string? Errors { get; set; } = null;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        Project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
+        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
+
+        if (Project == null)
+            NavigationManager.NavigateTo($"/projects", true);
     }
 
-    public void Save() {
+    private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
+    private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
+
+    public async Task Save() {
         try
         {
-            DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/projects/{id}", true);
+            var project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
+            project = Project;
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo($"/projects/details/{Id}", true);
         }
         catch (Exception ex)
         {
