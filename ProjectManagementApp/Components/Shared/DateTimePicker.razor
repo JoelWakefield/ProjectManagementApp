@@ -1,0 +1,57 @@
+﻿<MudContainer Class="ma-2">
+    <MudText Typo="Typo.subtitle2">@Label</MudText>
+    <MudContainer Class="pa-4 align-start d-flex">
+        <MudDatePicker Label="Date" @bind-Date="Date" ShowToolbar="false" Required="true"/>
+        <MudSpacer />
+        <MudTimePicker Label="Time" @bind-Time="Time" AmPm="true" Required="true" />
+    </MudContainer>
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public DateTime? DateTimeValue { get; set; }
+    [Parameter]
+    public EventCallback<DateTime> OnDateTimeChanged { get; set; }
+    [Parameter]
+    public string? Label { get; set; }
+
+    private DateTime? date;
+    private DateTime? Date
+    {
+        get => date;
+        set
+        {
+            date = value;
+            DateTimeValue = date!.Value.Add(time!.Value);
+            OnDateTimeChanged.InvokeAsync(DateTimeValue ?? DateTime.UtcNow);
+        }
+    }
+    private TimeSpan? time;
+    private TimeSpan? Time
+    {
+        get => time;
+        set
+        {
+            time = value;
+            DateTimeValue = date!.Value.Add(time!.Value);
+            OnDateTimeChanged.InvokeAsync(DateTimeValue ?? DateTime.UtcNow);
+        }
+    }
+
+
+    protected override void OnInitialized()
+    {
+        if (DateTimeValue == null)
+        {
+            DateTime localTime = DateTime.UtcNow.ToLocalTime();
+            date = DateTime.UtcNow;
+            time = new TimeSpan(localTime.Hour, localTime.Minute, localTime.Second);
+        }
+        else
+        {
+            date = DateTimeValue.Value.Date;
+            time = DateTimeValue.Value.TimeOfDay;
+        }
+    }
+}

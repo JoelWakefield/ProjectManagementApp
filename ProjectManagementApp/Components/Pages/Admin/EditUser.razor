@@ -1,5 +1,4 @@
 ﻿@page "/admin/users/{UserId}"
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
@@ -50,7 +49,7 @@
 
         if (ApplicationUser == null)
         {
-            NavigationManager.NavigateTo("/admin/users");
+            NavigationManager.NavigateTo("/admin/users", true);
         } 
         else
         {

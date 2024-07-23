@@ -1,0 +1,46 @@
+﻿@page "/projects"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Projects</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Projects</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Project</MudButton>
+
+<MudTable Items="@ProjectList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Projected Start</MudTh>
+        <MudTh>Projected End</MudTh>
+        <MudTh>Details</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Projected Start">@context.ProjectedStart.ToLocalTime()</MudTd>
+        <MudTd DataLabel="Projected End">@context.ProjectedEnd.ToLocalTime()</MudTd>
+        <MudTd DataLabel="Details">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Details(context.Id!))">Details</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    private IEnumerable<Project>? ProjectList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ProjectList = DbContext.Projects;
+    }
+
+    public void CreateNew() => NavigationManager.NavigateTo("/projects/create", true);
+    public void Details(string id) => NavigationManager.NavigateTo($"/projects/details/{id}", true);
+}

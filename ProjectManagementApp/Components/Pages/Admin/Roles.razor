@@ -1,5 +1,4 @@
 ﻿@page "/admin/roles"
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @attribute [Authorize]
@@ -24,5 +23,5 @@
 
 
 @code {
-    public void CreateNew() => NavigationManager.NavigateTo("/admin/roles/create");
+    public void CreateNew() => NavigationManager.NavigateTo("/admin/roles/create", true);
 }

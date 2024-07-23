@@ -1,5 +1,4 @@
 ﻿@page "/admin/users"
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
@@ -56,5 +55,5 @@
         UsersWithRoles = users.AsEnumerable();
     }
 
-    public void UpdateUser(string id) => NavigationManager.NavigateTo($"/admin/users/{id}");
+    public void UpdateUser(string id) => NavigationManager.NavigateTo($"/admin/users/{id}", true);
 }

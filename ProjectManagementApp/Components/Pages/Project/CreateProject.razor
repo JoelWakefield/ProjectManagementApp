@@ -1,0 +1,67 @@
+﻿@page "/projects/create"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using ProjectManagementApp.Components.Shared
+@using ProjectManagementApp.Data
+@attribute [Authorize]
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Create Project</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Create Project</MudText>
+
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
+
+<MudPaper Class="pa-8">
+    <MudContainer Class="pa-4">
+        <MudTextField Label="Name" @bind-Value="Project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
+        <MudTextField Label="Description" @bind-Value="Project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
+    </MudContainer>
+    <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
+    <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+</MudPaper>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
+
+
+@code {
+    public Project? Project { get; set; }
+    public string? Errors { get; set; } = null;
+
+    protected override void OnInitialized()
+    {
+        Project = new Project()
+        {
+            Id = Guid.NewGuid().ToString(),
+            CreatedBy = "project_setup",
+            CreatedOn = DateTime.UtcNow,
+        };
+    }
+
+    private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
+    private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
+
+    public async Task Create()
+    {
+        if (Project == null || String.IsNullOrEmpty(Project.Name))
+            return;
+
+        try
+        {
+            await DbContext.Projects.AddAsync(Project);
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
+        }
+        catch (Exception ex)
+        {
+            Errors = ex.Message;
+        }
+    }
+}

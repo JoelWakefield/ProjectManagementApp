@@ -5,10 +5,10 @@ using ProjectManagementApp.Components;
 using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
-using ProjectManagementApp.Models;
 using ProjectManagementApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -27,8 +27,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("ProjectManagement") ?? throw new InvalidOperationException("Connection string 'ProjectManagement' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)

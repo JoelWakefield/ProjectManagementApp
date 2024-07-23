@@ -1,5 +1,4 @@
 ﻿@page "/admin/roles/create"
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
 @inject RoleManager<IdentityRole> RoleManager
@@ -9,18 +8,6 @@
 <PageTitle>Create Role</PageTitle>
 
 <MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
-
-<EditForm Model="Model" OnValidSubmit="Create">
-    <DataAnnotationsValidator />
-    <MudCard>
-        <MudCardContent>
-            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
-        </MudCardActions>
-    </MudCard>
-</EditForm>
 
 @if (Errors != null)
 {
@@ -33,6 +20,18 @@
         </MudList>
     </MudPaper>
 }
+
+<EditForm Model="Model" OnValidSubmit="Create">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
 
 
 @code {
@@ -61,7 +60,7 @@
 
             if (result.Succeeded)
             {   
-                NavigationManager.NavigateTo($"/admin/roles");
+                NavigationManager.NavigateTo($"/admin/roles", true);
                 StateHasChanged();
             } else
             {
