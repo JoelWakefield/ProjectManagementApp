@@ -3,9 +3,9 @@
     public class Project
     {
         public string? Id { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public string? CreatedBy { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; }
         public string? Description { get; set; }
         public DateTime ProjectedStart { get; set; }
         public DateTime ProjectedEnd { get; set; }
