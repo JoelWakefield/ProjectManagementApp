@@ -2,7 +2,7 @@
 using ProjectManagementApp.Data;
 using ProjectManagementApp.Models;
 
-namespace ProjectManagementApp.Services
+namespace ProjectManagementApp.SampleData
 {
     public static class ProjectBuilderExtention
     {
@@ -13,7 +13,7 @@ namespace ProjectManagementApp.Services
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            
+
             // Create initial roles
             if (roleManager.RoleExistsAsync(Roles.Admin).Result == false)
                 roleManager.CreateAsync(new IdentityRole(Roles.Admin)).Wait();
