@@ -42,7 +42,6 @@
             Id = Guid.NewGuid().ToString(),
             CreatedBy = "project_setup",
             CreatedOn = DateTime.UtcNow,
-            Name = "project name"
         };
     }
 
@@ -51,7 +50,7 @@
 
     public async Task Create()
     {
-        if (Project == null)
+        if (Project == null || String.IsNullOrEmpty(Project.Name))
             return;
 
         try
