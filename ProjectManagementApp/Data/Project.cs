@@ -1,5 +1,8 @@
 ﻿namespace ProjectManagementApp.Data
 {
+    /// <summary>
+    /// The Project entity keeps track of broad data which isn't likely to change and whose changes aren't worth tracking.
+    /// </summary>
     public class Project
     {
         public string? Id { get; set; }
