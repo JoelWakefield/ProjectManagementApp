@@ -4,11 +4,13 @@
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
+@inject ProjectOwnerService ProjectOwnerService
 
 
 <PageTitle>@Project?.Name - Edit</PageTitle>
@@ -60,15 +62,12 @@
     protected override void OnInitialized()
     {
         Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
-        ProjectOwner? owner = DbContext.ProjectOwners
-            .OrderByDescending(o => o.CreatedOn)
-            .FirstOrDefault(o => o.ProjectId == Id);
+        ApplicationUser? user = ProjectOwnerService.GetOwner(Project?.Id);
 
-        if (Project == null || owner == null)
+        if (Project == null || user == null)
             NavigationManager.NavigateTo($"/projects", true);
 
-        ApplicationUser user = UserManager.Users.FirstOrDefault(u => u.Id == owner!.UserId)!;
-        OldOwnerSelection = new ProjectOwnerSelection(owner!.Id, user.UserName);
+        OldOwnerSelection = new ProjectOwnerSelection(user!.Id, user.UserName);
         CurrentOwnerSelection = OldOwnerSelection;
     }
 
@@ -76,7 +75,7 @@
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
     public async Task Save() {
-        if (String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
+        if (String.IsNullOrEmpty(Project!.Name) || CurrentOwnerSelection == null)
             Errors = "Required fields are missing.";
 
         try
