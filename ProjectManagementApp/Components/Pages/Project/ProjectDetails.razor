@@ -1,11 +1,13 @@
 ﻿@page "/projects/details/{Id}"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -14,6 +16,7 @@
 
 <MudPaper Class="my-6 pa-8">
     <LabeledText Label="Description" Text="@Project!.Description" />
+    <LabeledText Label="Owner" Text="@User.UserName" />
     <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
     <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
 </MudPaper>
@@ -26,10 +29,20 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
+    public ApplicationUser? User { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        Project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
+        ProjectOwner owner = DbContext.ProjectOwners
+            .OrderByDescending(o => o.CreatedOn)
+            .FirstOrDefault(o => o.ProjectId == Id);
+
+        if (owner != null)
+        {
+            User = UserManager.Users.FirstOrDefault(u => u.Id == owner.UserId);
+        }
+
+        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");

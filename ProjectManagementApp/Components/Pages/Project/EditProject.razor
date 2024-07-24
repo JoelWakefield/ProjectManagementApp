@@ -1,11 +1,14 @@
 ﻿@page "/projects/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 <PageTitle>@Project?.Name - Edit</PageTitle>
@@ -27,6 +30,14 @@
     </MudContainer>
     <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+    <MudContainer Class="pa-4">
+        <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var user in UserManager.Users)
+            {
+                <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+            }
+        </MudSelect>
+    </MudContainer>
     <MudDivider />
     <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Auto-Filled Values</MudText>
     <LabeledText Label="Actual Start Date" Text="@Project?.ActualStart.ToString()" />
@@ -42,22 +53,42 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
+    public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
+    public ProjectOwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override void OnInitialized()
     {
         Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
+        ProjectOwner? owner = DbContext.ProjectOwners
+            .OrderByDescending(o => o.CreatedOn)
+            .FirstOrDefault(o => o.ProjectId == Id);
 
-        if (Project == null)
+        if (Project == null || owner == null)
             NavigationManager.NavigateTo($"/projects", true);
+
+        ApplicationUser user = UserManager.Users.FirstOrDefault(u => u.Id == owner!.UserId)!;
+        OldOwnerSelection = new ProjectOwnerSelection(owner!.Id, user.UserName);
+        CurrentOwnerSelection = OldOwnerSelection;
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
     public async Task Save() {
+        if (String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
+            Errors = "Required fields are missing.";
+
         try
         {
+            if (CurrentOwnerSelection.Id != OldOwnerSelection.Id)
+            {
+                await DbContext.ProjectOwners.AddAsync(new ProjectOwner()
+                {
+                    ProjectId = Project.Id,
+                    UserId = CurrentOwnerSelection.Id,
+                });
+            }
             var project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
             project = Project;
             await DbContext.SaveChangesAsync();
