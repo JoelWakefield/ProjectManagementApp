@@ -6,5 +6,6 @@ namespace ProjectManagementApp.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectOwner> ProjectOwners { get; set; }
     }
 }
