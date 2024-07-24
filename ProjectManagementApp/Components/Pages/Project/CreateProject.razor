@@ -60,20 +60,20 @@
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public async Task Create()
+    public void Create()
     {
         if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
             Errors = "Required fields are missing.";
 
         try
         {
-            await DbContext.ProjectOwners.AddAsync(new ProjectOwner()
+            DbContext.ProjectOwners.Add(new ProjectOwner()
             {
                 ProjectId = Project.Id,
                 UserId = CurrentOwnerSelection.Id,
             });
-            await DbContext.Projects.AddAsync(Project);
-            await DbContext.SaveChangesAsync();
+            DbContext.Projects.Add(Project);
+            DbContext.SaveChanges();
             NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
         }
         catch (Exception ex)
