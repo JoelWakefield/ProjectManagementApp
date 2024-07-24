@@ -14,15 +14,18 @@ namespace ProjectManagementApp.SampleData
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // Create initial roles
-            if (roleManager.RoleExistsAsync(Roles.Admin).Result == false)
-                roleManager.CreateAsync(new IdentityRole(Roles.Admin)).Wait();
-            if (roleManager.RoleExistsAsync(Roles.Manager).Result == false)
-                roleManager.CreateAsync(new IdentityRole(Roles.Manager)).Wait();
-            if (roleManager.RoleExistsAsync(Roles.Lead).Result == false)
-                roleManager.CreateAsync(new IdentityRole(Roles.Lead)).Wait();
-            if (roleManager.RoleExistsAsync(Roles.Member).Result == false)
-                roleManager.CreateAsync(new IdentityRole(Roles.Member)).Wait();
+            // Create initial roles (for identity and project)
+            if (roleManager.RoleExistsAsync(IdentityRoles.Admin).Result == false)
+                await roleManager.CreateAsync(new IdentityRole(IdentityRoles.Admin));
+            if (roleManager.RoleExistsAsync(IdentityRoles.User).Result == false)
+                await roleManager.CreateAsync(new IdentityRole(IdentityRoles.User));
+
+            if (dbContext.ProjectRoles.Any(r => r.Name == ProjectRoles.Manager) == false)
+                dbContext.ProjectRoles.Add(new ProjectRole() { Name = ProjectRoles.Manager });
+            if (dbContext.ProjectRoles.Any(r => r.Name == ProjectRoles.Owner) == false)
+                dbContext.ProjectRoles.Add(new ProjectRole() { Name = ProjectRoles.Owner });
+            if (dbContext.ProjectRoles.Any(r => r.Name == ProjectRoles.Member) == false)
+                dbContext.ProjectRoles.Add(new ProjectRole() { Name = ProjectRoles.Member });
 
             // Create initial users
             if (userManager.Users.Any(u => u.UserName == Users.Bert.UserName) == false)
@@ -40,24 +43,41 @@ namespace ProjectManagementApp.SampleData
             Users.Alayah = userManager.Users.FirstOrDefault(u => u.UserName == Users.Alayah.UserName)!;
             Users.Zahir = userManager.Users.FirstOrDefault(u => u.UserName == Users.Zahir.UserName)!;
 
-            // Assign roles to new users
-            if ((await userManager.GetRolesAsync(Users.Bert)).Contains(Roles.Member) == false)
-                await userManager.AddToRoleAsync(Users.Bert, Roles.Member);
-            if ((await userManager.GetRolesAsync(Users.Bert)).Contains(Roles.Lead) == false)
-                await userManager.AddToRoleAsync(Users.Bert, Roles.Lead);
+            // Pull the updated/pre-existing project role data
+            ProjectRole managerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Manager)!;
+            ProjectRole ownerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Owner)!;
+            ProjectRole memberRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Member)!;
 
-            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(Roles.Manager) == false)
-                await userManager.AddToRoleAsync(Users.Mylo, Roles.Manager);
-            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(Roles.Member) == false)
-                await userManager.AddToRoleAsync(Users.Mylo, Roles.Member);
+            // Assign identity roles to new users
+            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(IdentityRoles.Admin) == false)
+                await userManager.AddToRoleAsync(Users.Mylo, IdentityRoles.Admin);
 
-            if ((await userManager.GetRolesAsync(Users.Alayah)).Contains(Roles.Lead) == false)
-                await userManager.AddToRoleAsync(Users.Alayah, Roles.Lead);
-            if ((await userManager.GetRolesAsync(Users.Alayah)).Contains(Roles.Member) == false)
-                await userManager.AddToRoleAsync(Users.Alayah, Roles.Member);
+            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(Users.Mylo, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(Users.Bert)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(Users.Bert, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(Users.Alayah)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(Users.Alayah, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(Users.Zahir)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(Users.Zahir, IdentityRoles.User);
 
-            if ((await userManager.GetRolesAsync(Users.Zahir)).Contains(Roles.Member) == false)
-                await userManager.AddToRoleAsync(Users.Zahir, Roles.Member);
+            // Assign project roles to new users
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Mylo.Id && r.RoleId == managerRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Mylo.Id, RoleId = managerRole.Id });
+
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Mylo.Id && r.RoleId == ownerRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Mylo.Id, RoleId = ownerRole.Id });
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Alayah.Id && r.RoleId == ownerRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Alayah.Id, RoleId = ownerRole.Id });
+
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Mylo.Id && r.RoleId == memberRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Mylo.Id, RoleId = memberRole.Id });
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Bert.Id && r.RoleId == memberRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Bert.Id, RoleId = memberRole.Id });
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Alayah.Id && r.RoleId == memberRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Alayah.Id, RoleId = memberRole.Id });
+            if (dbContext.ProjectUserRoles.Any(r => r.UserId == Users.Zahir.Id && r.RoleId == memberRole.Id) == false)
+                dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Zahir.Id, RoleId = memberRole.Id });
 
             // Setup initial projects
             if (dbContext.Projects.Any(p => p.Name == ProjectConstants.SimpleProject.Name) == false)
@@ -80,13 +100,13 @@ namespace ProjectManagementApp.SampleData
                 dbContext.ProjectOwners.Add(new ProjectOwner() 
                 {
                     ProjectId = ProjectConstants.SimpleProject.Id,
-                    UserId = Users.Bert.Id,
+                    UserId = Users.Mylo.Id,
                 });
             if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.MultiPhaseProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner()
                 {
                     ProjectId = ProjectConstants.MultiPhaseProject.Id,
-                    UserId = Users.Bert.Id,
+                    UserId = Users.Mylo.Id,
                 });
             if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.MultiPersonProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner()
