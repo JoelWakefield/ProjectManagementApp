@@ -1,11 +1,14 @@
 ﻿@page "/projects/create"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 
 
 <PageTitle>Create Project</PageTitle>
@@ -26,6 +29,14 @@
     </MudContainer>
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+    <MudContainer Class="pa-4">
+        <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach(var user in UserManager.Users)
+            {
+                <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+            }
+        </MudSelect>
+    </MudContainer>
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
@@ -33,6 +44,7 @@
 
 @code {
     public Project? Project { get; set; }
+    public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override void OnInitialized()
@@ -50,11 +62,16 @@
 
     public async Task Create()
     {
-        if (Project == null || String.IsNullOrEmpty(Project.Name))
-            return;
+        if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
+            Errors = "Required fields are missing.";
 
         try
         {
+            await DbContext.ProjectOwners.AddAsync(new ProjectOwner()
+            {
+                ProjectId = Project.Id,
+                UserId = CurrentOwnerSelection.Id,
+            });
             await DbContext.Projects.AddAsync(Project);
             await DbContext.SaveChangesAsync();
             NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
