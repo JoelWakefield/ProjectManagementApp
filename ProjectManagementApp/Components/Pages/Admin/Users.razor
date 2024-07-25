@@ -2,8 +2,10 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
 @inject UserManager<ApplicationUser> UserManager
+@inject ProjectRoleService ProjectRoleService
 @inject NavigationManager NavigationManager
 
 
@@ -13,15 +15,15 @@
 
 <MudTable Items="@UsersWithRoles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
-        <MudTh>UserName</MudTh>
+        <MudTh>Name</MudTh>
         <MudTh>Roles</MudTh>
         <MudTh>Update</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="UserName">@context.User?.UserName</MudTd>
+        <MudTd DataLabel="Name">@context.UserName</MudTd>
         <MudTd DataLabel="Roles">@context.Roles</MudTd>
         <MudTd DataLabel="Update">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => UpdateUser(context.User?.Id!))">Update</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => UpdateUser(context.Id!))">Update</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -32,27 +34,31 @@
 
     public class UserWithRoles
     {
-        public ApplicationUser? User { get; set; }
+        public string? Id { get; set; }
+        public string? UserName { get; set; }
         public string? Roles { get; set; }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var users = new List<UserWithRoles>();
-
-        foreach (var user in UserManager.Users)
-        {
-            users.Add(new UserWithRoles{
-                User = user
-            });
-        }
+        var usersWithRoles = new List<UserWithRoles>();
+        var users = UserManager.Users.Select(u => new {
+            Id = u.Id,
+            Name = u.UserName,
+        }).ToList();
 
         foreach (var user in users)
         {
-            user.Roles = String.Join(", ", await UserManager.GetRolesAsync(user.User!));
+            IEnumerable<string>? roles = ProjectRoleService.GetUserRoleNames(user.Id);
+            usersWithRoles.Add(new UserWithRoles
+            {
+                Id = user.Id,
+                UserName = user.Name,
+                Roles = roles?.Any() == true ? String.Join(", ", roles) : ""
+            });
         }
 
-        UsersWithRoles = users.AsEnumerable();
+        UsersWithRoles = usersWithRoles.AsEnumerable();
     }
 
     public void UpdateUser(string id) => NavigationManager.NavigateTo($"/admin/users/{id}", true);

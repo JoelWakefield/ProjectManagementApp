@@ -2,9 +2,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext;
 @inject UserManager<ApplicationUser> UserManager
+@inject ProjectRoleService ProjectRoleService
 @inject NavigationManager NavigationManager
 
 
@@ -41,7 +43,6 @@
     public class UserWithRoles
     {
         public string? UserName { get; set; }
-        public IEnumerable<ProjectRole>? Roles { get; set; }
     }
 
     protected override void OnInitialized()
@@ -55,28 +56,15 @@
         else
         {
             User = new UserWithRoles { UserName = ApplicationUser?.UserName };
-
-            var userRoleIds = DbContext.ProjectUserRoles.Where(r => r.UserId == UserId).Select(r => r.RoleId);
-            IEnumerable<ProjectRole> projectRoles;
-
-            if (userRoleIds.Count() == 0)
-            {
-                User.Roles = new List<ProjectRole>();
-                UserRoleNames = new List<string>();
-            }
-            else
-            {
-                projectRoles = DbContext.ProjectRoles.Where(r => userRoleIds.Contains(r.Id));
-                User.Roles = projectRoles;
-                UserRoleNames = projectRoles.Select(r => r.Name);
-            }
+            UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
 
             AllRoles = DbContext.ProjectRoles.ToDictionary(
                 role => role.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{role.Id}"),
                 role => false);
 
-            foreach (var key in AllRoles.Keys)
-                AllRoles[key] = UserRoleNames.Contains(key);
+            if (UserRoleNames.Any())
+                foreach (var key in AllRoles.Keys)
+                    AllRoles[key] = UserRoleNames.Contains(key);
         }
     }
 
@@ -88,19 +76,10 @@
             NavigationManager.Refresh(true);
 
         if (UserRoleNames!.Contains(role))
-        {
-            ProjectUserRole? projectUserRole = DbContext.ProjectUserRoles.FirstOrDefault(r => r.RoleId == projectRole!.Id && r.UserId == UserId!);
-
-            if (projectUserRole != null)
-                DbContext.ProjectUserRoles.Remove(projectUserRole);
-        }
+            ProjectRoleService.RemoveRoleFromUser(UserId!, role);
         else
-        {
-            DbContext.ProjectUserRoles.Add(new ProjectUserRole { UserId = UserId!, RoleId = projectRole!.Id });
-        }
-        DbContext.SaveChanges();
+            ProjectRoleService.AddRoleToUser(UserId!, role);
 
-        var userRoleIds = DbContext.ProjectUserRoles.Where(r => r.UserId == UserId).Select(r => r.RoleId);
-        User!.Roles = DbContext.ProjectRoles.Where(r => userRoleIds.Contains(r.Id));
+        UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
     }
 }
