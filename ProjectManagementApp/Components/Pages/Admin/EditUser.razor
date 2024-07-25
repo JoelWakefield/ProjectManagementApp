@@ -3,8 +3,8 @@
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
 @attribute [Authorize]
+@inject ApplicationDbContext DbContext;
 @inject UserManager<ApplicationUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager
 @inject NavigationManager NavigationManager
 
 
@@ -36,14 +36,15 @@
     public ApplicationUser? ApplicationUser { get; set; }
     public UserWithRoles? User { get; set; }
     public Dictionary<string, bool>? AllRoles { get; set; }
+    private IEnumerable<string>? UserRoleNames { get; set; }
 
     public class UserWithRoles
     {
         public string? UserName { get; set; }
-        public IEnumerable<string>? Roles { get; set; }
+        public IEnumerable<ProjectRole>? Roles { get; set; }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         ApplicationUser = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
 
@@ -53,33 +54,53 @@
         } 
         else
         {
-            User = new UserWithRoles
-            {
-                UserName = ApplicationUser?.UserName,
-                Roles = await UserManager.GetRolesAsync(ApplicationUser!)
-            };
+            User = new UserWithRoles { UserName = ApplicationUser?.UserName };
 
-            AllRoles = RoleManager.Roles.ToDictionary(
-                identityRole => identityRole.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{identityRole.Id}"), 
-                identityRole => User.Roles.Contains(identityRole.Name)
-            );
+            var userRoleIds = DbContext.ProjectUserRoles.Where(r => r.UserId == UserId).Select(r => r.RoleId);
+            IEnumerable<ProjectRole> projectRoles;
+
+            if (userRoleIds.Count() == 0)
+            {
+                User.Roles = new List<ProjectRole>();
+                UserRoleNames = new List<string>();
+            }
+            else
+            {
+                projectRoles = DbContext.ProjectRoles.Where(r => userRoleIds.Contains(r.Id));
+                User.Roles = projectRoles;
+                UserRoleNames = projectRoles.Select(r => r.Name);
+            }
+
+            AllRoles = DbContext.ProjectRoles.ToDictionary(
+                role => role.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{role.Id}"),
+                role => false);
+
+            foreach (var key in AllRoles.Keys)
+                AllRoles[key] = UserRoleNames.Contains(key);
         }
     }
 
-    public async Task ToggleRole(string role)
+    public void ToggleRole(string role)
     {
-        if (User != null)
+        ProjectRole? projectRole = DbContext.ProjectRoles.FirstOrDefault(r => r.Name == role);
+
+        if (projectRole == null)
+            NavigationManager.Refresh(true);
+
+        if (UserRoleNames!.Contains(role))
         {
-            if (User.Roles!.Contains(role))
-                await UserManager.RemoveFromRoleAsync(ApplicationUser!, role);
-            else
-                await UserManager.AddToRoleAsync(ApplicationUser!, role);
-            
-            User.Roles = await UserManager.GetRolesAsync(ApplicationUser!);
+            ProjectUserRole? projectUserRole = DbContext.ProjectUserRoles.FirstOrDefault(r => r.RoleId == projectRole!.Id && r.UserId == UserId!);
+
+            if (projectUserRole != null)
+                DbContext.ProjectUserRoles.Remove(projectUserRole);
         }
         else
         {
-            throw new Exception("User should be redirected if no 'User' data is present.");
+            DbContext.ProjectUserRoles.Add(new ProjectUserRole { UserId = UserId!, RoleId = projectRole!.Id });
         }
+        DbContext.SaveChanges();
+
+        var userRoleIds = DbContext.ProjectUserRoles.Where(r => r.UserId == UserId).Select(r => r.RoleId);
+        User!.Roles = DbContext.ProjectRoles.Where(r => userRoleIds.Contains(r.Id));
     }
 }

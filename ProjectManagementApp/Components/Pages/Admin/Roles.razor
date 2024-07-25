@@ -1,8 +1,8 @@
 ﻿@page "/admin/roles"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
 @attribute [Authorize]
-@inject RoleManager<IdentityRole> RoleManager
+@inject ApplicationDbContext DbContext;
 @inject NavigationManager NavigationManager
 
 
@@ -12,7 +12,7 @@
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Role</MudButton>
 
-<MudTable Items="@RoleManager.Roles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+<MudTable Items="@DbContext.ProjectRoles" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
     </HeaderContent>
