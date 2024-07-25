@@ -1,17 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
 using ProjectManagementApp.Models;
 
 namespace ProjectManagementApp.Services
 {
-    public class ProjectRoleService
+    public class ProjectRoleService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
     {
-        private ApplicationDbContext dbContext { get; set; }
-
-        public ProjectRoleService(ApplicationDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
+        private ApplicationDbContext dbContext { get; set; } = dbContext;
+        private UserManager<ApplicationUser> userManager { get; set; } = userManager;
 
         public IEnumerable<ProjectRole>? GetUserRoles(string userId)
         {
@@ -58,6 +55,20 @@ namespace ProjectManagementApp.Services
             });
 
             dbContext.SaveChanges();
+        }
+
+        public IEnumerable<ApplicationUser>? GetUsersWithRole(string roleName)
+        {
+            ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == roleName);
+            if (projectRole == null)
+                return new List<ApplicationUser>().AsEnumerable();
+            
+            IEnumerable<string> userIds = dbContext.ProjectUserRoles
+                .Where(r => r.RoleId == projectRole.Id)
+                .Select(r => r.UserId)
+                .AsEnumerable();
+
+            return userManager.Users.Where(u => userIds.Contains(u.Id));
         }
     }
 }

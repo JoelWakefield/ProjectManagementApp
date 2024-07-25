@@ -16,7 +16,7 @@
 
 <MudPaper Class="my-6 pa-8">
     <LabeledText Label="Description" Text="@Project!.Description" />
-    <LabeledText Label="Owner" Text="@User.UserName" />
+    <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
     <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
     <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
 </MudPaper>
@@ -33,16 +33,14 @@
 
     protected override void OnInitialized()
     {
-        ProjectOwner owner = DbContext.ProjectOwners
+        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
+        
+        ProjectOwner? owner = DbContext.ProjectOwners
             .OrderByDescending(o => o.CreatedOn)
             .FirstOrDefault(o => o.ProjectId == Id);
 
         if (owner != null)
-        {
             User = UserManager.Users.FirstOrDefault(u => u.Id == owner.UserId);
-        }
-
-        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");

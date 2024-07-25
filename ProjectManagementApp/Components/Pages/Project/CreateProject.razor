@@ -1,14 +1,14 @@
 ﻿@page "/projects/create"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
-@inject UserManager<ApplicationUser> UserManager
+@inject ProjectRoleService ProjectRoleService
 
 
 <PageTitle>Create Project</PageTitle>
@@ -30,12 +30,23 @@
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
     <MudContainer Class="pa-4">
-        <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-            @foreach(var user in UserManager.Users)
-            {
-                <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
-            }
-        </MudSelect>
+        @if (Owners == null || Owners.Any() == false)
+        {
+            <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
+        }
+        else
+        {
+            <MudSelect T="ProjectOwnerSelection" Label
+            ="Owner" @bind-Value="CurrentOwnerSelection" Required
+            ="true" Variant
+            ="Variant.Filled" AnchorOrigin
+            ="Origin.BottomCenter">
+                @foreach (var user in Owners!)
+                {
+                    <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+                }
+            </MudSelect>
+        }
     </MudContainer>
 </MudPaper>
 
@@ -44,6 +55,7 @@
 
 @code {
     public Project? Project { get; set; }
+    public IEnumerable<ApplicationUser>? Owners { get; set; }
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
@@ -55,6 +67,8 @@
             CreatedBy = "project_setup",
             CreatedOn = DateTime.UtcNow,
         };
+
+        Owners = ProjectRoleService.GetUsersWithRole("owner");
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
@@ -63,22 +77,26 @@
     public void Create()
     {
         if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
+        {
             Errors = "Required fields are missing.";
-
-        try
-        {
-            DbContext.ProjectOwners.Add(new ProjectOwner()
-            {
-                ProjectId = Project.Id,
-                UserId = CurrentOwnerSelection.Id,
-            });
-            DbContext.Projects.Add(Project);
-            DbContext.SaveChanges();
-            NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
         }
-        catch (Exception ex)
+        else
         {
-            Errors = ex.Message;
+            try
+            {
+                DbContext.ProjectOwners.Add(new ProjectOwner()
+                {
+                    ProjectId = Project.Id!,
+                    UserId = CurrentOwnerSelection.Id,
+                });
+                DbContext.Projects.Add(Project);
+                DbContext.SaveChanges();
+                NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
+            }
+            catch (Exception ex)
+            {
+                Errors = ex.Message;
+            }
         }
     }
 }
