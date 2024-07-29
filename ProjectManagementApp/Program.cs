@@ -5,10 +5,10 @@ using ProjectManagementApp.Components;
 using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
+using ProjectManagementApp.SampleData;
 using ProjectManagementApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -18,6 +18,10 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddScoped<ProjectOwnerService>();
+builder.Services.AddScoped<ProjectRoleService>();
+builder.Services.AddScoped<ProjectService>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -37,6 +41,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddMudServices();
+
 
 var app = builder.Build();
 

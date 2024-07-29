@@ -1,31 +1,21 @@
 ﻿@page "/admin/roles/create"
-@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
 @using System.ComponentModel.DataAnnotations
-@inject RoleManager<IdentityRole> RoleManager
+@using ProjectManagementApp.Services
+@attribute [Authorize]
 @inject NavigationManager NavigationManager
+@inject ProjectRoleService ProjectRoleService
 
 
 <PageTitle>Create Role</PageTitle>
 
 <MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
 
-@if (Errors != null)
-{
-    <MudPaper Class="pa-8">
-        <MudList T="string">
-            @foreach(IdentityError error in Errors)
-            {
-                <MudListItem Text="@error.Code" SecondaryText="@error.Description" Icon="@Icons.Material.Filled.Warning" />
-            }
-        </MudList>
-    </MudPaper>
-}
-
 <EditForm Model="Model" OnValidSubmit="Create">
     <DataAnnotationsValidator />
     <MudCard>
         <MudCardContent>
-            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" />
+            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" Required="true" RequiredError="A role must have a name." />
         </MudCardContent>
         <MudCardActions>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
@@ -36,7 +26,6 @@
 
 @code {
     RegisterRoleForm Model = new RegisterRoleForm();
-    private IEnumerable<IdentityError>? Errors { get; set; }
 
     public class RegisterRoleForm
     {
@@ -47,7 +36,7 @@
 
     protected override void OnInitialized() => Model ??= new();
 
-    private async void Create(EditContext context)
+    private void Create(EditContext context)
     {
         if (context?.Model == null)
             return;
@@ -56,16 +45,9 @@
 
         if (name != null)
         {
-            IdentityResult result = await RoleManager.CreateAsync(new IdentityRole(name));
-
-            if (result.Succeeded)
-            {   
-                NavigationManager.NavigateTo($"/admin/roles", true);
-                StateHasChanged();
-            } else
-            {
-                Errors = result.Errors;
-            }
+            ProjectRoleService.CreateRole(name);
+            NavigationManager.NavigateTo($"/admin/roles", true);
+            StateHasChanged();
         }
     }
 }

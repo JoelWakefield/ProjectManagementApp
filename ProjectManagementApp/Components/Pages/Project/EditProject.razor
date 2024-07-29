@@ -1,11 +1,14 @@
 ﻿@page "/projects/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectRoleService ProjectRoleService
+@inject ProjectService ProjectService
 
 
 <PageTitle>@Project?.Name - Edit</PageTitle>
@@ -27,6 +30,21 @@
     </MudContainer>
     <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+    <MudContainer Class="pa-4">
+        @if (NoOwners)
+        {   
+            <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
+        }
+        else
+        {
+            <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+                @foreach (var user in Owners!)
+                {
+                    <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+                }
+            </MudSelect>
+        }
+    </MudContainer>
     <MudDivider />
     <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Auto-Filled Values</MudText>
     <LabeledText Label="Actual Start Date" Text="@Project?.ActualStart.ToString()" />
@@ -42,30 +60,59 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
+    public IEnumerable<ApplicationUser>? Owners { get; set; }
+    public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
+    public ProjectOwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
+    private bool NoOwners = true;
 
     protected override void OnInitialized()
     {
-        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
-
-        if (Project == null)
+        if (String.IsNullOrEmpty(Id))
+        {
             NavigationManager.NavigateTo($"/projects", true);
+        }
+        else
+        {
+            Project = ProjectService.GetProject(Id);
+            if (Project == null)
+            {
+                NavigationManager.NavigateTo($"/projects", true);
+            }
+
+            ApplicationUser? user = ProjectOwnerService.GetOwner(Project?.Id);
+            if (user != null)
+            {
+                OldOwnerSelection = new ProjectOwnerSelection(user!.Id, user.UserName);
+                CurrentOwnerSelection = OldOwnerSelection;
+            }
+
+            Owners = ProjectRoleService.GetUsersWithRole("owner");
+            NoOwners = (Owners == null || Owners.Any() == false);
+        }
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public async Task Save() {
-        try
+    public void Save() {
+        if (String.IsNullOrEmpty(Project!.Name) || CurrentOwnerSelection == null)
         {
-            var project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
-            project = Project;
-            await DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo($"/projects/details/{Id}", true);
+            Errors = "Required fields are missing.";
         }
-        catch (Exception ex)
+        else
         {
-            Errors = ex.Message;
+            try
+            {
+                if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
+                    ProjectOwnerService.AssignOwner(Project.Id!, CurrentOwnerSelection.Id);
+                ProjectService.UpdateProject(Project);
+                NavigationManager.NavigateTo($"/projects/details/{Id}", true);
+            }
+            catch (Exception ex)
+            {
+                Errors = ex.Message;
+            }
         }
     }
 }

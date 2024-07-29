@@ -3,9 +3,13 @@
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject ProjectRoleService ProjectRoleService
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectService ProjectService
 
 
 <PageTitle>Create Project</PageTitle>
@@ -26,6 +30,25 @@
     </MudContainer>
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+    <MudContainer Class="pa-4">
+        @if (NoOwners)
+        {
+            <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
+        }
+        else
+        {
+            <MudSelect T="ProjectOwnerSelection" Label
+            ="Owner" @bind-Value="CurrentOwnerSelection" Required
+            ="true" Variant
+            ="Variant.Filled" AnchorOrigin
+            ="Origin.BottomCenter">
+                @foreach (var user in Owners!)
+                {
+                    <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+                }
+            </MudSelect>
+        }
+    </MudContainer>
 </MudPaper>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
@@ -33,7 +56,10 @@
 
 @code {
     public Project? Project { get; set; }
+    public IEnumerable<ApplicationUser>? Owners { get; set; }
+    public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
+    private bool NoOwners = true;
 
     protected override void OnInitialized()
     {
@@ -43,25 +69,32 @@
             CreatedBy = "project_setup",
             CreatedOn = DateTime.UtcNow,
         };
+
+        Owners = ProjectRoleService.GetUsersWithRole("owner");
+        NoOwners = (Owners == null || Owners.Any() == false);
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public async Task Create()
+    public void Create()
     {
-        if (Project == null || String.IsNullOrEmpty(Project.Name))
-            return;
-
-        try
+        if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
         {
-            await DbContext.Projects.AddAsync(Project);
-            await DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
+            Errors = "Required fields are missing.";
         }
-        catch (Exception ex)
+        else
         {
-            Errors = ex.Message;
+            try
+            {
+                ProjectService.Create(Project);
+                ProjectOwnerService.AssignOwner(Project.Id!, CurrentOwnerSelection.Id);
+                NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
+            }
+            catch (Exception ex)
+            {
+                Errors = ex.Message;
+            }
         }
     }
 }

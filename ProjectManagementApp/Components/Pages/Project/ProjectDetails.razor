@@ -1,11 +1,12 @@
 ﻿@page "/projects/details/{Id}"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectService ProjectService
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -14,6 +15,7 @@
 
 <MudPaper Class="my-6 pa-8">
     <LabeledText Label="Description" Text="@Project!.Description" />
+    <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
     <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
     <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
 </MudPaper>
@@ -26,10 +28,19 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
+    public ApplicationUser? User { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        Project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
+        if (String.IsNullOrEmpty(Id))
+        {
+            NavigationManager.NavigateTo("/projects", true);
+        }
+        else
+        {
+            Project = ProjectService.GetProject(Id);
+            User = ProjectOwnerService.GetOwner(Id);
+        }
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");
