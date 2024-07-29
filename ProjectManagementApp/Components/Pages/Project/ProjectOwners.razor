@@ -1,0 +1,109 @@
+﻿@page "/projects/owners"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectRoleService ProjectRoleService
+@inject ProjectService ProjectService
+
+
+<PageTitle>Project Owners</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Project Owners</MudText>
+
+@if (Errors != null)
+{
+	<MudPaper Class="my-6 pa-8">
+		<MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+	</MudPaper>
+}
+
+<MudDropContainer T="KanbanProjectItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="ProjectUpdated" Class="d-flex flex-row">
+	<ChildContent>
+		@foreach (var item in _sections)
+		{
+			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+				<MudToolBar Gutters="false">
+					<MudText Typo="Typo.subtitle1" Color="item.Type == KanbanProjectType.Unowned ? Color.Warning : Color.Primary"><b>@item.Name</b></MudText>
+				</MudToolBar>
+				<MudDropZone T="KanbanProjectItem" Identifier="@item.Name" CanDrop="@((_) => item.Type == KanbanProjectType.Owned)" Class="mud-height-full" />
+			</MudPaper>
+		}
+	</ChildContent>
+	<ItemRenderer>
+		<MudPaper Elevation="25" Class="pa-4 rounded-lg my-3">@context.Name</MudPaper>
+	</ItemRenderer>
+</MudDropContainer>
+
+
+@code {
+	const string UNOWNED_SECTION_NAME = "UNOWNED";
+
+	private IEnumerable<Project>? ProjectList { get; set; }
+	private IEnumerable<ApplicationUser>? Owners { get; set; }
+
+	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
+	{
+		new KanBanSection(UNOWNED_SECTION_NAME)
+	};
+	private MudDropContainer<KanbanProjectItem> _dropContainer { get; set; } = default!;
+	private List<KanbanProjectItem> _items { get; set; } = new List<KanbanProjectItem>();
+	private string? Errors { get; set; } = null;
+
+	protected override void OnInitialized()
+	{
+		ProjectList = ProjectService.GetProjects();
+
+		if (ProjectList.Any() == false)
+		{
+			Errors = "There are no projects - please check your data.";
+		}
+		else
+		{
+			//	Add the owner sections
+			Owners = ProjectRoleService.GetUsersWithRole("owner");
+
+			if (Owners != null && Owners.Any() != false)
+				foreach (var owner in Owners)
+					_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanProjectType.Owned));
+
+			//	Assign each project to the owner's section
+			foreach (var project in ProjectList.ToList())
+			{
+				ApplicationUser? owner = ProjectOwnerService.GetOwner(project.Id);
+
+				if (owner == null)
+					_items.Add(new KanbanProjectItem(project.Name, project.Id!, UNOWNED_SECTION_NAME, String.Empty));
+				else
+					_items.Add(new KanbanProjectItem(project.Name, project.Id!, owner.UserName!, owner.Id));
+			}
+		}
+	}
+
+	private void ProjectUpdated(MudItemDropInfo<KanbanProjectItem> info)
+	{
+		if (info.Item == null)
+		{
+			Errors = "Item has no info.";
+		}
+		else
+		{
+			//	Update the board
+			string ownerName = info.DropzoneIdentifier;
+			info.Item.Owner = ownerName;
+
+			//	Update the project owner
+			string? ownerId = Owners!.FirstOrDefault(o => o?.UserName == info.Item.Owner)?.Id;
+
+			if (ownerId == null)
+				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
+			else
+				ProjectOwnerService.AssignOwner(info.Item.ProjectId, ownerId);
+		}
+	}
+}
