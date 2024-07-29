@@ -1,10 +1,10 @@
 ﻿@page "/admin/roles/create"
 @using Microsoft.AspNetCore.Authorization
 @using System.ComponentModel.DataAnnotations
-@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject ProjectRoleService ProjectRoleService
 
 
 <PageTitle>Create Role</PageTitle>
@@ -36,7 +36,7 @@
 
     protected override void OnInitialized() => Model ??= new();
 
-    private void Create(EditContext context)
+    private async Task Create(EditContext context)
     {
         if (context?.Model == null)
             return;
@@ -45,7 +45,7 @@
 
         if (name != null)
         {
-            DbContext.ProjectRoles.Add(new ProjectRole() { Name = name });
+            await ProjectRoleService.CreateRoleAsync(name);
             NavigationManager.NavigateTo($"/admin/roles", true);
             StateHasChanged();
         }

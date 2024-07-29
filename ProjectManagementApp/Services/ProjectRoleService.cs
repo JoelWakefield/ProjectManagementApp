@@ -10,6 +10,10 @@ namespace ProjectManagementApp.Services
         private ApplicationDbContext dbContext { get; set; } = dbContext;
         private UserManager<ApplicationUser> userManager { get; set; } = userManager;
 
+        public IEnumerable<ProjectRole> GetAllRoles() => dbContext.ProjectRoles;
+
+        public ProjectRole? GetRole(string name) => dbContext.ProjectRoles.FirstOrDefault(r => r.Name == name);
+
         public IEnumerable<ProjectRole>? GetUserRoles(string userId)
         {
             var userRoles = dbContext.ProjectUserRoles.Where(r => r.UserId == userId).AsEnumerable();
@@ -69,6 +73,12 @@ namespace ProjectManagementApp.Services
                 .AsEnumerable();
 
             return userManager.Users.Where(u => userIds.Contains(u.Id));
+        }
+
+        public async Task CreateRoleAsync(string name)
+        {
+            dbContext.ProjectRoles.Add(new ProjectRole() { Name = name });
+            await dbContext.SaveChangesAsync();
         }
     }
 }

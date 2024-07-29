@@ -1,15 +1,14 @@
 ﻿@page "/projects/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ProjectOwnerService ProjectOwnerService
 @inject ProjectRoleService ProjectRoleService
+@inject ProjectService ProjectService
 
 
 <PageTitle>@Project?.Name - Edit</PageTitle>
@@ -32,7 +31,7 @@
     <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
     <MudContainer Class="pa-4">
-        @if (Owners == null || Owners.Any() == false)
+        @if (NoOwners)
         {   
             <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
         }
@@ -65,19 +64,32 @@
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public ProjectOwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
+    private bool NoOwners = true;
 
     protected override void OnInitialized()
     {
-        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
-        ApplicationUser? user = ProjectOwnerService.GetOwner(Project?.Id);
-
-        if (Project == null || user == null)
+        if (String.IsNullOrEmpty(Id))
+        {
             NavigationManager.NavigateTo($"/projects", true);
+        }
+        else
+        {
+            Project = ProjectService.GetProject(Id);
+            if (Project == null)
+            {
+                NavigationManager.NavigateTo($"/projects", true);
+            }
 
-        OldOwnerSelection = new ProjectOwnerSelection(user!.Id, user.UserName);
-        CurrentOwnerSelection = OldOwnerSelection;
+            ApplicationUser? user = ProjectOwnerService.GetOwner(Project?.Id);
+            if (user != null)
+            {
+                OldOwnerSelection = new ProjectOwnerSelection(user!.Id, user.UserName);
+                CurrentOwnerSelection = OldOwnerSelection;
+            }
 
-        Owners = ProjectRoleService.GetUsersWithRole("owner");
+            Owners = ProjectRoleService.GetUsersWithRole("owner");
+            NoOwners = (Owners == null || Owners.Any() == false);
+        }
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
@@ -92,17 +104,9 @@
         {
             try
             {
-                if (CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                {
-                    await DbContext.ProjectOwners.AddAsync(new ProjectOwner()
-                    {
-                        ProjectId = Project.Id!,
-                        UserId = CurrentOwnerSelection.Id,
-                    });
-                }
-                var project = await DbContext.Projects.FirstOrDefaultAsync(p => p.Id == Id);
-                project = Project;
-                await DbContext.SaveChangesAsync();
+                if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
+                    await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                await ProjectService.UpdateProject(Project);
                 NavigationManager.NavigateTo($"/projects/details/{Id}", true);
             }
             catch (Exception ex)

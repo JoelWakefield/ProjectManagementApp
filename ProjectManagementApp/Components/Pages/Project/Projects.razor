@@ -1,10 +1,10 @@
 ﻿@page "/projects"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject ProjectService ProjectService
 
 
 <PageTitle>Projects</PageTitle>
@@ -38,7 +38,7 @@
 
     protected override void OnInitialized()
     {
-        ProjectList = DbContext.Projects;
+        ProjectList = ProjectService.GetProjects();
     }
 
     public void CreateNew() => NavigationManager.NavigateTo("/projects/create", true);

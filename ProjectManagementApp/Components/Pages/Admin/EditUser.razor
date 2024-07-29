@@ -4,7 +4,6 @@
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext;
 @inject UserManager<ApplicationUser> UserManager
 @inject ProjectRoleService ProjectRoleService
 @inject NavigationManager NavigationManager
@@ -58,10 +57,9 @@
             User = new UserWithRoles { UserName = ApplicationUser?.UserName };
             UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
 
-            AllRoles = DbContext.ProjectRoles.ToDictionary(
+            AllRoles = ProjectRoleService.GetAllRoles().ToDictionary(
                 role => role.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{role.Id}"),
                 role => false);
-
             if (UserRoleNames.Any())
                 foreach (var key in AllRoles.Keys)
                     AllRoles[key] = UserRoleNames.Contains(key);
@@ -70,7 +68,7 @@
 
     public void ToggleRole(string role)
     {
-        ProjectRole? projectRole = DbContext.ProjectRoles.FirstOrDefault(r => r.Name == role);
+        ProjectRole? projectRole = ProjectRoleService.GetRole(role);
 
         if (projectRole == null)
             NavigationManager.Refresh(true);

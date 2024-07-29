@@ -6,9 +6,10 @@
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject ProjectRoleService ProjectRoleService
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectService ProjectService
 
 
 <PageTitle>Create Project</PageTitle>
@@ -30,7 +31,7 @@
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
     <MudContainer Class="pa-4">
-        @if (Owners == null || Owners.Any() == false)
+        @if (NoOwners)
         {
             <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
         }
@@ -58,6 +59,7 @@
     public IEnumerable<ApplicationUser>? Owners { get; set; }
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
+    private bool NoOwners = true;
 
     protected override void OnInitialized()
     {
@@ -69,12 +71,13 @@
         };
 
         Owners = ProjectRoleService.GetUsersWithRole("owner");
+        NoOwners = (Owners == null || Owners.Any() == false);
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public void Create()
+    public async Task Create()
     {
         if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
         {
@@ -84,13 +87,8 @@
         {
             try
             {
-                DbContext.ProjectOwners.Add(new ProjectOwner()
-                {
-                    ProjectId = Project.Id!,
-                    UserId = CurrentOwnerSelection.Id,
-                });
-                DbContext.Projects.Add(Project);
-                DbContext.SaveChanges();
+                await ProjectService.CreateAsync(Project);
+                await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
                 NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
             }
             catch (Exception ex)

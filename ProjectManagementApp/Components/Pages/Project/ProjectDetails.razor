@@ -1,13 +1,12 @@
 ﻿@page "/projects/details/{Id}"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
-@inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
-@inject UserManager<ApplicationUser> UserManager
+@inject ProjectOwnerService ProjectOwnerService
+@inject ProjectService ProjectService
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -33,14 +32,15 @@
 
     protected override void OnInitialized()
     {
-        Project = DbContext.Projects.FirstOrDefault(p => p.Id == Id);
-        
-        ProjectOwner? owner = DbContext.ProjectOwners
-            .OrderByDescending(o => o.CreatedOn)
-            .FirstOrDefault(o => o.ProjectId == Id);
-
-        if (owner != null)
-            User = UserManager.Users.FirstOrDefault(u => u.Id == owner.UserId);
+        if (String.IsNullOrEmpty(Id))
+        {
+            NavigationManager.NavigateTo("/projects", true);
+        }
+        else
+        {
+            Project = ProjectService.GetProject(Id);
+            User = ProjectOwnerService.GetOwner(Id);
+        }
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");
