@@ -36,7 +36,7 @@
 
     protected override void OnInitialized() => Model ??= new();
 
-    private async Task Create(EditContext context)
+    private void Create(EditContext context)
     {
         if (context?.Model == null)
             return;
@@ -45,7 +45,7 @@
 
         if (name != null)
         {
-            await ProjectRoleService.CreateRoleAsync(name);
+            ProjectRoleService.CreateRole(name);
             NavigationManager.NavigateTo($"/admin/roles", true);
             StateHasChanged();
         }

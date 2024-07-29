@@ -74,10 +74,10 @@ namespace ProjectManagementApp.Services
             return userManager.Users.Where(u => userIds.Contains(u.Id));
         }
 
-        public async Task CreateRoleAsync(string name)
+        public void CreateRole(string name)
         {
             dbContext.ProjectRoles.Add(new ProjectRole() { Name = name });
-            await dbContext.SaveChangesAsync();
+            dbContext.SaveChanges();
         }
     }
 }

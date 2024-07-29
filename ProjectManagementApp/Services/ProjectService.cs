@@ -11,21 +11,19 @@ namespace ProjectManagementApp.Services
         
         public Project? GetProject(string id) => dbContext.Projects.FirstOrDefault(p => p.Id == id);
         
-        public async Task<Project?> GetProjectAsync(string id) => await dbContext.Projects.FirstOrDefaultAsync(p => p.Id == id);
-
-        public async Task CreateAsync(Project project)
+        public void Create(Project project)
         {
             dbContext.Projects.Add(project);
-            await dbContext.SaveChangesAsync();
+            dbContext.SaveChanges();
         }
 
-        public async Task UpdateProject(Project project)
+        public void UpdateProject(Project project)
         {
-            Project? existingProject = await GetProjectAsync(project.Id!);
+            Project? existingProject = GetProject(project.Id!);
             if (existingProject != null)
             {
                 existingProject = project;
-                await dbContext.SaveChangesAsync();
+                dbContext.SaveChanges();
             }
         }
     }

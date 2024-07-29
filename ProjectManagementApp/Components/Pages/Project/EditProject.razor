@@ -95,7 +95,7 @@
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public async Task Save() {
+    public void Save() {
         if (String.IsNullOrEmpty(Project!.Name) || CurrentOwnerSelection == null)
         {
             Errors = "Required fields are missing.";
@@ -105,8 +105,8 @@
             try
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
-                await ProjectService.UpdateProject(Project);
+                    ProjectOwnerService.AssignOwner(Project.Id!, CurrentOwnerSelection.Id);
+                ProjectService.UpdateProject(Project);
                 NavigationManager.NavigateTo($"/projects/details/{Id}", true);
             }
             catch (Exception ex)

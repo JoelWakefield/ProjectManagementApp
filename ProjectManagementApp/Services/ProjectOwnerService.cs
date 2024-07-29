@@ -20,14 +20,14 @@ namespace ProjectManagementApp.Services
             return userManager.Users.FirstOrDefault(u => u.Id == owner!.UserId)!;
         }
 
-        public async Task AssignOwnerAsync(string projectId, string userId)
+        public void AssignOwner(string projectId, string userId)
         {
             dbContext.ProjectOwners.Add(new ProjectOwner()
             {
                 ProjectId = projectId,
                 UserId = userId,
             });
-            await dbContext.SaveChangesAsync();
+            dbContext.SaveChanges();
         }
     }
 }
