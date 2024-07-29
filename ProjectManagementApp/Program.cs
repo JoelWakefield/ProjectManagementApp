@@ -5,7 +5,6 @@ using ProjectManagementApp.Components;
 using ProjectManagementApp.Components.Account;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
-using ProjectManagementApp.Models;
 using ProjectManagementApp.SampleData;
 using ProjectManagementApp.Services;
 
@@ -19,6 +18,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
 builder.Services.AddScoped<ProjectOwnerService>();
 builder.Services.AddScoped<ProjectRoleService>();
 builder.Services.AddScoped<ProjectService>();
@@ -31,8 +31,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("ProjectManagement") ?? throw new InvalidOperationException("Connection string 'ProjectManagement' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
