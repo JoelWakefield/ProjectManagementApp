@@ -45,7 +45,7 @@
 	const string UNOWNED_SECTION_NAME = "UNOWNED";
 
 	private IEnumerable<Project>? ProjectList { get; set; }
-	private IEnumerable<ApplicationUser>? Owners { get; set; }
+	private IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
 	{
@@ -68,9 +68,8 @@
 			//	Add the owner sections
 			Owners = ProjectRoleService.GetUsersWithRole("owner");
 
-			if (Owners != null && Owners.Any() != false)
-				foreach (var owner in Owners)
-					_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanProjectType.Owned));
+			foreach (var owner in Owners)
+				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanProjectType.Owned));
 
 			//	Assign each project to the owner's section
 			foreach (var project in ProjectList.ToList())
@@ -98,7 +97,7 @@
 			info.Item.Owner = ownerName;
 
 			//	Update the project owner
-			string? ownerId = Owners!.FirstOrDefault(o => o?.UserName == info.Item.Owner)?.Id;
+			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Owner)?.Id;
 
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";

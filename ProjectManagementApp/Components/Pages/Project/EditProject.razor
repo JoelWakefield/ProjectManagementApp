@@ -38,9 +38,9 @@
         else
         {
             <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                @foreach (var user in Owners!)
+                @foreach (var user in Owners)
                 {
-                    <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
+                    <MudSelectItem Value="@(new ProjectOwnerSelection(user!.Id, user.UserName))" />
                 }
             </MudSelect>
         }
@@ -60,7 +60,7 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
-    public IEnumerable<ApplicationUser>? Owners { get; set; }
+    public IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public ProjectOwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
@@ -88,7 +88,7 @@
             }
 
             Owners = ProjectRoleService.GetUsersWithRole("owner");
-            NoOwners = (Owners == null || Owners.Any() == false);
+            NoOwners = Owners.Any() == false;
         }
     }
 

@@ -56,7 +56,7 @@
 
 @code {
     public Project? Project { get; set; }
-    public IEnumerable<ApplicationUser>? Owners { get; set; }
+    public IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
     private bool NoOwners = true;
@@ -71,7 +71,7 @@
         };
 
         Owners = ProjectRoleService.GetUsersWithRole("owner");
-        NoOwners = (Owners == null || Owners.Any() == false);
+        NoOwners = Owners.Any() == false;
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
