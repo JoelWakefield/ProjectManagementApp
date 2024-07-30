@@ -60,7 +60,7 @@ namespace ProjectManagementApp.Services
             dbContext.SaveChanges();
         }
 
-        public IEnumerable<ApplicationUser>? GetUsersWithRole(string roleName)
+        public IEnumerable<ApplicationUser?> GetUsersWithRole(string roleName)
         {
             ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == roleName);
             if (projectRole == null)
