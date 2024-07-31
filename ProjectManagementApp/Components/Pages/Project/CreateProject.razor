@@ -7,9 +7,9 @@
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject ProjectRoleService ProjectRoleService
-@inject ProjectOwnerService ProjectOwnerService
-@inject ProjectService ProjectService
+@inject IProjectRoleService ProjectRoleService
+@inject IProjectOwnerService ProjectOwnerService
+@inject IProjectService ProjectService
 
 
 <PageTitle>Create Project</PageTitle>
@@ -51,7 +51,7 @@
     </MudContainer>
 </MudPaper>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="Create">Create</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateAsync">Create</MudButton>
 
 
 @code {
@@ -61,7 +61,7 @@
     public string? Errors { get; set; } = null;
     private bool NoOwners = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Project = new Project()
         {
@@ -70,14 +70,14 @@
             CreatedOn = DateTime.UtcNow,
         };
 
-        Owners = ProjectRoleService.GetUsersWithRole("owner");
+        Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
         NoOwners = Owners.Any() == false;
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
 
-    public void Create()
+    public async Task CreateAsync()
     {
         if (Project == null || String.IsNullOrEmpty(Project.Name) || CurrentOwnerSelection == null)
         {
@@ -87,8 +87,8 @@
         {
             try
             {
-                ProjectService.Create(Project);
-                ProjectOwnerService.AssignOwner(Project.Id!, CurrentOwnerSelection.Id);
+                await ProjectService.CreateAsync(Project);
+                await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
                 NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
             }
             catch (Exception ex)

@@ -4,14 +4,14 @@
 @using ProjectManagementApp.Services
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject ProjectRoleService ProjectRoleService
+@inject IProjectRoleService ProjectRoleService
 
 
 <PageTitle>Create Role</PageTitle>
 
 <MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
 
-<EditForm Model="Model" OnValidSubmit="Create">
+<EditForm Model="Model" OnValidSubmit="CreateAsync">
     <DataAnnotationsValidator />
     <MudCard>
         <MudCardContent>
@@ -36,7 +36,7 @@
 
     protected override void OnInitialized() => Model ??= new();
 
-    private void Create(EditContext context)
+    private async Task CreateAsync(EditContext context)
     {
         if (context?.Model == null)
             return;
@@ -45,7 +45,7 @@
 
         if (name != null)
         {
-            ProjectRoleService.CreateRole(name);
+            await ProjectRoleService.CreateRoleAsync(name);
             NavigationManager.NavigateTo($"/admin/roles", true);
             StateHasChanged();
         }

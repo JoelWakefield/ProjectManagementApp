@@ -3,27 +3,35 @@ using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
 {
-    public class ProjectService(ApplicationDbContext dbContext)
+    public interface IProjectService
+    {
+        IEnumerable<Project> GetProjects();
+        Task<Project?> GetProjectAsync(string id);
+        Task CreateAsync(Project project);
+        Task UpdateProjectAsync(Project project);
+    }
+
+    public class ProjectService(ApplicationDbContext dbContext) : IProjectService
     {
         private ApplicationDbContext dbContext = dbContext;
 
         public IEnumerable<Project> GetProjects() => dbContext.Projects;
         
-        public Project? GetProject(string id) => dbContext.Projects.FirstOrDefault(p => p.Id == id);
+        public async Task<Project?> GetProjectAsync(string id) => await dbContext.Projects.FirstOrDefaultAsync(p => p.Id == id);
         
-        public void Create(Project project)
+        public async Task CreateAsync(Project project)
         {
-            dbContext.Projects.Add(project);
-            dbContext.SaveChanges();
+            await dbContext.Projects.AddAsync(project);
+            await dbContext.SaveChangesAsync();
         }
 
-        public void UpdateProject(Project project)
+        public async Task UpdateProjectAsync(Project project)
         {
-            Project? existingProject = GetProject(project.Id!);
+            Project? existingProject = await GetProjectAsync(project.Id!);
             if (existingProject != null)
             {
                 existingProject = project;
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
     }
