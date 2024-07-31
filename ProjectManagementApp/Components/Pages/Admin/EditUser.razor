@@ -5,8 +5,8 @@
 @using ProjectManagementApp.Services
 @attribute [Authorize]
 @inject UserManager<ApplicationUser> UserManager
-@inject ProjectRoleService ProjectRoleService
 @inject NavigationManager NavigationManager
+@inject IProjectRoleService ProjectRoleService
 
 
 <PageTitle>Edit User</PageTitle>
@@ -23,7 +23,7 @@
         {
             @foreach (string key in AllRoles?.Keys!)
             {
-                <MudCheckBox @onclick="@(() => ToggleRole(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
+                <MudCheckBox @onclick="@(() => ToggleRoleAsync(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
             }
         }
     </MudList>
@@ -66,17 +66,17 @@
         }
     }
 
-    public void ToggleRole(string role)
+    public async Task ToggleRoleAsync(string role)
     {
-        ProjectRole? projectRole = ProjectRoleService.GetRole(role);
+        ProjectRole? projectRole = await ProjectRoleService.GetRoleAsync(role);
 
         if (projectRole == null)
             NavigationManager.Refresh(true);
 
         if (UserRoleNames!.Contains(role))
-            ProjectRoleService.RemoveRoleFromUser(UserId!, role);
+            await ProjectRoleService.RemoveRoleFromUserAsync(UserId!, role);
         else
-            ProjectRoleService.AddRoleToUser(UserId!, role);
+            await ProjectRoleService.AddRoleToUserAsync(UserId!, role);
 
         UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
     }

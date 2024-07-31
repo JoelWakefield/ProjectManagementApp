@@ -4,14 +4,26 @@ using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
 {
-    public class ProjectRoleService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+    public interface IProjectRoleService
+    {
+        IEnumerable<ProjectRole> GetAllRoles();
+        Task<ProjectRole?> GetRoleAsync(string name);
+        IEnumerable<ProjectRole>? GetUserRoles(string userId);
+        IEnumerable<string> GetUserRoleNames(string userId);
+        Task RemoveRoleFromUserAsync(string userId, string roleName);
+        Task AddRoleToUserAsync(string userId, string roleName);
+        Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName);
+        Task CreateRoleAsync(string name);
+	}
+
+	public class ProjectRoleService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IProjectRoleService
     {
         private ApplicationDbContext dbContext { get; set; } = dbContext;
         private UserManager<ApplicationUser> userManager { get; set; } = userManager;
 
         public IEnumerable<ProjectRole> GetAllRoles() => dbContext.ProjectRoles;
 
-        public ProjectRole? GetRole(string name) => dbContext.ProjectRoles.FirstOrDefault(r => r.Name == name);
+        public async Task<ProjectRole?> GetRoleAsync(string name) => await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == name);
 
         public IEnumerable<ProjectRole>? GetUserRoles(string userId)
         {
@@ -32,37 +44,37 @@ namespace ProjectManagementApp.Services
                 return roles!.Select(r => r.Name).ToList();
         }
 
-        public void RemoveRoleFromUser(string userId, string roleName)
+        public async Task RemoveRoleFromUserAsync(string userId, string roleName)
         {
-            ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == roleName);
+            ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
 
             if (projectRole == null) { return; }
 
-            ProjectUserRole? projectUserRole = dbContext.ProjectUserRoles.FirstOrDefault(r => r.RoleId == projectRole!.Id && r.UserId == userId);
+            ProjectUserRole? projectUserRole = await dbContext.ProjectUserRoles.FirstOrDefaultAsync(r => r.RoleId == projectRole!.Id && r.UserId == userId);
             
             if (projectUserRole != null)
             {
                 dbContext.ProjectUserRoles.Remove(projectUserRole);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
 
-        public void AddRoleToUser(string userId, string roleName)
+        public async Task AddRoleToUserAsync(string userId, string roleName)
         {
-            ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == roleName);
+            ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
             if (projectRole == null) { return; }
             
-            dbContext.ProjectUserRoles.Add(new ProjectUserRole { 
+            await dbContext.ProjectUserRoles.AddAsync(new ProjectUserRole { 
                 UserId = userId, 
                 RoleId = projectRole!.Id 
             });
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<ApplicationUser?> GetUsersWithRole(string roleName)
+        public async Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName)
         {
-            ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == roleName);
+            ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
             if (projectRole == null)
                 return new List<ApplicationUser>().AsEnumerable();
             
@@ -74,10 +86,10 @@ namespace ProjectManagementApp.Services
             return userManager.Users.Where(u => userIds.Contains(u.Id));
         }
 
-        public void CreateRole(string name)
+        public async Task CreateRoleAsync(string name)
         {
-            dbContext.ProjectRoles.Add(new ProjectRole() { Name = name });
-            dbContext.SaveChanges();
+            await dbContext.ProjectRoles.AddAsync(new ProjectRole() { Name = name });
+            await dbContext.SaveChangesAsync();
         }
     }
 }

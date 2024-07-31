@@ -5,8 +5,8 @@
 @using ProjectManagementApp.Services
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject ProjectOwnerService ProjectOwnerService
-@inject ProjectService ProjectService
+@inject IProjectOwnerService ProjectOwnerService
+@inject IProjectService ProjectService
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -14,13 +14,16 @@
 <MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
 
 <MudPaper Class="my-6 pa-8">
-    <LabeledText Label="Description" Text="@Project!.Description" />
-    <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
-    <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
-    <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
+    @if (Project != null)
+    {
+        <LabeledText Label="Description" Text="@Project!.Description" />
+        <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
+        <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
+        <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
+    }
 </MudPaper>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id!))">Update</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id))">Update</MudButton>
 
 
 @code {
@@ -30,7 +33,7 @@
     public Project? Project { get; set; }
     public ApplicationUser? User { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (String.IsNullOrEmpty(Id))
         {
@@ -38,8 +41,8 @@
         }
         else
         {
-            Project = ProjectService.GetProject(Id);
-            User = ProjectOwnerService.GetOwner(Id);
+            Project = await ProjectService.GetProjectAsync(Id);
+            User = await ProjectOwnerService.GetOwnerAsync(Id);
         }
     }
 

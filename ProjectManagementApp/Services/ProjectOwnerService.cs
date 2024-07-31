@@ -1,33 +1,39 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
 {
-    public class ProjectOwnerService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+    public interface IProjectOwnerService
+    {
+        Task<ApplicationUser?> GetOwnerAsync(string projectId);
+
+        Task AssignOwnerAsync(string projectId, string userId);
+    }
+
+    public class ProjectOwnerService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IProjectOwnerService
     {
         private ApplicationDbContext dbContext = dbContext;
         private UserManager<ApplicationUser> userManager = userManager;
 
-        public ApplicationUser? GetOwner(string? projectId) {
-            if (projectId == null) { return null; }
-
-            ProjectOwner? owner = dbContext.ProjectOwners
+        public async Task<ApplicationUser?> GetOwnerAsync(string projectId) {
+            ProjectOwner? owner = await dbContext.ProjectOwners 
                 .OrderByDescending(o => o.CreatedOn)
-                .FirstOrDefault(o => o.ProjectId == projectId);
+                .FirstOrDefaultAsync(o => o.ProjectId == projectId);
 
             if (owner == null) { return null; }
 
-            return userManager.Users.FirstOrDefault(u => u.Id == owner!.UserId)!;
+            return await userManager.Users.FirstOrDefaultAsync(u => u.Id == owner!.UserId)!;
         }
 
-        public void AssignOwner(string projectId, string userId)
+        public async Task AssignOwnerAsync(string projectId, string userId)
         {
-            dbContext.ProjectOwners.Add(new ProjectOwner()
+            await dbContext.ProjectOwners.AddAsync(new ProjectOwner()
             {
                 ProjectId = projectId,
                 UserId = userId,
             });
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }

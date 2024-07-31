@@ -7,9 +7,9 @@
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject ProjectOwnerService ProjectOwnerService
-@inject ProjectRoleService ProjectRoleService
-@inject ProjectService ProjectService
+@inject IProjectOwnerService ProjectOwnerService
+@inject IProjectRoleService ProjectRoleService
+@inject IProjectService ProjectService
 
 
 <PageTitle>Project Owners</PageTitle>
@@ -23,7 +23,7 @@
 	</MudPaper>
 }
 
-<MudDropContainer T="KanbanProjectItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="ProjectUpdated" Class="d-flex flex-row">
+<MudDropContainer T="KanbanProjectItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="ProjectUpdatedAsync" Class="d-flex flex-row">
 	<ChildContent>
 		@foreach (var item in _sections)
 		{
@@ -45,7 +45,7 @@
 	const string UNOWNED_SECTION_NAME = "UNOWNED";
 
 	private IEnumerable<Project>? ProjectList { get; set; }
-	private IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
+	private List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
 	{
@@ -55,7 +55,7 @@
 	private List<KanbanProjectItem> _items { get; set; } = new List<KanbanProjectItem>();
 	private string? Errors { get; set; } = null;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		ProjectList = ProjectService.GetProjects();
 
@@ -66,7 +66,7 @@
 		else
 		{
 			//	Add the owner sections
-			Owners = ProjectRoleService.GetUsersWithRole("owner");
+			Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
 
 			foreach (var owner in Owners)
 				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanProjectType.Owned));
@@ -74,7 +74,7 @@
 			//	Assign each project to the owner's section
 			foreach (var project in ProjectList.ToList())
 			{
-				ApplicationUser? owner = ProjectOwnerService.GetOwner(project.Id);
+				ApplicationUser? owner = await ProjectOwnerService.GetOwnerAsync(project.Id);
 
 				if (owner == null)
 					_items.Add(new KanbanProjectItem(project.Name, project.Id!, UNOWNED_SECTION_NAME, String.Empty));
@@ -84,7 +84,7 @@
 		}
 	}
 
-	private void ProjectUpdated(MudItemDropInfo<KanbanProjectItem> info)
+	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanProjectItem> info)
 	{
 		if (info.Item == null)
 		{
@@ -102,7 +102,7 @@
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
 			else
-				ProjectOwnerService.AssignOwner(info.Item.ProjectId, ownerId);
+				await ProjectOwnerService.AssignOwnerAsync(info.Item.ProjectId, ownerId);
 		}
 	}
 }
