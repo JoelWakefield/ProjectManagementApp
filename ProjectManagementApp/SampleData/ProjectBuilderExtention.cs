@@ -80,46 +80,121 @@ namespace ProjectManagementApp.SampleData
                 dbContext.ProjectUserRoles.Add(new ProjectUserRole() { UserId = Users.Zahir.Id, RoleId = memberRole.Id });
 
             // Setup initial projects
-            if (dbContext.Projects.Any(p => p.Name == ProjectConstants.SimpleProject.Name) == false)
-                dbContext.Projects.Add(ProjectConstants.SimpleProject);
-            if (dbContext.Projects.Any(p => p.Name == ProjectConstants.MultiPhaseProject.Name) == false)
-                dbContext.Projects.Add(ProjectConstants.MultiPhaseProject);
-            if (dbContext.Projects.Any(p => p.Name == ProjectConstants.MultiPersonProject.Name) == false)
-                dbContext.Projects.Add(ProjectConstants.MultiPersonProject);
-            if (dbContext.Projects.Any(p => p.Name == ProjectConstants.MultiPersonMultiPhaseProject.Name) == false)
-                dbContext.Projects.Add(ProjectConstants.MultiPersonMultiPhaseProject);
+            if (dbContext.Projects.Any(p => p.Name == Projects.SimpleProject.Name) == false)
+                dbContext.Projects.Add(Projects.SimpleProject);
+            if (dbContext.Projects.Any(p => p.Name == Projects.MultiPhaseProject.Name) == false)
+                dbContext.Projects.Add(Projects.MultiPhaseProject);
+            if (dbContext.Projects.Any(p => p.Name == Projects.MultiPersonProject.Name) == false)
+                dbContext.Projects.Add(Projects.MultiPersonProject);
+            if (dbContext.Projects.Any(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name) == false)
+                dbContext.Projects.Add(Projects.MultiPersonMultiPhaseProject);
 
             // Pull the updated/pre-existing project info
-            ProjectConstants.SimpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == ProjectConstants.SimpleProject.Name)!;
-            ProjectConstants.MultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == ProjectConstants.MultiPhaseProject.Name)!;
-            ProjectConstants.MultiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == ProjectConstants.MultiPersonProject.Name)!;
-            ProjectConstants.MultiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == ProjectConstants.MultiPersonMultiPhaseProject.Name)!;
+            Projects.SimpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
+            Projects.MultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
+            Projects.MultiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
+            Projects.MultiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
 
             // Setup owners with projects (if a project exists, then it already has an owner - no need to add another record)
-            if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.SimpleProject.Id) == false)
+            if (dbContext.ProjectOwners.Any(p => p.ProjectId == Projects.SimpleProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner() 
                 {
-                    ProjectId = ProjectConstants.SimpleProject.Id,
+                    ProjectId = Projects.SimpleProject.Id,
                     UserId = Users.Mylo.Id,
                 });
-            if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.MultiPhaseProject.Id) == false)
+            if (dbContext.ProjectOwners.Any(p => p.ProjectId == Projects.MultiPhaseProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner()
                 {
-                    ProjectId = ProjectConstants.MultiPhaseProject.Id,
+                    ProjectId = Projects.MultiPhaseProject.Id,
                     UserId = Users.Mylo.Id,
                 });
-            if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.MultiPersonProject.Id) == false)
+            if (dbContext.ProjectOwners.Any(p => p.ProjectId == Projects.MultiPersonProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner()
                 {
-                    ProjectId = ProjectConstants.MultiPersonProject.Id,
+                    ProjectId = Projects.MultiPersonProject.Id,
                     UserId = Users.Alayah.Id,
                 });
-            if (dbContext.ProjectOwners.Any(p => p.ProjectId == ProjectConstants.MultiPersonMultiPhaseProject.Id) == false)
+            if (dbContext.ProjectOwners.Any(p => p.ProjectId == Projects.MultiPersonMultiPhaseProject.Id) == false)
                 dbContext.ProjectOwners.Add(new ProjectOwner()
                 {
-                    ProjectId = ProjectConstants.MultiPersonMultiPhaseProject.Id,
+                    ProjectId = Projects.MultiPersonMultiPhaseProject.Id,
                     UserId = Users.Alayah.Id,
                 });
+
+            // Add Stages
+            if (dbContext.Stages.Any(s => s.Name == Stages.Backlog.Name) == false)
+                dbContext.Stages.Add(Stages.Backlog);
+            if (dbContext.Stages.Any(s => s.Name == Stages.ToDo.Name) == false)
+                dbContext.Stages.Add(Stages.ToDo);
+            if (dbContext.Stages.Any(s => s.Name == Stages.InProgress.Name) == false)
+                dbContext.Stages.Add(Stages.InProgress);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Review.Name) == false)
+                dbContext.Stages.Add(Stages.Review);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Complete.Name) == false)
+                dbContext.Stages.Add(Stages.Complete);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Canceled.Name) == false)
+                dbContext.Stages.Add(Stages.Canceled);
+
+            // Pull stage data
+            Stages.Backlog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
+            Stages.ToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
+            Stages.InProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
+            Stages.Review = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Review.Name)!;
+            Stages.Complete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
+            Stages.Canceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
+
+            // Add Phases
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.Complete.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimplePlanning",
+                    Description = "a complete phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    StageId = Stages.Complete.Id,
+                });
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.Review.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimpleSetup",
+                    Description = "a review phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    StageId = Stages.Review.Id,
+                });
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.InProgress.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimpleDataEntry",
+                    Description = "an in progress phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    StageId = Stages.InProgress.Id,
+                });
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.ToDo.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimpleQA",
+                    Description = "a todo phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    Priority = Priority.High,
+                    StageId = Stages.ToDo.Id,
+                });
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.ToDo.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimpleNotifyCompletion",
+                    Description = "another todo phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    Priority = Priority.Low,
+                    StageId = Stages.ToDo.Id,
+                });
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id || p.StageId == Stages.Backlog.Id) == false)
+                dbContext.Phases.Add(new Phase
+                {
+                    Name = "SimplePostAnalytics",
+                    Description = "a backlog phase for simple project",
+                    ProjectId = Projects.SimpleProject.Id,
+                    StageId = Stages.Backlog.Id,
+                });
+
 
             // Save all updates
             await dbContext.SaveChangesAsync();

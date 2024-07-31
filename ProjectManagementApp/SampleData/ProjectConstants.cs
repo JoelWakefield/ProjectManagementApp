@@ -2,7 +2,7 @@
 
 namespace ProjectManagementApp.Models
 {
-    public static class ProjectConstants
+    public static class Projects
     {
         public static Project SimpleProject { get; set; } = new Project()
         {
