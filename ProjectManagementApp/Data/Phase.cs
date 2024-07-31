@@ -13,9 +13,7 @@ namespace ProjectManagementApp.Data
         [Required]
         public string Name { get; set; }
         public string? Description { get; set; }
-        public Priority Priority { get; set; }
-        [Range(0,100)]
-        public byte Progress { get; set; }
+        public Priority Priority { get; set; } = Priority.Medium;
     }
 
     public enum Priority
