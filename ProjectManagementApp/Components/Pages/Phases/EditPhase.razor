@@ -1,0 +1,75 @@
+﻿@page "/phases/edit/{Id}"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PhaseService PhaseService
+
+
+<PageTitle>@Phase?.Name - Edit</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
+
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
+
+<MudPaper Class="pa-8">
+    @if (Phase != null)
+    {
+        <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Editable Values</MudText>
+        <MudContainer Class="pa-4 align-start">
+            <MudTextField Label="Name" @bind-Value="Phase!.Name" T="string" Required="true" RequiredError="A Phase must have a name." />
+            <MudTextField Label="Description" @bind-Value="Phase!.Description" T="string" Required="true" RequiredError="A Phase must have a description." />
+        </MudContainer>
+    }
+</MudPaper>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="SaveAsync">Save</MudButton>
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    public Phase? Phase { get; set; }
+    public string? Errors { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (String.IsNullOrEmpty(Id))
+        {
+            NavigationManager.NavigateTo($"/phases", true);
+        }
+        else
+        {
+            Phase = await PhaseService.GetPhaseAsync(Id);
+            if (Phase == null)
+                NavigationManager.NavigateTo($"/phases", true);
+        }
+    }
+
+    public async Task SaveAsync()
+    {
+        if (String.IsNullOrEmpty(Phase!.Name))
+        {
+            Errors = "Required fields are missing.";
+        }
+        else
+        {
+            try
+            {
+                await PhaseService.UpdatePhaseAsync(Phase);
+                NavigationManager.NavigateTo($"/phases/details/{Id}", true);
+            }
+            catch (Exception ex)
+            {
+                Errors = ex.Message;
+            }
+        }
+    }
+}

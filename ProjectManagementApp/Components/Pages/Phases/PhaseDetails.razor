@@ -1,0 +1,46 @@
+﻿@page "/phases/details/{Id}"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Components.Shared
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PhaseService PhaseService
+
+
+<PageTitle>@Phase?.Name - Details</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
+
+<MudPaper Class="my-6 pa-8">
+    @if (Phase != null)
+    {
+        <LabeledText Label="Description" Text="@Phase!.Description" />
+        @* <LabeledText Label="Priority" Text="@Phase!.Priority" /> *@
+    }
+</MudPaper>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Phase?.Id))">Update</MudButton>
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    public Phase? Phase { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (String.IsNullOrEmpty(Id)){
+            NavigationManager.NavigateTo("/phases", true);
+        }
+        else {
+            Phase = await PhaseService.GetPhaseAsync(Id);
+
+            if (Phase == null)
+                throw new Exception($"Could not find phase with id: {Id}");
+        }
+    }
+
+    public void Update(string id) => NavigationManager.NavigateTo($"/phases/edit/{id}");
+}

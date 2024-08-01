@@ -1,0 +1,41 @@
+﻿@page "/phases"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PhaseService PhaseService
+
+
+<PageTitle>Phases</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phases</MudText>
+
+<MudTable Items="@PhaseList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Priority</MudTh>
+        <MudTh>Details</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Projected Start">@context.Priority</MudTd>
+        <MudTd DataLabel="Details">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Details(context.Id!))">Details</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    private IEnumerable<Phase>? PhaseList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PhaseList = PhaseService.GetAllPhases();
+    }
+
+    public void Details(string id) => NavigationManager.NavigateTo($"/phases/details/{id}", true);
+}
