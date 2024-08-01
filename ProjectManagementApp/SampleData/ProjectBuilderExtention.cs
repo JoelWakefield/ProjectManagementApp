@@ -37,6 +37,10 @@ namespace ProjectManagementApp.SampleData
             if (userManager.Users.Any(u => u.UserName == Users.Zahir.UserName) == false)
                 await userManager.CreateAsync(Users.Zahir);
 
+            // Save all updates
+            await dbContext.SaveChangesAsync();
+
+
             // Pull the updated/pre-existing user data
             Users.Bert = userManager.Users.FirstOrDefault(u => u.UserName == Users.Bert.UserName)!;
             Users.Mylo = userManager.Users.FirstOrDefault(u => u.UserName == Users.Mylo.UserName)!;
@@ -47,6 +51,7 @@ namespace ProjectManagementApp.SampleData
             ProjectRole managerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Manager)!;
             ProjectRole ownerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Owner)!;
             ProjectRole memberRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Member)!;
+
 
             // Assign identity roles to new users
             if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(IdentityRoles.Admin) == false)
@@ -88,6 +93,10 @@ namespace ProjectManagementApp.SampleData
                 dbContext.Projects.Add(Projects.MultiPersonProject);
             if (dbContext.Projects.Any(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name) == false)
                 dbContext.Projects.Add(Projects.MultiPersonMultiPhaseProject);
+
+            // Save all updates
+            await dbContext.SaveChangesAsync();
+
 
             // Pull the updated/pre-existing project info
             Projects.SimpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
@@ -134,6 +143,10 @@ namespace ProjectManagementApp.SampleData
                 dbContext.Stages.Add(Stages.Complete);
             if (dbContext.Stages.Any(s => s.Name == Stages.Canceled.Name) == false)
                 dbContext.Stages.Add(Stages.Canceled);
+            
+            // Save all updates
+            await dbContext.SaveChangesAsync();
+
 
             // Pull stage data
             Stages.Backlog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
@@ -194,7 +207,6 @@ namespace ProjectManagementApp.SampleData
                     ProjectId = Projects.SimpleProject.Id,
                     StageId = Stages.Backlog.Id,
                 });
-
 
             // Save all updates
             await dbContext.SaveChangesAsync();
