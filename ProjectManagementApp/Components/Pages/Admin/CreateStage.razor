@@ -1,0 +1,53 @@
+﻿@page "/admin/stages/create"
+@using Microsoft.AspNetCore.Authorization
+@using System.ComponentModel.DataAnnotations
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject StageService StageService
+
+
+<PageTitle>Create Stage</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Create New Stage</MudText>
+
+<EditForm Model="Model" OnValidSubmit="CreateAsync">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="First name" HelperText="Max. 256 characters" @bind-Value="Model.Name" For="@(() => Model.Name)" Required="true" RequiredError="A role must have a name." />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+
+@code {
+    RegisterStageForm Model = new RegisterStageForm();
+
+    public class RegisterStageForm
+    {
+        [Required]
+        [StringLength(256, ErrorMessage = "Name length can't be more than 256 characters.")]
+        public string? Name { get; set; }
+    }
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private async Task CreateAsync(EditContext context)
+    {
+        if (context?.Model == null)
+            return;
+
+        string? name = ((RegisterStageForm)context?.Model!).Name;
+
+        if (name != null)
+        {
+            await StageService.CreateStageAsync(name);
+            NavigationManager.NavigateTo($"/admin/stages", true);
+            StateHasChanged();
+        }
+    }
+}

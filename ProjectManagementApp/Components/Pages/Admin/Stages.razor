@@ -1,0 +1,28 @@
+﻿@page "/admin/stages"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject StageService StageService
+
+
+<PageTitle>Stages</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Stages</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Stage</MudButton>
+
+<MudTable Items="@StageService.GetAllStages()" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    public void CreateNew() => NavigationManager.NavigateTo("/admin/stages/create", true);
+}
