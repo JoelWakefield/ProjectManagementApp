@@ -1,0 +1,59 @@
+﻿@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@inject IProjectRoleService ProjectRoleService
+
+
+<MudContainer Class="pa-4">
+    @if (Owners.Any() == false)
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
+    }
+    else
+    {
+        <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var user in Owners)
+            {
+                <MudSelectItem Value="@(new ProjectOwnerSelection(user!.Id, user.UserName))" />
+            }
+        </MudSelect>
+    }
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public ProjectOwnerSelection? OwnerSelection { get; set; }
+    [Parameter]
+    public EventCallback<ProjectOwnerSelection> OnOwnerChanged { get; set; }
+
+    private ProjectOwnerSelection? selection;
+    private ProjectOwnerSelection? Selection
+    {
+        get => selection;
+        set
+        {
+            selection = value;
+            OwnerSelection = selection;
+            OnOwnerChanged.InvokeAsync(OwnerSelection);
+        }
+    }
+
+    private IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
+
+        if (OwnerSelection == null && Owners.Any())
+        {
+            ApplicationUser? user = Owners.FirstOrDefault();
+            Selection = new ProjectOwnerSelection(user!.Id, user.UserName);
+        } 
+        else
+        {
+            Selection = OwnerSelection;
+        }
+    }
+}

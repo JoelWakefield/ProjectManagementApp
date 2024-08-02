@@ -32,21 +32,8 @@
         </MudContainer>
         <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
         <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
-        <MudContainer Class="pa-4">
-            @if (NoOwners)
-            {   
-                <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
-            }
-            else
-            {
-                <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="CurrentOwnerSelection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var user in Owners)
-                    {
-                        <MudSelectItem Value="@(new ProjectOwnerSelection(user!.Id, user.UserName))" />
-                    }
-                </MudSelect>
-            }
-        </MudContainer>
+        <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" />
+        
         <MudDivider />
         <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Auto-Filled Values</MudText>
         <LabeledText Label="Actual Start Date" Text="@Project?.ActualStart.ToString()" />
@@ -63,11 +50,9 @@
     public string? Id { get; set; }
 
     public Project? Project { get; set; }
-    public List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public ProjectOwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
-    private bool NoOwners = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,14 +74,12 @@
                 OldOwnerSelection = new ProjectOwnerSelection(user!.Id, user.UserName);
                 CurrentOwnerSelection = OldOwnerSelection;
             }
-
-            Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
-            NoOwners = Owners.Any() == false;
         }
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
+    private void ProjectOwnerChanged(ProjectOwnerSelection selection) => CurrentOwnerSelection = selection;
 
     public async Task SaveAsync() {
         if (String.IsNullOrEmpty(Project!.Name) || CurrentOwnerSelection == null)
