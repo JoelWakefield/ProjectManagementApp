@@ -7,6 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IProjectService ProjectService
+@inject PhaseService PhaseService
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -14,6 +15,7 @@
 <MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
 
 <MudPaper Class="my-6 pa-8">
+    <MudText Typo="Typo.h2" Class="pa-4">Details</MudText>
     @if (Project != null)
     {
         <LabeledText Label="Description" Text="@Project!.Description" />
@@ -21,9 +23,14 @@
         <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
         <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
     }
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id))">Update</MudButton>
+</MudPaper>
+<MudPaper Class="my-6 pa-6">
+    <MudText Typo="Typo.h2" Class="pa-4">Phases</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-6" @onclick="AddPhase">Add Phase</MudButton>
+    <PhaseTable PhaseList="@PhaseList" />
 </MudPaper>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id))">Update</MudButton>
 
 
 @code {
@@ -32,6 +39,7 @@
 
     public Project? Project { get; set; }
     public ApplicationUser? User { get; set; }
+    private IEnumerable<Phase>? PhaseList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,8 +51,10 @@
         {
             Project = await ProjectService.GetProjectAsync(Id);
             User = await ProjectOwnerService.GetOwnerAsync(Id);
+            PhaseList = PhaseService.GetProjectPhases(Id);
         }
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");
+    public void AddPhase() => NavigationManager.NavigateTo($"/phases/create/{Id}");
 }
