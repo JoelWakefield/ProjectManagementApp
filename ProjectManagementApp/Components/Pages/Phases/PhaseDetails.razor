@@ -12,15 +12,18 @@
 
 <MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
 
-<MudPaper Class="my-6 pa-8">
-    @if (Phase != null)
-    {
-        <LabeledText Label="Description" Text="@Phase!.Description" />
-        @* <LabeledText Label="Priority" Text="@Phase!.Priority" /> *@
-    }
-</MudPaper>
+@if (Phase != null)
+{
+    <MudPaper Class="my-6 pa-8">
+            <LabeledText Label="Description" Text="@Phase!.Description" />
+            <LabeledText Label="Priority" Text="@Phase!.Priority.ToString()" />
+    </MudPaper>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Phase?.Id))">Update</MudButton>
+    <MudContainer Class="d-flex flex-column align-start my-4 mx-2 gap-2" Gutters="false">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Update(Phase.Id))">Update</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" @onclick="(() => Return(Phase.ProjectId))">Return to Project</MudButton>
+    </MudContainer>
+}
 
 
 @code {
@@ -43,4 +46,5 @@
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/phases/edit/{id}");
+    public void Return(string id) => NavigationManager.NavigateTo($"/projects/details/{id}");
 }
