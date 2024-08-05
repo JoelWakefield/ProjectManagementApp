@@ -2,6 +2,9 @@
 
 namespace ProjectManagementApp.Data
 {
+    /// <summary>
+    /// Each project is worked in phases, which have priority and can be grouped in stages; phases are defined and ordered at the discretion of the app user.
+    /// </summary>
     public class Phase
     {
         [Required]
