@@ -31,23 +31,7 @@
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
     <MudContainer Class="pa-4">
-        @if (NoOwners)
-        {
-            <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
-        }
-        else
-        {
-            <MudSelect T="ProjectOwnerSelection" Label
-            ="Owner" @bind-Value="CurrentOwnerSelection" Required
-            ="true" Variant
-            ="Variant.Filled" AnchorOrigin
-            ="Origin.BottomCenter">
-                @foreach (var user in Owners!)
-                {
-                    <MudSelectItem Value="@(new ProjectOwnerSelection(user.Id, user.UserName))" />
-                }
-            </MudSelect>
-        }
+        <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" />
     </MudContainer>
 </MudPaper>
 
@@ -56,12 +40,10 @@
 
 @code {
     public Project? Project { get; set; }
-    public IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
     public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
-    private bool NoOwners = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Project = new Project()
         {
@@ -69,13 +51,11 @@
             CreatedBy = "project_setup",
             CreatedOn = DateTime.UtcNow,
         };
-
-        Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
-        NoOwners = Owners.Any() == false;
     }
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
+    private void ProjectOwnerChanged(ProjectOwnerSelection selection) => CurrentOwnerSelection = selection;
 
     public async Task CreateAsync()
     {

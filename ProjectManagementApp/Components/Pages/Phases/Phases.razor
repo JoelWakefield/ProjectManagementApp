@@ -1,0 +1,27 @@
+﻿@page "/phases"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Components.Shared
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PhaseService PhaseService
+
+
+<PageTitle>Phases</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phases</MudText>
+
+<PhaseTable PhaseList="@PhaseList" />
+
+
+@code {
+    private IEnumerable<Phase>? PhaseList { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PhaseList = PhaseService.GetAllPhases();
+    }
+
+    public void Details(string id) => NavigationManager.NavigateTo($"/phases/details/{id}", true);
+}

@@ -1,16 +1,16 @@
-﻿@page "/admin/roles/create"
+﻿@page "/admin/stages/create"
 @using Microsoft.AspNetCore.Authorization
 @using System.ComponentModel.DataAnnotations
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject IProjectRoleService ProjectRoleService
+@inject StageService StageService
 
 
-<PageTitle>Create Role</PageTitle>
+<PageTitle>Create Stage</PageTitle>
 
-<MudText Typo="Typo.h1" Class="px-6">Create New Role</MudText>
+<MudText Typo="Typo.h1" Class="px-6">Create New Stage</MudText>
 
 <EditForm Model="Model" OnValidSubmit="CreateAsync">
     <DataAnnotationsValidator />
@@ -26,7 +26,7 @@
 
 
 @code {
-    RegisterRoleForm Model = new RegisterRoleForm();
+    RegisterStageForm Model = new RegisterStageForm();
 
     protected override void OnInitialized() => Model ??= new();
 
@@ -35,12 +35,12 @@
         if (context?.Model == null)
             return;
 
-        string? name = ((RegisterRoleForm)context?.Model!).Name;
+        string? name = ((RegisterStageForm)context?.Model!).Name;
 
         if (name != null)
         {
-            await ProjectRoleService.CreateRoleAsync(name);
-            NavigationManager.NavigateTo($"/admin/roles", true);
+            await StageService.CreateStageAsync(name);
+            NavigationManager.NavigateTo($"/admin/stages", true);
             StateHasChanged();
         }
     }

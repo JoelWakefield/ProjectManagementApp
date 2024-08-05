@@ -1,0 +1,86 @@
+﻿@page "/phases/create/{ProjectId}"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject PhaseService PhaseService
+@inject IProjectService ProjectService
+
+
+<PageTitle>Create Phase</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Create Phase</MudText>
+
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
+
+<MudPaper Class="pa-8">
+    @if(Phase != null)
+    {
+        <MudTextField Label="Name" @bind-Value="Phase.Name" T="string" Required="true" RequiredError="A phase must have a name." />
+        <MudTextField Label="Description" @bind-Value="Phase.Description" T="string" Required="true" RequiredError="A phase must have a name." />
+        <MudSelect Label="Priority" @bind-Value="Phase.Priority" Required="true" OpenIcon="@Icons.Material.Filled.PriorityHigh" AdornmentColor="Color.Secondary">
+            @foreach (Priority priority in Enum.GetValues(typeof(Priority)))
+            {
+                <MudSelectItem Value="@priority">@priority</MudSelectItem>
+            }
+        </MudSelect>
+    }
+</MudPaper>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="SaveAsync">Save</MudButton>
+
+
+@code {
+    [Parameter]
+    public string? ProjectId { get; set; }
+
+    public Phase? Phase { get; set; }
+    public Project? Project { get; set; }
+    public string? Errors { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (String.IsNullOrEmpty(ProjectId))
+        {
+            NavigationManager.NavigateTo($"/projects", true);
+        }
+        else
+        {
+            Project = await ProjectService.GetProjectAsync(ProjectId);
+
+            if (Project == null)
+                NavigationManager.NavigateTo($"/projects", true);
+            else
+                Phase = new Phase
+                {
+                    ProjectId = ProjectId,
+                };
+        }
+    }
+
+    public async Task SaveAsync()
+    {
+        if (String.IsNullOrEmpty(Phase!.Name))
+        {
+            Errors = "Required fields are missing.";
+        }
+        else
+        {
+            try
+            {
+                await PhaseService.UpdatePhaseAsync(Phase);
+                NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);
+            }
+            catch (Exception ex)
+            {
+                Errors = ex.Message;
+            }
+        }
+    }
+}
