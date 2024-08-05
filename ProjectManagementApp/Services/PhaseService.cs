@@ -3,7 +3,16 @@ using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
 {
-    public class PhaseService(ApplicationDbContext dbContext)
+    public interface IPhaseService
+    {
+        IEnumerable<Phase> GetAllPhases();
+        Task<Phase?> GetPhaseAsync(string id);
+        Task CreatePhaseAsync(Phase phase);
+        Task UpdatePhaseAsync(Phase phase);
+        IEnumerable<Phase> GetProjectPhases(string projectId);
+    }
+
+    public class PhaseService(ApplicationDbContext dbContext) : IPhaseService
     {
         private ApplicationDbContext dbContext = dbContext;
 

@@ -22,8 +22,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 builder.Services.AddScoped<IProjectOwnerService,ProjectOwnerService>();
 builder.Services.AddScoped<IProjectRoleService,ProjectRoleService>();
 builder.Services.AddScoped<IProjectService,ProjectService>();
-builder.Services.AddScoped<PhaseService>();
-builder.Services.AddScoped<StageService>();
+builder.Services.AddScoped<IPhaseService,PhaseService>();
+builder.Services.AddScoped<IStageService,StageService>();
 
 builder.Services.AddAuthentication(options =>
     {
