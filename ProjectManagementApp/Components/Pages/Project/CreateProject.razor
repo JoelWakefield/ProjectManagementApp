@@ -31,7 +31,7 @@
     <DateTimePicker Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
     <DateTimePicker Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
     <MudContainer Class="pa-4">
-        <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" />
+        <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" FilterByRole="true" />
     </MudContainer>
 </MudPaper>
 
@@ -40,7 +40,7 @@
 
 @code {
     public Project? Project { get; set; }
-    public ProjectOwnerSelection? CurrentOwnerSelection { get; set; }
+    public OwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override void OnInitialized()
@@ -55,7 +55,7 @@
 
     private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
     private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
-    private void ProjectOwnerChanged(ProjectOwnerSelection selection) => CurrentOwnerSelection = selection;
+    private void ProjectOwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
 
     public async Task CreateAsync()
     {
