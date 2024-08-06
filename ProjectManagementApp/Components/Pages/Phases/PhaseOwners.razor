@@ -1,0 +1,110 @@
+﻿@page "/phases/owners"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IPhaseOwnerService PhaseOwnerService
+@inject IPhaseService PhaseService
+
+
+<PageTitle>Phase Owners</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phase Owners</MudText>
+
+@if (Errors != null)
+{
+	<MudPaper Class="my-6 pa-8">
+		<MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+	</MudPaper>
+}
+
+<MudDropContainer T="KanbanOwnerItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="PhaseUpdatedAsync" Class="d-flex flex-row">
+	<ChildContent>
+		@foreach (var item in _sections)
+		{
+			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+				<MudToolBar Gutters="false">
+					<MudText Typo="Typo.subtitle1" Color="item.Type == KanbanOwnerType.Unowned ? Color.Warning : Color.Primary"><b>@item.Name</b></MudText>
+				</MudToolBar>
+				<MudDropZone T="KanbanOwnerItem" Identifier="@item.Name" CanDrop="@((_) => item.Type == KanbanOwnerType.Owned)" Class="mud-height-full" />
+			</MudPaper>
+		}
+	</ChildContent>
+	<ItemRenderer>
+		<MudPaper Elevation="25" Class="pa-4 rounded-lg my-3">@context.Name</MudPaper>
+	</ItemRenderer>
+</MudDropContainer>
+
+
+@code {
+	const string UNOWNED_SECTION_NAME = "UNOWNED";
+
+	private IEnumerable<Phase>? PhaseList { get; set; }
+	private List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
+
+	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
+	{
+		new KanBanSection(UNOWNED_SECTION_NAME)
+	};
+	private MudDropContainer<KanbanOwnerItem> _dropContainer { get; set; } = default!;
+	private List<KanbanOwnerItem> _items { get; set; } = new List<KanbanOwnerItem>();
+	private string? Errors { get; set; } = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		PhaseList = PhaseService.GetAllPhases();
+
+		if (PhaseList.Any() == false)
+		{
+			Errors = "There are no Phases - please check your data.";
+		}
+		else
+		{
+			//	Add the owner sections
+			Owners = UserManager.Users.ToList()!;
+			//	TODO: handle a no user(owner) scenario
+
+			foreach (var owner in Owners)
+				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanOwnerType.Owned));
+
+			//	Assign each Phase to the owner's section
+			foreach (var Phase in PhaseList.ToList())
+			{
+				ApplicationUser? owner = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
+
+				if (owner == null)
+					_items.Add(new KanbanOwnerItem(Phase.Name, Phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
+				else
+					_items.Add(new KanbanOwnerItem(Phase.Name, Phase.Id!, owner.UserName!, owner.Id));
+			}
+		}
+	}
+
+	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanOwnerItem> info)
+	{
+		if (info.Item == null)
+		{
+			Errors = "Item has no info.";
+		}
+		else
+		{
+			//	Update the board
+			string ownerName = info.DropzoneIdentifier;
+			info.Item.Owner = ownerName;
+
+			//	Update the Phase owner
+			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Owner)?.Id;
+
+			if (ownerId == null)
+				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
+			else
+				await PhaseOwnerService.AssignOwnerAsync(info.Item.ItemId, ownerId);
+		}
+	}
+}
