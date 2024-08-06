@@ -23,6 +23,7 @@ builder.Services.AddScoped<IProjectOwnerService,ProjectOwnerService>();
 builder.Services.AddScoped<IProjectRoleService,ProjectRoleService>();
 builder.Services.AddScoped<IProjectService,ProjectService>();
 builder.Services.AddScoped<IPhaseService,PhaseService>();
+builder.Services.AddScoped<IPhaseOwnerService,PhaseOwnerService>();
 builder.Services.AddScoped<IStageService,StageService>();
 
 builder.Services.AddAuthentication(options =>
