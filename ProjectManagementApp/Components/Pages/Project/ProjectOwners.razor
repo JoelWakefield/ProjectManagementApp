@@ -23,15 +23,15 @@
 	</MudPaper>
 }
 
-<MudDropContainer T="KanbanProjectItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="ProjectUpdatedAsync" Class="d-flex flex-row">
+<MudDropContainer T="KanbanOwnerItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="ProjectUpdatedAsync" Class="d-flex flex-row">
 	<ChildContent>
 		@foreach (var item in _sections)
 		{
 			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
 				<MudToolBar Gutters="false">
-					<MudText Typo="Typo.subtitle1" Color="item.Type == KanbanProjectType.Unowned ? Color.Warning : Color.Primary"><b>@item.Name</b></MudText>
+					<MudText Typo="Typo.subtitle1" Color="item.Type == KanbanOwnerType.Unowned ? Color.Warning : Color.Primary"><b>@item.Name</b></MudText>
 				</MudToolBar>
-				<MudDropZone T="KanbanProjectItem" Identifier="@item.Name" CanDrop="@((_) => item.Type == KanbanProjectType.Owned)" Class="mud-height-full" />
+				<MudDropZone T="KanbanOwnerItem" Identifier="@item.Name" CanDrop="@((_) => item.Type == KanbanOwnerType.Owned)" Class="mud-height-full" />
 			</MudPaper>
 		}
 	</ChildContent>
@@ -51,8 +51,8 @@
 	{
 		new KanBanSection(UNOWNED_SECTION_NAME)
 	};
-	private MudDropContainer<KanbanProjectItem> _dropContainer { get; set; } = default!;
-	private List<KanbanProjectItem> _items { get; set; } = new List<KanbanProjectItem>();
+	private MudDropContainer<KanbanOwnerItem> _dropContainer { get; set; } = default!;
+	private List<KanbanOwnerItem> _items { get; set; } = new List<KanbanOwnerItem>();
 	private string? Errors { get; set; } = null;
 
 	protected override async Task OnInitializedAsync()
@@ -69,7 +69,7 @@
 			Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
 
 			foreach (var owner in Owners)
-				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanProjectType.Owned));
+				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanOwnerType.Owned));
 
 			//	Assign each project to the owner's section
 			foreach (var project in ProjectList.ToList())
@@ -77,14 +77,14 @@
 				ApplicationUser? owner = await ProjectOwnerService.GetOwnerAsync(project.Id);
 
 				if (owner == null)
-					_items.Add(new KanbanProjectItem(project.Name, project.Id!, UNOWNED_SECTION_NAME, String.Empty));
+					_items.Add(new KanbanOwnerItem(project.Name, project.Id!, UNOWNED_SECTION_NAME, String.Empty));
 				else
-					_items.Add(new KanbanProjectItem(project.Name, project.Id!, owner.UserName!, owner.Id));
+					_items.Add(new KanbanOwnerItem(project.Name, project.Id!, owner.UserName!, owner.Id));
 			}
 		}
 	}
 
-	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanProjectItem> info)
+	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanOwnerItem> info)
 	{
 		if (info.Item == null)
 		{
