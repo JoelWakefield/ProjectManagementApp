@@ -102,7 +102,7 @@
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
 			else
-				await ProjectOwnerService.AssignOwnerAsync(info.Item.ProjectId, ownerId);
+				await ProjectOwnerService.AssignOwnerAsync(info.Item.ItemId, ownerId);
 		}
 	}
 }
