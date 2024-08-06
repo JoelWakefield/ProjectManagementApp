@@ -1,4 +1,4 @@
-﻿namespace ProjectManagementApp.Models
+﻿namespace ProjectManagementApp.SampleData
 {
     public static class IdentityRoles
     {
