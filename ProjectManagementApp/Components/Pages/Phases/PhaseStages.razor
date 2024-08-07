@@ -47,14 +47,14 @@
 
 
 @code {
-	const string UNOWNED_SECTION_NAME = "UNOWNED";
+	const string UNSTAGED_SECTION_NAME = "UNSTAGED";
 
 	private IEnumerable<Phase>? PhaseList { get; set; }
 	private List<Stage?> Stages { get; set; } = new List<Stage>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
 {
-new KanBanSection(UNOWNED_SECTION_NAME)
+new KanBanSection(UNSTAGED_SECTION_NAME)
 };
 	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
 	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
@@ -83,7 +83,7 @@ new KanBanSection(UNOWNED_SECTION_NAME)
 				Stage? stage = await PhaseStageService.GetStageAsync(phase.Id);
 
 				if (stage == null)
-					_items.Add(new KanbanItem(phase.Name, phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
+					_items.Add(new KanbanItem(phase.Name, phase.Id!, UNSTAGED_SECTION_NAME, String.Empty));
 				else
 					_items.Add(new KanbanItem(phase.Name, phase.Id!, stage.Name!, stage.Id));
 			}
