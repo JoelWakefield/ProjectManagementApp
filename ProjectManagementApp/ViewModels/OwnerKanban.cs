@@ -3,35 +3,29 @@
 	public class KanBanSection
 	{
 		public string Name { get; init; }
-		public KanbanOwnerType Type { get; set; }
+		public bool Categorized { get; set; }
 
-		public KanBanSection(string name, KanbanOwnerType type = KanbanOwnerType.Unowned)
+		public KanBanSection(string name, bool categorized = false)
 		{
 			Name = name;
-			Type = type;
+			Categorized = categorized;
 		}
 	}
 
-	public class KanbanOwnerItem
+	public class KanbanItem
 	{
 		public string Name { get; init; }
 		public string ItemId { get; set; }
-		public string Owner { get; set; }
-		public string OwnerId { get; set; }
+		public string Category { get; set; }
+		public string CategoryId { get; set; }
 
 
-		public KanbanOwnerItem(string name, string itemId, string owner, string ownerId)
+		public KanbanItem(string name, string itemId, string category, string categoryId)
 		{
 			Name = name;
 			ItemId = itemId;
-			Owner = owner;
-			OwnerId = ownerId;
+			Category = category;
+			CategoryId = categoryId;
 		}
-	}
-
-	public enum KanbanOwnerType
-	{
-		Owned,
-		Unowned
 	}
 }

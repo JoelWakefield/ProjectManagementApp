@@ -24,15 +24,20 @@
 	</MudPaper>
 }
 
-<MudDropContainer T="KanbanOwnerItem" @ref="_dropContainer" Items="@_items" ItemsSelector="@((item,column) => item.Owner == column)" ItemDropped="PhaseUpdatedAsync" Class="d-flex flex-row">
+<MudDropContainer T="KanbanItem" @ref="_dropContainer" Items="@_items"
+	ItemsSelector="@((item,column) => item.Category == column)" ItemDropped="PhaseUpdatedAsync" Class="d-flex flex-row">
 	<ChildContent>
 		@foreach (var item in _sections)
 		{
-			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+			<MudPaper Elevation="0" Width="224px" MinHeight="400px"
+				Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
 				<MudToolBar Gutters="false">
-					<MudText Typo="Typo.subtitle1" Color="item.Type == KanbanOwnerType.Unowned ? Color.Warning : Color.Primary"><b>@item.Name</b></MudText>
+					<MudText Typo="Typo.subtitle1" Color="item.Categorized ? Color.Primary : Color.Warning">
+						<b>@item.Name</b>
+					</MudText>
 				</MudToolBar>
-				<MudDropZone T="KanbanOwnerItem" Identifier="@item.Name" CanDrop="@((_) => item.Type == KanbanOwnerType.Owned)" Class="mud-height-full" />
+				<MudDropZone T="KanbanItem" Identifier="@item.Name" CanDrop="@((_) => item.Categorized == true)"
+					Class="mud-height-full" />
 			</MudPaper>
 		}
 	</ChildContent>
@@ -49,11 +54,11 @@
 	private List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
-	{
-		new KanBanSection(UNOWNED_SECTION_NAME)
-	};
-	private MudDropContainer<KanbanOwnerItem> _dropContainer { get; set; } = default!;
-	private List<KanbanOwnerItem> _items { get; set; } = new List<KanbanOwnerItem>();
+{
+new KanBanSection(UNOWNED_SECTION_NAME)
+};
+	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
+	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
 	private string? Errors { get; set; } = null;
 
 	protected override async Task OnInitializedAsync()
@@ -66,27 +71,27 @@
 		}
 		else
 		{
-			//	Add the owner sections
+			// Add the owner sections
 			Owners = UserManager.Users.ToList()!;
-			//	TODO: handle a no user(owner) scenario
+			// TODO: handle a no user(owner) scenario
 
 			foreach (var owner in Owners)
-				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", KanbanOwnerType.Owned));
+				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true));
 
-			//	Assign each Phase to the owner's section
+			// Assign each Phase to the owner's section
 			foreach (var Phase in PhaseList.ToList())
 			{
 				ApplicationUser? owner = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
 
 				if (owner == null)
-					_items.Add(new KanbanOwnerItem(Phase.Name, Phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
+					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
 				else
-					_items.Add(new KanbanOwnerItem(Phase.Name, Phase.Id!, owner.UserName!, owner.Id));
+					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, owner.UserName!, owner.Id));
 			}
 		}
 	}
 
-	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanOwnerItem> info)
+	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)
 	{
 		if (info.Item == null)
 		{
@@ -94,12 +99,12 @@
 		}
 		else
 		{
-			//	Update the board
+			// Update the board
 			string ownerName = info.DropzoneIdentifier;
-			info.Item.Owner = ownerName;
+			info.Item.Category = ownerName;
 
-			//	Update the Phase owner
-			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Owner)?.Id;
+			// Update the Phase owner
+			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Category)?.Id;
 
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
