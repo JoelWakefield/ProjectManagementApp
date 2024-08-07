@@ -156,18 +156,22 @@ namespace ProjectManagementApp.SampleData
             Stages.Canceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
 
             //  Add Phases
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.Complete.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Complete.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePlanning);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.Review.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Review.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleSetup);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.InProgress.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.InProgress.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleDataEntry);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.ToDo.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.ToDo.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleQA);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.ToDo.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.ToDo.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleNotifyCompletion);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.StageId == Stages.Backlog.Id) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Backlog.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePostAnalytics);
+
+            //  Save all updates
+            await dbContext.SaveChangesAsync();
+
 
             //  Pull most up to date phase data
             Phases.SimplePlanning = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePlanning.Name)!;
@@ -177,7 +181,7 @@ namespace ProjectManagementApp.SampleData
             Phases.SimpleNotifyCompletion = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleNotifyCompletion.Name)!;
             Phases.SimplePostAnalytics = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePostAnalytics.Name)!;
 
-            //  Add project owners
+            //  Add phase owners
             if (dbContext.PhaseOwners.Any(p => p.PhaseId == Phases.SimplePlanning.Id) == false)
                 dbContext.PhaseOwners.Add(new PhaseOwner { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Bert.Id });
             if (dbContext.PhaseOwners.Any(p => p.PhaseId == Phases.SimpleSetup.Id) == false)
@@ -190,6 +194,24 @@ namespace ProjectManagementApp.SampleData
                 dbContext.PhaseOwners.Add(new PhaseOwner { PhaseId = Phases.SimpleNotifyCompletion.Id, UserId = Users.Alayah.Id });
             if (dbContext.PhaseOwners.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id) == false)
                 dbContext.PhaseOwners.Add(new PhaseOwner { PhaseId = Phases.SimplePostAnalytics.Id, UserId = Users.Zahir.Id });
+
+            //  Save all updates
+            await dbContext.SaveChangesAsync();
+
+
+            //  Add phase stages
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.StageId == Stages.Complete.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimplePlanning.Id, StageId = Stages.Complete.Id });
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.StageId == Stages.Review.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimpleSetup.Id, StageId = Stages.Review.Id });
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.StageId == Stages.InProgress.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimpleDataEntry.Id, StageId = Stages.InProgress.Id });
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimpleQA.Id && p.StageId == Stages.ToDo.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimpleQA.Id, StageId = Stages.ToDo.Id });
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.StageId == Stages.Backlog.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimpleNotifyCompletion.Id, StageId = Stages.Backlog.Id });
+            if (dbContext.PhaseStages.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.StageId == Stages.Canceled.Id) == false)
+                dbContext.PhaseStages.Add(new PhaseStage { PhaseId = Phases.SimplePostAnalytics.Id, StageId = Stages.Canceled.Id });
 
             //  Save all updates
             await dbContext.SaveChangesAsync();
