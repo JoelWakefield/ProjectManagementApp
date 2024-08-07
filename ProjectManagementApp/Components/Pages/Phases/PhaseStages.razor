@@ -1,0 +1,114 @@
+﻿@page "/phases/stages"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject IPhaseStageService PhaseStageService
+@inject IStageService StageService
+@inject IPhaseService PhaseService
+
+
+<PageTitle>Phase Stages</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phase Stages</MudText>
+
+@if (Errors != null)
+{
+	<MudPaper Class="my-6 pa-8">
+		<MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+	</MudPaper>
+}
+
+<MudDropContainer T="KanbanItem" @ref="_dropContainer" Items="@_items"
+	ItemsSelector="@((item,column) => item.Category == column)" ItemDropped="PhaseUpdatedAsync" Class="d-flex flex-row">
+	<ChildContent>
+		@foreach (var item in _sections)
+		{
+			<MudPaper Elevation="0" Width="224px" MinHeight="400px"
+				Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+				<MudToolBar Gutters="false">
+					<MudText Typo="Typo.subtitle1" Color="item.Categorized ? Color.Primary : Color.Warning">
+						<b>@item.Name</b>
+					</MudText>
+				</MudToolBar>
+				<MudDropZone T="KanbanItem" Identifier="@item.Name" CanDrop="@((_) => item.Categorized == true)"
+					Class="mud-height-full" />
+			</MudPaper>
+		}
+	</ChildContent>
+	<ItemRenderer>
+		<MudPaper Elevation="25" Class="pa-4 rounded-lg my-3">@context.Name</MudPaper>
+	</ItemRenderer>
+</MudDropContainer>
+
+
+@code {
+	const string UNOWNED_SECTION_NAME = "UNOWNED";
+
+	private IEnumerable<Phase>? PhaseList { get; set; }
+	private List<Stage?> Stages { get; set; } = new List<Stage>();
+
+	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
+{
+new KanBanSection(UNOWNED_SECTION_NAME)
+};
+	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
+	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
+	private string? Errors { get; set; } = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		PhaseList = PhaseService.GetAllPhases();
+
+		if (PhaseList.Any() == false)
+		{
+			Errors = "There are no Phases - please check your data.";
+		}
+		else
+		{
+			// Add the owner sections
+			Stages = StageService.GetAllStages().ToList()!;
+			// TODO: handle a no user(owner) scenario
+
+			foreach (var stage in Stages)
+				_sections.Add(new KanBanSection(stage!.Name ?? "USERNAME NOT FOUND", true));
+
+			// Assign each Phase to the owner's section
+			foreach (var phase in PhaseList.ToList())
+			{
+				Stage? stage = await PhaseStageService.GetStageAsync(phase.Id);
+
+				if (stage == null)
+					_items.Add(new KanbanItem(phase.Name, phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
+				else
+					_items.Add(new KanbanItem(phase.Name, phase.Id!, stage.Name!, stage.Id));
+			}
+		}
+	}
+
+	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)
+	{
+		if (info.Item == null)
+		{
+			Errors = "Item has no info.";
+		}
+		else
+		{
+			// Update the board
+			string ownerName = info.DropzoneIdentifier;
+			info.Item.Category = ownerName;
+
+			// Update the Phase owner
+			string? ownerId = Stages.FirstOrDefault(s => s?.Name == info.Item.Category)?.Id;
+
+			if (ownerId == null)
+				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
+			else
+				await PhaseStageService.AssignStageAsync(info.Item.ItemId, ownerId);
+		}
+	}
+}
