@@ -156,17 +156,17 @@ namespace ProjectManagementApp.SampleData
             Stages.Canceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
 
             //  Add Phases
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Complete.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePlanning.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePlanning);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Review.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleSetup.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleSetup);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.InProgress.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleDataEntry.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleDataEntry);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.ToDo.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleQA.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleQA);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.ToDo.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleNotifyCompletion.Name) == false)
                 dbContext.Phases.Add(Phases.SimpleNotifyCompletion);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Stages.Backlog.Name) == false)
+            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePostAnalytics.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePostAnalytics);
 
             //  Save all updates
