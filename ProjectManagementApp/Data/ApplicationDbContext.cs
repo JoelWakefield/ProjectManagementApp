@@ -13,5 +13,6 @@ namespace ProjectManagementApp.Data
         public DbSet<Phase> Phases { get; set; }
         public DbSet<PhaseOwner> PhaseOwners { get; set; }
         public DbSet<PhaseStage> PhaseStages { get; set; }
+        public DbSet<PhaseAssignment> PhaseAssignments { get; set; }
     }
 }
