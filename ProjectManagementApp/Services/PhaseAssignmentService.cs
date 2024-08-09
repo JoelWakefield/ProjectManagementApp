@@ -21,7 +21,7 @@ namespace ProjectManagementApp.Services
 			Dictionary<string,PhaseAssignedRecord> records = new Dictionary<string, PhaseAssignedRecord>();
 
 			IEnumerable<ApplicationUser> users = await userManager.Users.ToListAsync();
-			IEnumerable<Phase> phases = dbContext.Phases;
+			IEnumerable<Phase> phases = await dbContext.Phases.ToListAsync();
 
 			foreach (var phase in phases)
 			{
