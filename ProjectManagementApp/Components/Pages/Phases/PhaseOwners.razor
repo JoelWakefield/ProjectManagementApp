@@ -1,20 +1,21 @@
-﻿@page "/projects/owners"
+﻿@page "/phases/owners"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject IProjectOwnerService ProjectOwnerService
-@inject IProjectRoleService ProjectRoleService
-@inject IProjectService ProjectService
+@inject UserManager<ApplicationUser> UserManager
+@inject IPhaseOwnerService PhaseOwnerService
+@inject IPhaseService PhaseService
 
 
-<PageTitle>Project Owners</PageTitle>
+<PageTitle>Phase Owners</PageTitle>
 
-<MudText Typo="Typo.h1" Class="px-6">Project Owners</MudText>
+<MudText Typo="Typo.h1" Class="px-6">Phase Owners</MudText>
 
 @if (Errors != null)
 {
@@ -24,7 +25,7 @@
 }
 
 <MudDropContainer T="KanbanItem" @ref="_dropContainer" Items="@_items"
-	ItemsSelector="@((item,column) => item.Category == column)" ItemDropped="ProjectUpdatedAsync" Class="d-flex flex-row">
+	ItemsSelector="@((item,column) => item.Category == column)" ItemDropped="PhaseUpdatedAsync" Class="d-flex flex-row">
 	<ChildContent>
 		@foreach (var item in _sections)
 		{
@@ -49,7 +50,7 @@
 @code {
 	const string UNOWNED_SECTION_NAME = "UNOWNED";
 
-	private IEnumerable<Project>? ProjectList { get; set; }
+	private IEnumerable<Phase>? PhaseList { get; set; }
 	private List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
@@ -62,34 +63,35 @@ new KanBanSection(UNOWNED_SECTION_NAME)
 
 	protected override async Task OnInitializedAsync()
 	{
-		ProjectList = ProjectService.GetProjects();
+		PhaseList = PhaseService.GetAllPhases();
 
-		if (ProjectList.Any() == false)
+		if (PhaseList.Any() == false)
 		{
-			Errors = "There are no projects - please check your data.";
+			Errors = "There are no Phases - please check your data.";
 		}
 		else
 		{
 			// Add the owner sections
-			Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
+			Owners = UserManager.Users.ToList()!;
+			// TODO: handle a no user(owner) scenario
 
 			foreach (var owner in Owners)
 				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true));
 
-			// Assign each project to the owner's section
-			foreach (var project in ProjectList.ToList())
+			// Assign each Phase to the owner's section
+			foreach (var Phase in PhaseList.ToList())
 			{
-				ApplicationUser? owner = await ProjectOwnerService.GetOwnerAsync(project.Id);
+				ApplicationUser? owner = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
 
 				if (owner == null)
-					_items.Add(new KanbanItem(project.Name, project.Id!, UNOWNED_SECTION_NAME, String.Empty));
+					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
 				else
-					_items.Add(new KanbanItem(project.Name, project.Id!, owner.UserName!, owner.Id));
+					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, owner.UserName!, owner.Id));
 			}
 		}
 	}
 
-	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanItem> info)
+	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)
 	{
 		if (info.Item == null)
 		{
@@ -101,13 +103,13 @@ new KanBanSection(UNOWNED_SECTION_NAME)
 			string ownerName = info.DropzoneIdentifier;
 			info.Item.Category = ownerName;
 
-			// Update the project owner
+			// Update the Phase owner
 			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Category)?.Id;
 
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
 			else
-				await ProjectOwnerService.AssignOwnerAsync(info.Item.ItemId, ownerId);
+				await PhaseOwnerService.AssignOwnerAsync(info.Item.ItemId, ownerId);
 		}
 	}
 }

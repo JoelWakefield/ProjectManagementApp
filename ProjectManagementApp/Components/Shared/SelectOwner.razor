@@ -1,34 +1,39 @@
-﻿@using ProjectManagementApp.Data
+﻿@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @inject IProjectRoleService ProjectRoleService
+@inject UserManager<ApplicationUser> UserManager
 
 
-<MudContainer Class="pa-4">
-    @if (Owners.Any() == false)
-    {
-        <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
-    }
-    else
-    {
-        <MudSelect T="ProjectOwnerSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
-            @foreach (var user in Owners)
-            {
-                <MudSelectItem Value="@(new ProjectOwnerSelection(user!.Id, user.UserName))" />
-            }
-        </MudSelect>
-    }
-</MudContainer>
+@if (Owners.Any() == false)
+{
+    <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no users with the "Owner" role - an admin needs to add someone with said role.</MudText>
+}
+else
+{
+    <MudSelect T="OwnerSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+        @foreach (var user in Owners)
+        {
+            <MudSelectItem Value="@(new OwnerSelection(user!.Id, user.UserName))" />
+        }
+    </MudSelect>
+}
 
 
 @code {
     [Parameter]
-    public ProjectOwnerSelection? OwnerSelection { get; set; }
+    public OwnerSelection? OwnerSelection { get; set; }
     [Parameter]
-    public EventCallback<ProjectOwnerSelection> OnOwnerChanged { get; set; }
+    public EventCallback<OwnerSelection> OnOwnerChanged { get; set; }
+    [Parameter]
+    public bool? FilterByRole { get; set; } = false;
+    [Parameter]
+    public string RoleFilter { get; set; } = "owner";
 
-    private ProjectOwnerSelection? selection;
-    private ProjectOwnerSelection? Selection
+
+    private OwnerSelection? selection;
+    private OwnerSelection? Selection
     {
         get => selection;
         set
@@ -43,13 +48,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (FilterByRole ?? false)
+            Owners = (await ProjectRoleService.GetUsersWithRoleAsync(RoleFilter)).ToList();
+        else
+            Owners = UserManager.Users.ToList();
 
-        Owners = (await ProjectRoleService.GetUsersWithRoleAsync("owner")).ToList();
 
         if (OwnerSelection == null && Owners.Any())
         {
             ApplicationUser? user = Owners.FirstOrDefault();
-            Selection = new ProjectOwnerSelection(user!.Id, user.UserName);
+            Selection = new OwnerSelection(user!.Id, user.UserName);
         } 
         else
         {

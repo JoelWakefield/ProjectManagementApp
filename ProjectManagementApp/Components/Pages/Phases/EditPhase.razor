@@ -1,10 +1,13 @@
 ﻿@page "/phases/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
+@inject IPhaseOwnerService PhaseOwnerService
 
 
 <PageTitle>@Phase?.Name - Edit</PageTitle>
@@ -29,6 +32,7 @@
                 <MudSelectItem Value="@priority">@priority</MudSelectItem>
             }
         </MudSelect>
+        <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="PhaseOwnerChanged" />
     }
 </MudPaper>
 
@@ -40,6 +44,8 @@
     public string? Id { get; set; }
 
     public Phase? Phase { get; set; }
+    public OwnerSelection? CurrentOwnerSelection { get; set; }
+    public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
@@ -56,9 +62,11 @@
         }
     }
 
+    private void PhaseOwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
+
     public async Task SaveAsync()
     {
-        if (String.IsNullOrEmpty(Phase!.Name))
+        if (String.IsNullOrEmpty(Phase!.Name) || CurrentOwnerSelection == null)
         {
             Errors = "Required fields are missing.";
         }
@@ -66,6 +74,8 @@
         {
             try
             {
+                if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
+                    await PhaseOwnerService.AssignOwnerAsync(Phase.Id!, CurrentOwnerSelection.Id);
                 await PhaseService.UpdatePhaseAsync(Phase);
                 NavigationManager.NavigateTo($"/phases/details/{Id}", true);
             }

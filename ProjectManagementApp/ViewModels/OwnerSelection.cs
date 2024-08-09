@@ -1,8 +1,8 @@
 ﻿namespace ProjectManagementApp.ViewModels
 {
-    public class ProjectOwnerSelection
+    public class OwnerSelection
     {
-        public ProjectOwnerSelection(string id, string? name)
+        public OwnerSelection(string id, string? name)
         {
             Id = id;
             Name = name ?? "NO USERNAME";
@@ -14,7 +14,7 @@
         // Note: this is important so the MudSelect can compare ownerss
         public override bool Equals(object o)
         {
-            var other = o as ProjectOwnerSelection;
+            var other = o as OwnerSelection;
             return other?.Name == Name;
         }
 

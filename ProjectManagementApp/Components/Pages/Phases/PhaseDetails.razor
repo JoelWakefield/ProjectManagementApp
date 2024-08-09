@@ -6,6 +6,7 @@
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
+@inject IPhaseOwnerService PhaseOwnerService
 
 
 <PageTitle>@Phase?.Name - Details</PageTitle>
@@ -17,6 +18,7 @@
     <MudPaper Class="my-6 pa-8">
             <LabeledText Label="Description" Text="@Phase!.Description" />
             <LabeledText Label="Priority" Text="@Phase!.Priority.ToString()" />
+            <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
     </MudPaper>
 
     <MudContainer Class="d-flex flex-column align-start my-4 mx-2 gap-2" Gutters="false">
@@ -31,6 +33,7 @@
     public string? Id { get; set; }
 
     public Phase? Phase { get; set; }
+    public ApplicationUser? User { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,9 +42,10 @@
         }
         else {
             Phase = await PhaseService.GetPhaseAsync(Id);
-
             if (Phase == null)
                 throw new Exception($"Could not find phase with id: {Id}");
+
+            User = await PhaseOwnerService.GetOwnerAsync(Id);
         }
     }
 

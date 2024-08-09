@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectManagementApp.Data;
+﻿using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
 {
@@ -12,7 +11,7 @@ namespace ProjectManagementApp.Services
     {
         private ApplicationDbContext dbContext = dbContext;
 
-        public IEnumerable<Stage> GetAllStages() => dbContext.Stages;
+        public IEnumerable<Stage> GetAllStages() => dbContext.Stages.OrderBy(s => s.OrderId);
 
         public async Task CreateStageAsync(string name)
         {

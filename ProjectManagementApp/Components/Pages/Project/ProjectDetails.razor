@@ -19,9 +19,9 @@
     @if (Project != null)
     {
         <LabeledText Label="Description" Text="@Project!.Description" />
-        <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
         <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
         <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
+        <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
     }
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id))">Update</MudButton>
 </MudPaper>
