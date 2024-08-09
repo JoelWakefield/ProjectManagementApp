@@ -25,6 +25,7 @@
 
 <MudTable Items="@AssignedRecords.Take(10)" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
 	<HeaderContent>
+		<MudTh></MudTh>
 		@foreach(var user in Users)
 		{
 			<MudTh>@user.UserName</MudTh>
