@@ -219,28 +219,28 @@ namespace ProjectManagementApp.SampleData
 
             //  Assign users to phases
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Alayah.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Alayah.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Alayah.Id, Assigned = true });
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Bert.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Bert.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Bert.Id, Assigned = true });
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Zahir.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Zahir.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePlanning.Id, UserId = Users.Zahir.Id, Assigned = true });
 
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.UserId == Users.Alayah.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleSetup.Id, UserId = Users.Alayah.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleSetup.Id, UserId = Users.Alayah.Id, Assigned = true });
 
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Zahir.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleDataEntry.Id, UserId = Users.Zahir.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleDataEntry.Id, UserId = Users.Zahir.Id, Assigned = true });
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Alayah.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleDataEntry.Id, UserId = Users.Alayah.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleDataEntry.Id, UserId = Users.Alayah.Id, Assigned = true });
 
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimpleQA.Id && p.UserId == Users.Bert.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleQA.Id, UserId = Users.Bert.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleQA.Id, UserId = Users.Bert.Id, Assigned = true });
 
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.UserId == Users.Mylo.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleNotifyCompletion.Id, UserId = Users.Mylo.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimpleNotifyCompletion.Id, UserId = Users.Mylo.Id, Assigned = true });
 
             if (dbContext.PhaseAssignments.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.UserId == Users.Alayah.Id) == false)
-                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePostAnalytics.Id, UserId = Users.Alayah.Id });
+                dbContext.PhaseAssignments.Add(new PhaseAssignment { PhaseId = Phases.SimplePostAnalytics.Id, UserId = Users.Alayah.Id, Assigned = true });
 
 			//  Save all updates
 			await dbContext.SaveChangesAsync();
