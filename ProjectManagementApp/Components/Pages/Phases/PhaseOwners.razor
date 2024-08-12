@@ -10,7 +10,6 @@
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IPhaseOwnerService PhaseOwnerService
-@inject IPhaseService PhaseService
 
 
 <PageTitle>Phase Owners</PageTitle>
@@ -51,44 +50,25 @@
 	const string UNOWNED_SECTION_NAME = "UNOWNED";
 
 	private IEnumerable<Phase>? PhaseList { get; set; }
-	private List<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
 
-	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
-{
-new KanBanSection(UNOWNED_SECTION_NAME)
-};
+	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>() {
+		new KanBanSection(UNOWNED_SECTION_NAME)
+	};
 	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
 	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
 	private string? Errors { get; set; } = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		PhaseList = PhaseService.GetAllPhases();
+		//	Add the owner sections
+		IEnumerable<ApplicationUser> owners = UserManager.Users.ToList()!;
+		//	TODO: handle a no user(owner) scenario
 
-		if (PhaseList.Any() == false)
-		{
-			Errors = "There are no Phases - please check your data.";
-		}
-		else
-		{
-			// Add the owner sections
-			Owners = UserManager.Users.ToList()!;
-			// TODO: handle a no user(owner) scenario
+		foreach (var owner in owners)
+			_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true));
 
-			foreach (var owner in Owners)
-				_sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true));
-
-			// Assign each Phase to the owner's section
-			foreach (var Phase in PhaseList.ToList())
-			{
-				ApplicationUser? owner = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
-
-				if (owner == null)
-					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, UNOWNED_SECTION_NAME, String.Empty));
-				else
-					_items.Add(new KanbanItem(Phase.Name, Phase.Id!, owner.UserName!, owner.Id));
-			}
-		}
+		//	Get all kanban items
+		_items.AddRange(await PhaseOwnerService.GetPhaseOwnerKanbanItemsAsync());
 	}
 
 	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)
@@ -99,12 +79,12 @@ new KanBanSection(UNOWNED_SECTION_NAME)
 		}
 		else
 		{
-			// Update the board
+			//	Update the board
 			string ownerName = info.DropzoneIdentifier;
 			info.Item.Category = ownerName;
 
-			// Update the Phase owner
-			string? ownerId = Owners.FirstOrDefault(o => o?.UserName == info.Item.Category)?.Id;
+			//	Update the Phase owner
+			string? ownerId = UserManager.Users.FirstOrDefault(u => u.UserName == info.Item.Category)?.Id;
 
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";

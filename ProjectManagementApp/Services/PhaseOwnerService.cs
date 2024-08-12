@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
+using ProjectManagementApp.ViewModels;
 
 namespace ProjectManagementApp.Services
 {
 	public interface IPhaseOwnerService
 	{
+		Task<IEnumerable<KanbanItem>> GetPhaseOwnerKanbanItemsAsync();
 		Task<ApplicationUser?> GetOwnerAsync(string phaseId);
-
 		Task AssignOwnerAsync(string phaseId, string userId);
 	}
 
@@ -15,6 +16,24 @@ namespace ProjectManagementApp.Services
 	{
 		private ApplicationDbContext dbContext = dbContext;
 		private UserManager<ApplicationUser> userManager = userManager;
+
+		public async Task<IEnumerable<KanbanItem>> GetPhaseOwnerKanbanItemsAsync()
+		{
+			List<KanbanItem> items = new List<KanbanItem>();
+
+			// Assign each phase to the owner's section
+			foreach (var phase in dbContext.Phases.ToList())
+			{
+				ApplicationUser? owner = await GetOwnerAsync(phase.Id);
+
+				if (owner == null)
+					items.Add(new KanbanItem(phase.Name, phase.Id!, "UNOWNED", String.Empty));
+				else
+					items.Add(new KanbanItem(phase.Name, phase.Id!, owner.UserName!, owner.Id));
+			}
+
+			return items.AsEnumerable();
+		} 
 
 		public async Task<ApplicationUser?> GetOwnerAsync(string phaseId)
 		{
