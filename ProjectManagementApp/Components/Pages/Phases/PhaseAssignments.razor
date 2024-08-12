@@ -1,0 +1,63 @@
+﻿@page "/phases/assignments"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IPhaseAssignmentService PhaseAssignmentService
+
+
+<PageTitle>Phase Stages</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phase Stages</MudText>
+
+@if (Errors != null)
+{
+	<MudPaper Class="my-6 pa-8">
+		<MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+	</MudPaper>
+}
+
+<MudTable Items="@AssignedRecords.Take(10)" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+	<HeaderContent>
+		<MudTh></MudTh>
+		@foreach(var user in Users)
+		{
+			<MudTh>@user.UserName</MudTh>
+		}
+	</HeaderContent>
+	<RowTemplate>
+		<MudTd>@context.Value.Name</MudTd>
+		@foreach(var user in Users)
+		{
+			<MudTd DataLabel="@user.UserName">
+				<MudCheckBox @onclick="@(() => ToggleAssignmentAsync(context.Value, user.Id))" @bind-Value="context.Value.Assignments[user.Id]" Color="Color.Primary" />
+			</MudTd>
+		}
+	</RowTemplate>
+</MudTable>
+
+
+@code {
+	private IEnumerable<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+	private Dictionary<string,PhaseAssignedRecord> AssignedRecords { get; set; } = new Dictionary<string, PhaseAssignedRecord>();
+	private string? Errors { get; set; } = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Users = UserManager.Users.ToList();
+
+		if (Users.Any() == false)
+			Errors = "There are no user records - check the 'ProjectBuilderExtention'.";
+		else
+			AssignedRecords = await PhaseAssignmentService.GetPhaseAssignedRecordsAsync();
+	}
+
+	private async Task ToggleAssignmentAsync(PhaseAssignedRecord record, string userId) =>
+		await PhaseAssignmentService.CreatePhaseAssignmentAsync(record.PhaseId, userId, !record.Assignments[userId]);
+}

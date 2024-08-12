@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjectManagementApp.Data;
@@ -11,9 +12,11 @@ using ProjectManagementApp.Data;
 namespace ProjectManagementApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240807194320_RemoveStageIdFromPhaseTable")]
+    partial class RemoveStageIdFromPhaseTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,30 +245,6 @@ namespace ProjectManagementApp.Migrations
                     b.ToTable("Phases");
                 });
 
-            modelBuilder.Entity("ProjectManagementApp.Data.PhaseAssignment", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Assigned")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PhaseId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PhaseAssignments");
-                });
-
             modelBuilder.Entity("ProjectManagementApp.Data.PhaseOwner", b =>
                 {
                     b.Property<string>("Id")
@@ -407,9 +386,6 @@ namespace ProjectManagementApp.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
