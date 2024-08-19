@@ -44,7 +44,7 @@
     </ChildContent>
     <ItemRenderer>
         <div class="d-flex justify-center align-center flex-grow-1">
-            <MudIcon Icon="@Icons.Material.Rounded.Pin" Color="@context.Color" Size="Size.Large" />
+            <MudIcon Icon="@Icons.Material.Rounded.Pin" Color="Color.Primary" Size="Size.Large" />
         </div>
     </ItemRenderer>
 </MudDropContainer>
@@ -75,7 +75,7 @@
     {
         public string PhaseId { get; set; }
         public string DateTime { get; set; }
-        public string Identifier = $"{PhaseId}-{DateTime}";
+        public string Identifier { get; set; }
     }
 }
 
