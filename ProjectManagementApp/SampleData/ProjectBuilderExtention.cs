@@ -244,6 +244,24 @@ namespace ProjectManagementApp.SampleData
 
 			//  Save all updates
 			await dbContext.SaveChangesAsync();
-		}
+
+
+            //  Create Schedules for phases
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimplePlanning.Id, Start = DateTime.UtcNow.AddDays(-8), End = DateTime.UtcNow.AddDays(-6) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleSetup.Id, Start = DateTime.UtcNow.AddDays(-5), End = DateTime.UtcNow.AddDays(-2) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleDataEntry.Id, Start = DateTime.UtcNow.AddDays(-1), End = DateTime.UtcNow.AddDays(4) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleQA.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleQA.Id, Start = DateTime.UtcNow.AddDays(5), End = DateTime.UtcNow.AddDays(6) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleNotifyCompletion.Id, Start = DateTime.UtcNow.AddDays(7), End = DateTime.UtcNow.AddDays(7) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id) == false)
+                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimplePostAnalytics.Id, Start = DateTime.UtcNow.AddDays(7), End = DateTime.UtcNow.AddDays(10) });
+
+            //  Save all updates
+            await dbContext.SaveChangesAsync();
+        }
     }
 }
