@@ -30,14 +30,14 @@
 
         @foreach(var date in Dates)
         {
-                <MudContainer 
-                    Class="d-flex justify-center align-center flex-column border-2 border-solid docs-gray-bg mud-border-lines-default"
-                    Style="height:64px;width:64px;"
-                >
-                    <div class="d-flex">@date.Day</div>
-                    <div class="d-flex">@date.Month</div>
-                    <div class="d-flex">@date.Year</div>
-                </MudContainer>
+            <MudContainer 
+                Class="d-flex justify-center align-center flex-column border-2 border-solid docs-gray-bg mud-border-lines-default"
+                Style="height:64px;width:64px;"
+            >
+                <div class="d-flex">@date.Day</div>
+                <div class="d-flex">@date.ToString("MMM")</div>
+                <div class="d-flex">@date.Year</div>
+            </MudContainer>
         }
     </div>
 </div>
@@ -48,7 +48,7 @@
                       Items="_items"
                       CanDropClass="mud-border-info"
                       NoDropClass="mud-border-error"
-                      CanDrop="@((item,identifier ) => _items.Count(x => x.Identifier == identifier ) == 0)"
+                      CanDrop="@((item,identifier) => _items.Count(x => x.Identifier == identifier ) == 0)"
                       ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)"
                       ItemDropped="ItemUpdated"
                       Style="@($"width:{64*DAYS_DISPLAYED + 220}px")"
@@ -59,7 +59,7 @@
                 @foreach (var date in Dates)
                 {
                     <MudDropZone T="DropItem"
-                                 Identifier="@($"{date.Date.ToString()}")"
+                                 Identifier="@($"{phase.Id}|{date.Date.ToString()}")"
                                  DraggingClass="mud-theme-success"
                                  Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default"
                                  Style="height:64px;width:64px;" />
@@ -89,7 +89,7 @@
 
         for (int i = -DAYS_DISPLAYED / 2; i < DAYS_DISPLAYED / 2; i++)
         {
-            Dates.Add(DateTime.UtcNow.AddDays(i));
+            Dates.Add(DateTime.UtcNow.Date.AddDays(i));
         }
 
         foreach (var phase in Phases)
@@ -102,13 +102,16 @@
 
     private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
     {
-        dropItem.Item.Identifier = dropItem.DropzoneIdentifier;
+        var parts = dropItem.DropzoneIdentifier.Split("|");
+        dropItem.Item.PhaseId = parts[0];
+        dropItem.Item.Start = parts[1];
 
         //  create a new record for the schedule update
         PhaseScheduleService.CreateScheduleAsync(new PhaseSchedule
             {
                 PhaseId = dropItem.Item.PhaseId,
                 Start = DateTime.Parse(dropItem.Item.Start),
+                End = DateTime.Parse(dropItem.Item.Start).AddDays(1)
             });
     }
 
@@ -116,6 +119,6 @@
     {
         public string PhaseId { get; set; }
         public string Start { get; set; }
-        public string Identifier { get; set; }
+        public string Identifier { get => $"{PhaseId}|{Start}"; }
     }
 }
