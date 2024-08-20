@@ -4,7 +4,10 @@
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @attribute [Authorize]
+@inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
+@inject IPhaseScheduleService PhaseScheduleService
+
 
 <PageTitle>Phase Schedules</PageTitle>
 
@@ -17,19 +20,102 @@
     </MudPaper>
 }
 
+<div style="@($"width:{64*DAYS_DISPLAYED + 220}px")">
+    <div class="d-flex">
+        <MudText Class="d-flex align-center border-2 border-solid mud-border-lines-default px-2"
+            Style="width:220px"
+        >
+            Dates
+        </MudText>
+
+        @foreach(var date in Dates)
+        {
+                <MudContainer 
+                    Class="d-flex justify-center align-center flex-column border-2 border-solid docs-gray-bg mud-border-lines-default"
+                    Style="height:64px;width:64px;"
+                >
+                    <div class="d-flex">@date.Day</div>
+                    <div class="d-flex">@date.Month</div>
+                    <div class="d-flex">@date.Year</div>
+                </MudContainer>
+        }
+    </div>
+</div>
+
 @foreach(var phase in Phases)
 {
-    <GanttRow Phase="phase" />
+    <MudDropContainer T="DropItem"
+                      Items="_items"
+                      CanDropClass="mud-border-info"
+                      NoDropClass="mud-border-error"
+                      CanDrop="@((item,identifier ) => _items.Count(x => x.Identifier == identifier ) == 0)"
+                      ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)"
+                      ItemDropped="ItemUpdated"
+                      Style="@($"width:{64*DAYS_DISPLAYED + 220}px")"
+                      >
+        <ChildContent>
+            <div class="d-flex">
+                <MudText Class="d-flex align-center border-2 border-solid mud-border-lines-default px-2" Style="width:220px">@phase.Name</MudText>
+                @foreach (var date in Dates)
+                {
+                    <MudDropZone T="DropItem"
+                                 Identifier="@($"{date.Date.ToString()}")"
+                                 DraggingClass="mud-theme-success"
+                                 Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default"
+                                 Style="height:64px;width:64px;" />
+                }
+            </div>
+        </ChildContent>
+        <ItemRenderer>
+            <div class="d-flex justify-center align-center flex-grow-1">
+                <MudIcon Icon="@Icons.Material.Rounded.Pin" Color="Color.Primary" Size="Size.Large" />
+            </div>
+        </ItemRenderer>
+    </MudDropContainer>
 }
 
 @code {
+    const int DAYS_DISPLAYED = 20;
 
     private IEnumerable<Phase> Phases { get; set; } = new List<Phase>();
+    private List<PhaseSchedule> Schedules { get; set; } = new List<PhaseSchedule>();
+    private List<DateTime> Dates { get; set; } = new List<DateTime>();
+    private List<DropItem> _items = new List<DropItem>();
     private string? Errors { get; set; } = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Phases = PhaseService.GetAllPhases();
+        Phases = PhaseService.GetAllPhases().ToList();
 
+        for (int i = -DAYS_DISPLAYED / 2; i < DAYS_DISPLAYED / 2; i++)
+        {
+            Dates.Add(DateTime.UtcNow.AddDays(i));
+        }
+
+        foreach (var phase in Phases)
+        {
+            var schedule = await PhaseScheduleService.GetScheduleAsync(phase.Id);
+            _items.Add(new DropItem() { PhaseId = schedule.PhaseId, Start = schedule.Start.Date.ToString() });
+            Schedules.Add(schedule);
+        }
+    }
+
+    private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
+    {
+        dropItem.Item.Identifier = dropItem.DropzoneIdentifier;
+
+        //  create a new record for the schedule update
+        PhaseScheduleService.CreateScheduleAsync(new PhaseSchedule
+            {
+                PhaseId = dropItem.Item.PhaseId,
+                Start = DateTime.Parse(dropItem.Item.Start),
+            });
+    }
+
+    public class DropItem
+    {
+        public string PhaseId { get; set; }
+        public string Start { get; set; }
+        public string Identifier { get; set; }
     }
 }
