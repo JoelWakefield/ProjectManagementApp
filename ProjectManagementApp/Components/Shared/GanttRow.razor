@@ -1,0 +1,82 @@
+﻿@page "/phases/schedules"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject IPhaseScheduleService PhaseScheduleService
+
+
+<MudDropContainer 
+    T="DropItem"
+    Items="_items"
+    CanDropClass="mud-border-info"
+    NoDropClass="mud-border-error"
+    CanDrop="@((item,identifier ) => _items.Count(x => x.Identifier == identifier ) == 0)"
+    ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)"
+    ItemDropped="ItemUpdated"
+    Class="border-2 border-solid mud-border-lines-default"
+    Style="@($"width:{64*DAYS_DISPLAYED + 220}px")"
+>
+    <ChildContent>
+        <div class="d-flex">
+            <MudText Class="d-flex align-center px-2" Style="width:220px">@Phase.Name</MudText>
+            @foreach (var date in Dates)
+            {
+                <MudDropZone 
+                    T="DropItem"
+                    Identifier="@($"{date.Date.ToString()}")"
+                    DraggingClass="mud-theme-success"
+                    Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default"
+                    Style="height:64px;width:64px;" 
+                />
+            }
+        </div>
+    </ChildContent>
+    <ItemRenderer>
+        <div class="d-flex justify-center align-center flex-grow-1">
+            <MudIcon Icon="@Icons.Material.Rounded.Pin" Color="Color.Primary" Size="Size.Large" />
+        </div>
+    </ItemRenderer>
+</MudDropContainer>
+
+
+@code {
+    const int DAYS_DISPLAYED = 20;
+
+    [Parameter]
+    public Phase Phase { get; set; }
+
+    private PhaseSchedule? Schedule { get; set; }
+    private List<DateTime> Dates { get; set; } = new List<DateTime>();
+    private string? Errors { get; set; } = null;
+    private List<DropItem> _items = new List<DropItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (int i = -DAYS_DISPLAYED / 2; i < DAYS_DISPLAYED / 2; i++)
+        {
+            Dates.Add(DateTime.UtcNow.AddDays(i));
+        }
+
+        if (Phase == null)
+        {
+
+        }
+        else
+        {   
+            Schedule = await PhaseScheduleService.GetSchedule(Phase.Id);
+            _items.Add(new DropItem() { Identifier = Schedule.Start.Date.ToString() });
+        }
+    }
+
+    private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
+    {
+        dropItem.Item.Identifier = dropItem.DropzoneIdentifier;
+    }
+
+    public class DropItem
+    {
+        public string Identifier { get; set; }
+    }
+}

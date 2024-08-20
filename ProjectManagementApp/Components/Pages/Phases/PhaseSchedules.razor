@@ -1,6 +1,10 @@
 ﻿@page "/phases/schedules"
 @using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Components.Shared
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
 @attribute [Authorize]
+@inject IPhaseService PhaseService
 
 <PageTitle>Phase Schedules</PageTitle>
 
@@ -13,72 +17,19 @@
     </MudPaper>
 }
 
-<MudDropContainer 
-    T="DropItem" 
-    Items="_items" 
-    CanDropClass="mud-border-info" 
-    NoDropClass="mud-border-error" 
-    CanDrop="@( (item,identifier ) => _items.Count(x => x.Identifier == identifier ) == 0)" 
-    ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)" 
-    ItemDropped="ItemUpdated" 
-    Class="border-2 border-solid mud-border-lines-default"
->
-    <ChildContent>
-        @for(int r = 0; r < 8; r++)
-        {
-            var row = r.ToString();
-            <div class="d-flex">
-                @for (int c = 0; c < 8; c++)
-                {
-                    var col = c.ToString();
-                    <MudDropZone 
-                        T="DropItem" 
-                        Identifier="@($"{row}-{col}")" 
-                        DraggingClass="mud-theme-success" 
-                        Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default" 
-                        Style="height:64px;width:64px;"
-                    />
-                }
-            </div>
-        }
-    </ChildContent>
-    <ItemRenderer>
-        <div class="d-flex justify-center align-center flex-grow-1">
-            <MudIcon Icon="@Icons.Material.Rounded.Pin" Color="Color.Primary" Size="Size.Large" />
-        </div>
-    </ItemRenderer>
-</MudDropContainer>
-
-@code {
-    private string? Errors { get; set; } = null;
-
-    private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
-    {
-        dropItem.Item.Identifier = dropItem.DropzoneIdentifier;
-    }
-
-    private List<DropItem> _items = new()
-    {
-        new DropItem(){ PhaseId = "0", DateTime = "0" },
-        new DropItem(){ PhaseId = "1", DateTime = "1" },
-        new DropItem(){ PhaseId = "2", DateTime = "2" },
-        new DropItem(){ PhaseId = "3", DateTime = "2" },
-        new DropItem(){ PhaseId = "4", DateTime = "4" },
-        new DropItem(){ PhaseId = "5", DateTime = "5" },
-        new DropItem(){ PhaseId = "6", DateTime = "7" },
-        new DropItem(){ PhaseId = "7", DateTime = "8" },
-        new DropItem(){ PhaseId = "8", DateTime = "8" },
-        new DropItem(){ PhaseId = "9", DateTime = "9" },
-    };
-
-    public class DropItem
-    {
-        public string PhaseId { get; set; }
-        public string DateTime { get; set; }
-        public string Identifier { get; set; }
-    }
+@foreach(var phase in Phases)
+{
+    <GanttRow Phase="phase" />
 }
 
 @code {
 
+    private IEnumerable<Phase> Phases { get; set; } = new List<Phase>();
+    private string? Errors { get; set; } = null;
+
+    protected override void OnInitialized()
+    {
+        Phases = PhaseService.GetAllPhases();
+
+    }
 }

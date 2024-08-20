@@ -27,6 +27,7 @@ builder.Services.AddScoped<IPhaseService,PhaseService>();
 builder.Services.AddScoped<IPhaseOwnerService,PhaseOwnerService>();
 builder.Services.AddScoped<IPhaseStageService,PhaseStageService>();
 builder.Services.AddScoped<IPhaseAssignmentService,PhaseAssignmentService>();
+builder.Services.AddScoped<IPhaseScheduleService,PhaseScheduleService>();
 
 builder.Services.AddAuthentication(options =>
     {
