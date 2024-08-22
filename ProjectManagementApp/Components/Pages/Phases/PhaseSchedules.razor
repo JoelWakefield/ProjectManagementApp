@@ -1,11 +1,10 @@
 ﻿@page "/phases/schedules"
 @using Microsoft.AspNetCore.Authorization
-@using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
 @inject IPhaseScheduleService PhaseScheduleService
 
 
@@ -38,19 +37,19 @@
 @foreach (var item in GanttItems)
 {
     <MudGrid Class="my-3">
-        @if (item.OnChart)
+        @if (item.OnChart(DAYS_DISPLAYED))
         {
-            @for (int i = 0; i < item.FromStart; i++)
+            @for (int i = 0; i < item.FromStart(); i++)
             {
                 <MudSpacer />
             }
-            <MudItem Class="pa-0" xs="item.Duration">
+            <MudItem Class="pa-0" xs="item.Duration(DAYS_DISPLAYED)">
                 <MudPaper Class="d-flex align-center justify-center mud-width-full py-3">
                     <MudText Typo="Typo.h6" Align="Align.Center">@($"{item.Start.ToString("dd")} - {item.End.ToString("dd")}")
                     </MudText>
                 </MudPaper>
             </MudItem>
-            @for (int i = 0; i < item.ToEnd; i++)
+            @for (int i = 0; i < item.ToEnd(DAYS_DISPLAYED); i++)
             {
                 <MudSpacer />
             }
@@ -66,44 +65,21 @@
     </MudGrid>
 }
 
+
 @code {
     const int DAYS_DISPLAYED = 12;
-    private static DateTime Today = DateTime.UtcNow.Date;
-    private static DateTime ChartEnd = Today.AddDays(DAYS_DISPLAYED);
-
-    private IEnumerable<Phase> Phases { get; set; } = new List<Phase>();
-    private List<GanttItem> GanttItems { get; set; } = new List<GanttItem>();
+    
+    private IEnumerable<GanttItem> GanttItems { get; set; } = new List<GanttItem>();
     private List<DateTime> Dates { get; set; } = new List<DateTime>();
     private string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
-        Phases = PhaseService.GetAllPhases().ToList();
-
         for (int i = 0; i < DAYS_DISPLAYED; i++)
         {
             Dates.Add(DateTime.UtcNow.Date.AddDays(i));
         }
 
-        foreach (var phase in Phases)
-        {
-            GanttItems.Add(new GanttItem(await PhaseScheduleService.GetScheduleAsync(phase.Id)));
-        }
-    }
-
-    public class GanttItem
-    {
-        public GanttItem(PhaseSchedule schedule)
-        {
-            Start = schedule.Start;
-            End = schedule.End;
-        }
-
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public bool OnChart { get => !(Today > End || ChartEnd < Start); }
-        public int Duration { get => DAYS_DISPLAYED - FromStart - ToEnd; }
-        public int FromStart { get => Start > Today ? (Start - Today).Days : 0; }
-        public int ToEnd { get => ChartEnd > End ? (ChartEnd - End).Days : 0; }
+        GanttItems = await PhaseScheduleService.GetGanttItems();
     }
 }
