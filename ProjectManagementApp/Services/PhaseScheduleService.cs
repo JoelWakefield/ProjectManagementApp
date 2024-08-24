@@ -37,7 +37,7 @@ namespace ProjectManagementApp.Services
                     items.Add(new GanttItem(schedule, phase.Name));
             }
 
-            return items.AsEnumerable();
+            return items;
         }
 
         public async Task<PhaseSchedule?> GetScheduleAsync(string phaseId)

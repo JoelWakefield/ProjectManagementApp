@@ -68,14 +68,14 @@
     const int DAYS_DISPLAYED = 12;
     
     private IEnumerable<GanttItem> GanttItems { get; set; } = new List<GanttItem>();
-    private List<DateTime> Dates { get; set; } = new List<DateTime>();
+    private List<DateOnly> Dates { get; set; } = new List<DateOnly>();
     private string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
         for (int i = 0; i < DAYS_DISPLAYED; i++)
         {
-            Dates.Add(DateTime.UtcNow.Date.AddDays(i));
+            Dates.Add(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(i)));
         }
 
         GanttItems = await PhaseScheduleService.GetGanttItems();
