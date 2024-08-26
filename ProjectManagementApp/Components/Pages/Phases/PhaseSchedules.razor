@@ -1,0 +1,83 @@
+﻿@page "/phases/schedules"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject IPhaseScheduleService PhaseScheduleService
+
+
+<PageTitle>Phase Schedules</PageTitle>
+
+<MudText Typo="Typo.h1" Class="px-6">Phase Schedules</MudText>
+
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
+
+
+<MudGrid Class="my-3">
+    @foreach (var date in Dates)
+    {
+        <MudItem Class="pa-0" xs="1">
+            <MudContainer
+                Class="d-flex justify-center align-center flex-column border-2 border-solid docs-gray-bg mud-border-lines-default">
+                <div class="d-flex">@date.Day</div>
+                <div class="d-flex">@date.ToString("MMM")</div>
+                <div class="d-flex">@date.Year</div>
+            </MudContainer>
+        </MudItem>
+    }
+</MudGrid>
+
+@foreach (var item in GanttItems)
+{
+    <MudGrid Class="my-3">
+        @if (item.OnChart(DAYS_DISPLAYED))
+        {
+            @for (int i = 0; i < item.FromStart(); i++)
+            {
+                <MudSpacer />
+            }
+            <MudItem Class="pa-0" xs="item.Duration(DAYS_DISPLAYED)">
+                <MudPaper Class="d-flex align-center justify-center mud-width-full pa-3" Style="word-break:break-word;">
+                    <MudText Typo="Typo.body1" Align="Align.Center">@item.Name</MudText>
+                </MudPaper>
+            </MudItem>
+            @for (int i = 0; i < item.ToEnd(DAYS_DISPLAYED); i++)
+            {
+                <MudSpacer />
+            }
+        }
+        else
+        {
+            @for (int i = 0; i < DAYS_DISPLAYED; i++)
+            {
+                <MudSpacer />
+            }
+        }
+    </MudGrid>
+}
+
+
+@code {
+    const int DAYS_DISPLAYED = 12;
+    
+    private IEnumerable<GanttItem> GanttItems { get; set; } = new List<GanttItem>();
+    private List<DateOnly> Dates { get; set; } = new List<DateOnly>();
+    private string? Errors { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (int i = 0; i < DAYS_DISPLAYED; i++)
+        {
+            Dates.Add(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(i)));
+        }
+
+        GanttItems = await PhaseScheduleService.GetGanttItems();
+    }
+}
