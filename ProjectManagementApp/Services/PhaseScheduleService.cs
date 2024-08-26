@@ -9,7 +9,7 @@ namespace ProjectManagementApp.Services
         IEnumerable<PhaseSchedule> GetSchedules();
         Task<PhaseSchedule?> GetScheduleAsync(string phaseId);
         Task<IEnumerable<GanttItem>> GetGanttItems();
-        Task CreateScheduleAsync(PhaseSchedule schedule);
+        Task CreateScheduleAsync(PhaseScheduleVm viewModel);
     }
 
     public class PhaseScheduleService(ApplicationDbContext dbContext, IPhaseService phaseService) : IPhaseScheduleService
@@ -47,8 +47,14 @@ namespace ProjectManagementApp.Services
                 .FirstOrDefaultAsync(s => s.PhaseId == phaseId);
         }
 
-        public async Task CreateScheduleAsync(PhaseSchedule schedule)
+        public async Task CreateScheduleAsync(PhaseScheduleVm viewModel)
         {
+            PhaseSchedule schedule = new PhaseSchedule()
+            {
+                PhaseId = viewModel.PhaseId,
+                Start = viewModel.Start.ToDateTime(TimeOnly.MinValue),
+                End = viewModel.End.ToDateTime(TimeOnly.MinValue),
+            };
             await dbContext.PhaseSchedules.AddAsync(schedule);
             await dbContext.SaveChangesAsync();
         }

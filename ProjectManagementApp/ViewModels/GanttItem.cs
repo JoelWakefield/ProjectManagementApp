@@ -8,8 +8,8 @@ namespace ProjectManagementApp.ViewModels
         {
             PhaseId = schedule.PhaseId;
             Name = name;
-            Start = schedule.Start;
-            End = schedule.End;
+            Start = DateOnly.FromDateTime(schedule.Start);
+            End = DateOnly.FromDateTime(schedule.End);
         }
 
         public string PhaseId { get; set; }
@@ -25,6 +25,10 @@ namespace ProjectManagementApp.ViewModels
         public static int FromStart(this GanttItem item) => item.Start > Today ? (item.Start.ToDateTime(TimeOnly.MinValue) - Today.ToDateTime(TimeOnly.MinValue)).Days : 0;
         public static int ToEnd(this GanttItem item, int daysOnChart) => ChartEnd(daysOnChart) > item.End ? (ChartEnd(daysOnChart).ToDateTime(TimeOnly.MinValue) - item.End.ToDateTime(TimeOnly.MinValue)).Days : 0;
         public static bool OnChart(this GanttItem item, int daysOnChart) => !(Today > item.End || ChartEnd(daysOnChart) < item.Start);
-        public static int Duration(this GanttItem item, int daysOnChart) => daysOnChart - item.FromStart() - item.ToEnd(daysOnChart);
+        public static int Duration(this GanttItem item, int daysOnChart)
+        {
+            var duration = daysOnChart - item.FromStart() - item.ToEnd(daysOnChart);
+            return duration == 0 ? 1 : duration;
+        }
     }
 }
