@@ -11,6 +11,19 @@ namespace ProjectManagementApp.Data
     {
         [Required]
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string ArchiveId { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public int OrderId { get; set; }
+        public IEnumerable<PhaseStage> PhaseStages { get; set; }
+    }
+
+    public class StageArchive
+    {
+        [Required]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         [Required]
         public string Name { get; set; }
         [Required]

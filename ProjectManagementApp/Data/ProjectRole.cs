@@ -6,6 +6,15 @@
     public class ProjectRole
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string ArchiveId { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<ProjectUserRole> ProjectUserRoles { get; set; }
+    }
+
+    public class ProjectRoleArchive
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public string Name { get; set; }
     }
 }

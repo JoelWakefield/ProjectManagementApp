@@ -9,6 +9,30 @@ namespace ProjectManagementApp.Data
     {
         [Required]
         public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string ArchiveId { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+        public string? Description { get; set; }
+        public Priority Priority { get; set; } = Priority.Medium;
+
+        [Required]
+        public string ProjectId { get; set; }
+        public Project Project { get; set; }
+        public string PhaseStageId { get; set; }
+        public PhaseStage PhaseStage { get; set; }
+        public string OwnerId { get; set; }
+        public PhaseOwner Owner { get; set; }
+        public IEnumerable<PhaseAssignment> PhaseAssignments { get; set; }
+        public string PhaseScheduleId { get; set; }
+        public PhaseSchedule PhaseSchedule { get; set; }
+    }
+
+    public class PhaseArchive
+    {
+        [Required]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         [Required]
         public string Name { get; set; }
         [Required]
