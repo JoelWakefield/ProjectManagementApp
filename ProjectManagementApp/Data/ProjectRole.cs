@@ -8,7 +8,7 @@
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string ArchiveId { get; set; }
         public string Name { get; set; }
-        public IEnumerable<ProjectUserRole> ProjectUserRoles { get; set; }
+        public IEnumerable<ApplicationUser> Users { get; set; }
     }
 
     public class ProjectRoleArchive

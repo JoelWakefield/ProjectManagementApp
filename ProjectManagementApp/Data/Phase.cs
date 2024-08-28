@@ -19,11 +19,11 @@ namespace ProjectManagementApp.Data
         [Required]
         public string ProjectId { get; set; }
         public Project Project { get; set; }
-        public string PhaseStageId { get; set; }
-        public PhaseStage PhaseStage { get; set; }
+        public string StageId { get; set; }
+        public Stage Stage { get; set; }
         public string OwnerId { get; set; }
-        public PhaseOwner Owner { get; set; }
-        public IEnumerable<PhaseAssignment> PhaseAssignments { get; set; }
+        public ApplicationUser Owner { get; set; }
+        public IEnumerable<ApplicationUser> PhaseAssignments { get; set; }
         public string PhaseScheduleId { get; set; }
         public PhaseSchedule PhaseSchedule { get; set; }
     }
@@ -35,10 +35,13 @@ namespace ProjectManagementApp.Data
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         [Required]
         public string Name { get; set; }
-        [Required]
-        public string ProjectId { get; set; }
         public string? Description { get; set; }
         public Priority Priority { get; set; } = Priority.Medium;
+
+        public string ProjectId { get; set; }
+        public string StageId { get; set; }
+        public string OwnerId { get; set; }
+        public string PhaseScheduleId { get; set; }
     }
 
     public enum Priority

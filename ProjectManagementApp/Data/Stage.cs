@@ -16,7 +16,8 @@ namespace ProjectManagementApp.Data
         public string Name { get; set; }
         [Required]
         public int OrderId { get; set; }
-        public IEnumerable<PhaseStage> PhaseStages { get; set; }
+
+        public IEnumerable<Phase> Phases { get; set; }
     }
 
     public class StageArchive

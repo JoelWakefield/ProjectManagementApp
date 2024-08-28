@@ -18,7 +18,8 @@
         public float TotalWorkHours { get; set; }
 
         public IEnumerable<Phase> Phases { get; set; }
-        public ProjectOwner Owner { get; set; }
+        public string OwnerId { get; set; }
+        public ApplicationUser Owner { get; set; }
     }
 
     public class ProjectArchive
