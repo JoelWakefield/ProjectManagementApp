@@ -1,14 +1,9 @@
 ﻿namespace ProjectManagementApp.Data
 {
-    public class PhaseStage
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
-        public string PhaseId { get; set; }
-        public Phase Phase { get; set; }
-        public string StageId { get; set; }
-        public Stage Stage { get; set; }
-    }
+    /// <summary>
+    /// Keeps track of when a phase is assigned a stage;
+    /// therefore, the data is kept immutably.
+    /// </summary>
     public class PhaseStageArchive
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

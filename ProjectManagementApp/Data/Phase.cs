@@ -23,9 +23,9 @@ namespace ProjectManagementApp.Data
         public Stage Stage { get; set; }
         public string OwnerId { get; set; }
         public ApplicationUser Owner { get; set; }
-        public IEnumerable<ApplicationUser> PhaseAssignments { get; set; }
-        public string PhaseScheduleId { get; set; }
-        public PhaseSchedule PhaseSchedule { get; set; }
+
+        public IEnumerable<ApplicationUser> Assignments { get; set; }
+        public IEnumerable<PhaseSchedule> Schedules { get; set; }
     }
 
     public class PhaseArchive
@@ -41,7 +41,6 @@ namespace ProjectManagementApp.Data
         public string ProjectId { get; set; }
         public string StageId { get; set; }
         public string OwnerId { get; set; }
-        public string PhaseScheduleId { get; set; }
     }
 
     public enum Priority

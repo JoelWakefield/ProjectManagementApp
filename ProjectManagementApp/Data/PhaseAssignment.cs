@@ -1,15 +1,9 @@
 ﻿namespace ProjectManagementApp.Data
 {
-	public class PhaseAssignment
-	{
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
-        public string PhaseId { get; set; }
-        public Phase Phase { get; set; }
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-    }
-
+    /// <summary>
+    /// Keeps track of when people are assigned to what phase;
+    /// therefore, the data is kept immutably.
+    /// </summary>
     public class PhaseAssignmentArchive
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();

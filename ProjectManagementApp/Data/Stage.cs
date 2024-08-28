@@ -3,9 +3,8 @@
 namespace ProjectManagementApp.Data
 {
     /// <summary>
-    /// A separate table called `PhaseStages` will keep track of phase stage changes; the current phase will simply be the most recent record for said phase.
-    /// 
-    /// The order id must be unique, and 
+    /// A separate table called `PhaseStages` will keep track of phase stage changes; 
+    /// the current phase will simply be the most recent record for said phase.
     /// </summary>
     public class Stage
     {

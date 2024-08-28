@@ -1,18 +1,9 @@
 ﻿namespace ProjectManagementApp.Data
 {
     /// <summary>
-    /// Since Projects can change owner, it's important to keep track of who owns what and when; therefore, the data is kept immutably (ie, old records are not updated/deleted, new records are always made instead).
+    /// Keeps track of who owns what project and when; 
+    /// therefore, the data is kept immutably.
     /// </summary>
-    public class ProjectOwner
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-        public string ProjectId { get; set; }
-        public Project Project { get; set; }
-        public string UserId { get; set; }
-    }
-
     public class ProjectOwnerArchive
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
