@@ -75,15 +75,11 @@ namespace ProjectManagementApp.Services
         public async Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName)
         {
             ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
-            if (projectRole == null)
-                return new List<ApplicationUser>().AsEnumerable();
-            
-            IEnumerable<string> userIds = dbContext.ProjectUserRoles
-                .Where(r => r.RoleId == projectRole.Id)
-                .Select(r => r.UserId)
-                .AsEnumerable();
 
-            return userManager.Users.Where(u => userIds.Contains(u.Id));
+            if (projectRole == null)
+                return Enumerable.Empty<ApplicationUser>();
+            else
+                return projectRole.Users;
         }
 
         public async Task CreateRoleAsync(string name)

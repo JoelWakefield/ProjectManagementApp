@@ -5,7 +5,7 @@
     /// </summary>
     public class Project
     {
-        public string? Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string ArchiveId { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public string? CreatedBy { get; set; }
@@ -24,7 +24,7 @@
 
     public class ProjectArchive
     {
-        public string? Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public string? CreatedBy { get; set; }
         public string Name { get; set; }

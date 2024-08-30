@@ -68,7 +68,7 @@
             try
             {
                 await ProjectService.CreateAsync(Project);
-                await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                await ProjectOwnerService.AssignOwnerAsync(Project, CurrentOwnerSelection.Id);
                 NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
             }
             catch (Exception ex)

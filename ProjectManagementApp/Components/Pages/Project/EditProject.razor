@@ -68,7 +68,7 @@
                 NavigationManager.NavigateTo($"/projects", true);
             }
 
-            ApplicationUser? user = await ProjectOwnerService.GetOwnerAsync(Project?.Id);
+            ApplicationUser? user = Project?.Owner;
             if (user != null)
             {
                 OldOwnerSelection = new OwnerSelection(user!.Id, user.UserName);
@@ -91,7 +91,7 @@
             try
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                    await ProjectOwnerService.AssignOwnerAsync(Project, CurrentOwnerSelection.Id);
                 await ProjectService.UpdateProjectAsync(Project);
                 NavigationManager.NavigateTo($"/projects/details/{Id}", true);
             }

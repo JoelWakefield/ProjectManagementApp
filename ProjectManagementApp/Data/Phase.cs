@@ -24,8 +24,8 @@ namespace ProjectManagementApp.Data
         public string OwnerId { get; set; }
         public ApplicationUser Owner { get; set; }
 
-        public IEnumerable<ApplicationUser> Assignments { get; set; }
-        public IEnumerable<PhaseSchedule> Schedules { get; set; }
+        public List<ApplicationUser> Assignments { get; set; }
+        public List<PhaseSchedule> Schedules { get; set; }
     }
 
     public class PhaseArchive
