@@ -10,8 +10,7 @@ namespace ProjectManagementApp.Services
         Task<ProjectRole?> GetRoleAsync(string name);
         IEnumerable<ProjectRole>? GetUserRoles(string userId);
         IEnumerable<string> GetUserRoleNames(string userId);
-        Task RemoveRoleFromUserAsync(string userId, string roleName);
-        Task AddRoleToUserAsync(string userId, string roleName);
+        Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRole role);
         Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName);
         Task CreateRoleAsync(string name);
 	}
@@ -44,30 +43,16 @@ namespace ProjectManagementApp.Services
                 return roles!.Select(r => r.Name).ToList();
         }
 
-        public async Task RemoveRoleFromUserAsync(string userId, string roleName)
+        public async Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRole role)
         {
-            ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
-
-            if (projectRole == null) { return; }
-
-            ProjectUserRole? projectUserRole = await dbContext.ProjectUserRoles.FirstOrDefaultAsync(r => r.RoleId == projectRole!.Id && r.UserId == userId);
-            
-            if (projectUserRole != null)
+            if (user.ProjectRoles.Contains(role))
             {
-                dbContext.ProjectUserRoles.Remove(projectUserRole);
-                await dbContext.SaveChangesAsync();
+                user.ProjectRoles.Remove(role);
             }
-        }
-
-        public async Task AddRoleToUserAsync(string userId, string roleName)
-        {
-            ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
-            if (projectRole == null) { return; }
-            
-            await dbContext.ProjectUserRoles.AddAsync(new ProjectUserRole { 
-                UserId = userId, 
-                RoleId = projectRole!.Id 
-            });
+            else
+            {
+                user.ProjectRoles.Add(role);
+            }
 
             await dbContext.SaveChangesAsync();
         }

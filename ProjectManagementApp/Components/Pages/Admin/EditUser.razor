@@ -21,7 +21,7 @@
     <MudList T="string">
         @if (AllRoles != null)
         {
-            @foreach (string key in AllRoles?.Keys!)
+            @foreach (ProjectRole key in AllRoles?.Keys!)
             {
                 <MudCheckBox @onclick="@(() => ToggleRoleAsync(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
             }
@@ -34,10 +34,8 @@
     [Parameter]
     public string? UserId { get; set; }
 
-    public ApplicationUser? ApplicationUser { get; set; }
-    public UserWithRoles? User { get; set; }
-    public Dictionary<string, bool>? AllRoles { get; set; }
-    private IEnumerable<string>? UserRoleNames { get; set; }
+    public ApplicationUser? User { get; set; }
+    public Dictionary<ProjectRole, bool>? AllRoles { get; set; }
 
     public class UserWithRoles
     {
@@ -46,38 +44,22 @@
 
     protected override void OnInitialized()
     {
-        ApplicationUser = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
+        User = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
 
-        if (ApplicationUser == null)
+        if (User == null)
         {
             NavigationManager.NavigateTo("/admin/users", true);
         } 
         else
         {
-            User = new UserWithRoles { UserName = ApplicationUser?.UserName };
-            UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
-
-            AllRoles = ProjectRoleService.GetAllRoles().ToDictionary(
-                role => role.Name ?? throw new Exception($"An IdentityRole exists without a name - id:{role.Id}"),
-                role => false);
-            if (UserRoleNames.Any())
-                foreach (var key in AllRoles.Keys)
-                    AllRoles[key] = UserRoleNames.Contains(key);
+            AllRoles = ProjectRoleService.GetAllRoles().ToDictionary(role => role, _ => false);
+            foreach (var role in User.ProjectRoles)
+                AllRoles[role] = true;
         }
     }
 
-    public async Task ToggleRoleAsync(string role)
+    public async Task ToggleRoleAsync(ProjectRole role)
     {
-        ProjectRole? projectRole = await ProjectRoleService.GetRoleAsync(role);
-
-        if (projectRole == null)
-            NavigationManager.Refresh(true);
-
-        if (UserRoleNames!.Contains(role))
-            await ProjectRoleService.RemoveRoleFromUserAsync(UserId!, role);
-        else
-            await ProjectRoleService.AddRoleToUserAsync(UserId!, role);
-
-        UserRoleNames = ProjectRoleService.GetUserRoleNames(UserId!);
+        await ProjectRoleService.UpdateRoleForUserAsync(User!, role);
     }
 }

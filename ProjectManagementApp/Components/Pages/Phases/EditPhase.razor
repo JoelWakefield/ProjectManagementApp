@@ -75,7 +75,7 @@
             try
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await PhaseOwnerService.AssignOwnerAsync(Phase.Id!, CurrentOwnerSelection.Id);
+                    await PhaseOwnerService.AssignOwnerAsync(Phase, CurrentOwnerSelection.Id);
                 await PhaseService.UpdatePhaseAsync(Phase);
                 NavigationManager.NavigateTo($"/phases/details/{Id}", true);
             }

@@ -20,7 +20,7 @@
 		public string CategoryId { get; set; }
 
 
-		public KanbanItem(string name, string itemId, string category, string categoryId)
+		public KanbanItem(string name, string itemId, string category = "UNOWNED", string categoryId = "")
 		{
 			Name = name;
 			ItemId = itemId;

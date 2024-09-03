@@ -7,8 +7,7 @@ namespace ProjectManagementApp.Services
     public interface IPhaseScheduleService
     {
         IEnumerable<PhaseSchedule> GetSchedules();
-        Task<PhaseSchedule?> GetScheduleAsync(string phaseId);
-        Task<IEnumerable<GanttItem>> GetGanttItems();
+        IEnumerable<GanttItem> GetGanttItems();
         Task CreateScheduleAsync(PhaseScheduleVm viewModel);
     }
 
@@ -24,27 +23,13 @@ namespace ProjectManagementApp.Services
         /// TODO: only check for items which would be displayed on the chart.
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<GanttItem>> GetGanttItems()
+        public IEnumerable<GanttItem> GetGanttItems()
         {
-            var phases = phaseService.GetAllPhases().ToList();
-            var items = new List<GanttItem>();
-
-            foreach (var phase in phases)
+            foreach (var phase in phaseService.GetAllPhases())
             {
-                var schedule = await GetScheduleAsync(phase.Id);
-
-                if (schedule != null)
-                    items.Add(new GanttItem(schedule, phase.Name));
+                foreach (var schedule in phase.Schedules)
+                    yield return new GanttItem(schedule, phase.Name);
             }
-
-            return items;
-        }
-
-        public async Task<PhaseSchedule?> GetScheduleAsync(string phaseId)
-        {
-            return await dbContext.PhaseSchedules
-                .OrderByDescending(s => s.CreatedOn)
-                .FirstOrDefaultAsync(s => s.PhaseId == phaseId);
         }
 
         public async Task CreateScheduleAsync(PhaseScheduleVm viewModel)

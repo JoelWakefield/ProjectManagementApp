@@ -45,18 +45,18 @@
 @code {
 	const string UNOWNED_SECTION_NAME = "UNOWNED";
 
-	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
+	private IEnumerable<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
 	{
 	new KanBanSection(UNOWNED_SECTION_NAME)
 	};
 	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
-	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
+	private IEnumerable<KanbanItem> _items { get; set; } = new List<KanbanItem>();
 	private string? Errors { get; set; } = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		_sections = await ProjectOwnersVm.GetOwnerSectionsAsync();
-		_items = ProjectOwnersVm.GetProjectItems(UNOWNED_SECTION_NAME);
+		_sections = await ProjectOwnersVm.GetOwnerSectionsAsync().ToListAsync();
+		_items = ProjectOwnersVm.GetProjectItems();
 	}
 
 	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanItem> info)

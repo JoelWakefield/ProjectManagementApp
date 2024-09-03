@@ -8,7 +8,6 @@
 @inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
 @inject IProjectService ProjectService
-@inject IPhaseOwnerService PhaseOwnerService
 
 
 <PageTitle>Create Phase</PageTitle>
@@ -47,7 +46,6 @@
     public string? ProjectId { get; set; }
 
     public Phase? Phase { get; set; }
-    public Project? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
@@ -59,9 +57,9 @@
         }
         else
         {
-            Project = await ProjectService.GetProjectAsync(ProjectId);
+            var project = await ProjectService.GetProjectAsync(ProjectId);
 
-            if (Project == null)
+            if (project == null)
                 NavigationManager.NavigateTo($"/projects", true);
             else
                 Phase = new Phase
@@ -83,8 +81,7 @@
         {
             try
             {
-                await PhaseService.UpdatePhaseAsync(Phase);
-                await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                await PhaseService.CreatePhaseAsync(Phase, CurrentOwnerSelection.Id);
                 NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);
             }
             catch (Exception ex)

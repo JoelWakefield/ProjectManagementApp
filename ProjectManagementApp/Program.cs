@@ -7,6 +7,7 @@ using ProjectManagementApp.Data;
 using MudBlazor.Services;
 using ProjectManagementApp.SampleData;
 using ProjectManagementApp.Services;
+using ProjectManagementApp.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,9 @@ builder.Services.AddScoped<IPhaseOwnerService,PhaseOwnerService>();
 builder.Services.AddScoped<IPhaseStageService,PhaseStageService>();
 builder.Services.AddScoped<IPhaseAssignmentService,PhaseAssignmentService>();
 builder.Services.AddScoped<IPhaseScheduleService,PhaseScheduleService>();
+
+builder.Services.AddScoped<ProjectOwnersVm, ProjectOwnersVm>();
+builder.Services.AddScoped<UsersWithRolesVm, UsersWithRolesVm>();
 
 builder.Services.AddAuthentication(options =>
     {

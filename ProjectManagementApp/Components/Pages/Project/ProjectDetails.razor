@@ -6,7 +6,6 @@
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectService ProjectService
-@inject IPhaseService PhaseService
 
 
 <PageTitle>@Project?.Name - Details</PageTitle>
@@ -49,7 +48,11 @@
         else
         {
             Project = await ProjectService.GetProjectAsync(Id);
-            PhaseList = PhaseService.GetProjectPhases(Id);
+
+            if (Project == null)
+                NavigationManager.NavigateTo("/projects", true);
+
+            PhaseList = Project?.Phases;
         }
     }
 

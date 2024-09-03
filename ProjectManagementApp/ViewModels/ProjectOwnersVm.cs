@@ -8,35 +8,21 @@ namespace ProjectManagementApp.ViewModels
 		private ProjectRoleService projectRoleService = services.GetRequiredService<ProjectRoleService>();
 		private ProjectService projectService = services.GetRequiredService<ProjectService>();
 
-		public async Task<List<KanBanSection>> GetOwnerSectionsAsync()
+		public async IAsyncEnumerable<KanBanSection> GetOwnerSectionsAsync()
 		{
-			List<KanBanSection> sections = new List<KanBanSection>();
-
-			// Add the owner sections
-			var owners = (await projectRoleService.GetUsersWithRoleAsync("owner")).ToList();
-
-			foreach (var owner in owners)
-				sections.Add(new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true));
-
-			return sections;
+			foreach (var owner in await projectRoleService.GetUsersWithRoleAsync("owner"))
+				yield return new KanBanSection(owner!.UserName ?? "USERNAME NOT FOUND", true);
 		}
 
-		public List<KanbanItem> GetProjectItems(string unownedSectionName)
+		/// <summary>
+		/// Returns the project owners as KanbanItems
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<KanbanItem> GetProjectItems()
 		{
-			var items = new List<KanbanItem>();
-
 			// Assign each project to the owner's section
 			foreach (var project in projectService.GetProjects())
-			{
-				ApplicationUser? owner = project.Owner;
-
-				if (owner == null)
-					items.Add(new KanbanItem(project.Name, project.Id!, unownedSectionName, String.Empty));
-				else
-					items.Add(new KanbanItem(project.Name, project.Id!, owner.UserName!, owner.Id));
-			}
-
-			return items;
+				yield return new KanbanItem(project.Name, project.Id, project.Owner.UserName, project.Owner.Id);
 		}
 	}
 }
