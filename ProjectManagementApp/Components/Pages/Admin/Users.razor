@@ -5,7 +5,7 @@
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject UsersWithRolesVm UsersWithRolesVm
+@inject IProjectRoleService ProjectRoleService
 @inject NavigationManager NavigationManager
 
 
@@ -30,11 +30,11 @@
 
 
 @code {
-    public IEnumerable<UserWithRoles>? UsersWithRoles { get; set; } = new List<UserWithRoles>();
+    public IEnumerable<UserWithRolesVm>? UsersWithRoles { get; set; } = new List<UserWithRolesVm>();
 
     protected override void OnInitialized()
     {
-        UsersWithRoles = UsersWithRolesVm.GetUsersWithRoles();
+        UsersWithRoles = ProjectRoleService.GetAllUsersWithAllRoles();
     }
 
     public void UpdateUser(string id) => NavigationManager.NavigateTo($"/admin/users/{id}", true);

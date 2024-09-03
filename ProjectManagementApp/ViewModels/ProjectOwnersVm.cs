@@ -1,5 +1,4 @@
-﻿using ProjectManagementApp.Data;
-using ProjectManagementApp.Services;
+﻿using ProjectManagementApp.Services;
 
 namespace ProjectManagementApp.ViewModels
 {

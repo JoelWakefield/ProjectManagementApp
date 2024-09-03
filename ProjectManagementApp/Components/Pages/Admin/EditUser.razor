@@ -21,7 +21,7 @@
     <MudList T="string">
         @if (AllRoles != null)
         {
-            @foreach (ProjectRole key in AllRoles?.Keys!)
+            @foreach (ProjectRole key in AllRoles?.Keys)
             {
                 <MudCheckBox @onclick="@(() => ToggleRoleAsync(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
             }
