@@ -1,17 +1,22 @@
-﻿using ProjectManagementApp.Data;
+﻿using AutoMapper;
+using ProjectManagementApp.Data;
+using ProjectManagementApp.ViewModels;
 
 namespace ProjectManagementApp.Services
 {
     public interface IStageService
     {
-        IEnumerable<Stage> GetAllStages();
+        IEnumerable<StageVm> GetAllStages();
         Task CreateStageAsync(string name);
     }
-    public class StageService(ApplicationDbContext dbContext) : IStageService
+    public class StageService(ApplicationDbContext dbContext, IMapper mapper) : IStageService
     {
         private ApplicationDbContext dbContext = dbContext;
+        private IMapper mapper = mapper;
 
-        public IEnumerable<Stage> GetAllStages() => dbContext.Stages.OrderBy(s => s.OrderId);
+        public IEnumerable<StageVm> GetAllStages() => dbContext.Stages
+            .OrderBy(s => s.OrderId)
+            .Select(s => mapper.Map<StageVm>(s));
 
         public async Task CreateStageAsync(string name)
         {
