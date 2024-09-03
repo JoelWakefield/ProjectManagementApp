@@ -21,6 +21,7 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectOwnerService,ProjectOwnerService>();
 builder.Services.AddScoped<IProjectRoleService,ProjectRoleService>();
 builder.Services.AddScoped<IProjectService,ProjectService>();

@@ -5,9 +5,9 @@
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
-@inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
 @inject IProjectRoleService ProjectRoleService
+@inject IUserService UserService
 
 
 <PageTitle>Edit User</PageTitle>
@@ -35,24 +35,23 @@
     [Parameter]
     public string? UserId { get; set; }
 
-    public ApplicationUser? User { get; set; }
+    public ApplicationUserVm? User { get; set; }
     public Dictionary<ProjectRoleVm, bool>? AllRoles { get; set; }
 
-    public class UserWithRoles
-    {
-        public string? UserName { get; set; }
-    }
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (UserId == null)
+        {
             NavigationManager.NavigateTo("/admin/users", true);
-
-        User = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
-        if (User == null)
-            NavigationManager.NavigateTo("/admin/users", true);
+        }
         else
-            AllRoles = ProjectRoleService.GetAllRolesAndUserAssignment(User);
+        {
+            User = await UserService.GetUser(UserId);
+            if (User == null)
+                NavigationManager.NavigateTo("/admin/users", true);
+            else
+                AllRoles = ProjectRoleService.GetAllRolesAndUserAssignment(User);
+        }
     }
 
     public async Task ToggleRoleAsync(ProjectRoleVm role)

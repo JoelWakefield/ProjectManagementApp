@@ -12,6 +12,8 @@ namespace ProjectManagementApp
             CreateMap<Stage, StageVm>();
             CreateMap<StageVm,Stage>();
 
+            CreateMap<ApplicationUser, ApplicationUserVm>();
+            CreateMap<ApplicationUserVm, ApplicationUser>();
             CreateMap<ApplicationUser, UserWithRolesVm>()
                 .ForMember(
                     dest => dest.User,
