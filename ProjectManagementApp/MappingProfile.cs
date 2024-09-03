@@ -1,0 +1,24 @@
+﻿using AutoMapper;
+using ProjectManagementApp.Data;
+using ProjectManagementApp.ViewModels;
+
+namespace ProjectManagementApp
+{
+    public class MappingProfile : Profile
+    {
+        public MappingProfile() {
+            CreateMap<ApplicationUser, UserWithRolesVm>()
+                .ForMember(
+                    dest => dest.User,
+                    opt => opt.MapFrom(src => src)
+                )
+                .ForMember(
+                    dest => dest.Roles,
+                    opt => opt.MapFrom(
+                        src => src.ProjectRoles.Any() == true
+                            ? string.Join(", ", src.ProjectRoles.Select(r => r.Name))
+                            : string.Empty
+                ));
+        }
+    }
+}
