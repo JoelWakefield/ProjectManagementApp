@@ -7,6 +7,11 @@ namespace ProjectManagementApp
     public class MappingProfile : Profile
     {
         public MappingProfile() {
+            CreateMap<ProjectRole, ProjectRoleVm>();
+            CreateMap<ProjectRoleVm, ProjectRole>();
+            CreateMap<Stage, StageVm>();
+            CreateMap<StageVm,Stage>();
+
             CreateMap<ApplicationUser, UserWithRolesVm>()
                 .ForMember(
                     dest => dest.User,

@@ -8,14 +8,12 @@ namespace ProjectManagementApp.Services
 {
     public interface IProjectRoleService
     {
-        IEnumerable<ProjectRole> GetAllRoles();
-        Task<ProjectRole?> GetRoleAsync(string name);
-        IEnumerable<ProjectRole>? GetUserRoles(string userId);
-        IEnumerable<string> GetUserRoleNames(string userId);
-        Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRole role);
+        IEnumerable<ProjectRoleVm> GetAllRoles();
+        Dictionary<ProjectRoleVm, bool> GetAllRolesAndUserAssignment(ApplicationUser user);
         Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName);
         IEnumerable<UserWithRolesVm> GetAllUsersWithAllRoles();
         Task CreateRoleAsync(string name);
+        Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRoleVm role);
 	}
 
     public class ProjectRoleService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IMapper mapper) : IProjectRoleService
@@ -24,42 +22,20 @@ namespace ProjectManagementApp.Services
         private UserManager<ApplicationUser> userManager { get; set; } = userManager;
         private IMapper mapper { get; set; } = mapper;
 
-        public IEnumerable<ProjectRole> GetAllRoles() => dbContext.ProjectRoles;
+        public IEnumerable<ProjectRoleVm> GetAllRoles() => dbContext.ProjectRoles.Select(r => mapper.Map<ProjectRoleVm>(r));
 
-        public async Task<ProjectRole?> GetRoleAsync(string name) => await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == name);
-
-        public IEnumerable<ProjectRole>? GetUserRoles(string userId)
+        public IEnumerable<UserWithRolesVm> GetAllUsersWithAllRoles()
         {
-            var userRoles = dbContext.ProjectUserRoles.Where(r => r.UserId == userId).AsEnumerable();
-            if (userRoles.Any() == false)
-                return new List<ProjectRole>().AsEnumerable();
+            IEnumerable<ApplicationUser> users = userManager.Users;
 
-            var userRoleIds = userRoles.Select(r => r.RoleId);
-            return dbContext.ProjectRoles.Where(r => userRoleIds.Contains(r.Id)).AsEnumerable();
-        }
-
-        public IEnumerable<string> GetUserRoleNames(string userId)
-        {
-            var roles = GetUserRoles(userId);
-            if (roles?.Any() == false)
-                return new List<string>().AsEnumerable();
-            else
-                return roles!.Select(r => r.Name).ToList();
-        }
-
-        public async Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRole role)
-        {
-            if (user.ProjectRoles.Contains(role))
+            foreach (var user in users)
             {
-                user.ProjectRoles.Remove(role);
+                yield return mapper.Map<UserWithRolesVm>(user);
             }
-            else
-            {
-                user.ProjectRoles.Add(role);
-            }
-
-            await dbContext.SaveChangesAsync();
         }
+
+		public Dictionary<ProjectRoleVm, bool> GetAllRolesAndUserAssignment(ApplicationUser user) => dbContext.ProjectRoles
+            .ToDictionary(mapper.Map<ProjectRoleVm>,user.ProjectRoles.Contains);
 
         public async Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName)
         {
@@ -77,14 +53,20 @@ namespace ProjectManagementApp.Services
             await dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<UserWithRolesVm> GetAllUsersWithAllRoles()
+        public async Task UpdateRoleForUserAsync(ApplicationUser user, ProjectRoleVm roleVm)
         {
-            IEnumerable<ApplicationUser> users = userManager.Users;
+            var role = mapper.Map<ProjectRole>(roleVm);
 
-            foreach (var user in users)
+            if (user.ProjectRoles.Contains(role))
             {
-                yield return mapper.Map<UserWithRolesVm>(user);
+                user.ProjectRoles.Remove(role);
             }
+            else
+            {
+                user.ProjectRoles.Add(role);
+            }
+
+            await dbContext.SaveChangesAsync();
         }
-    }
+	}
 }

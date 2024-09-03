@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
@@ -21,7 +22,7 @@
     <MudList T="string">
         @if (AllRoles != null)
         {
-            @foreach (ProjectRole key in AllRoles?.Keys)
+            @foreach (ProjectRoleVm key in AllRoles.Keys)
             {
                 <MudCheckBox @onclick="@(() => ToggleRoleAsync(key))" @bind-Value="AllRoles[key]" Color="Color.Primary">@key</MudCheckBox>
             }
@@ -35,7 +36,7 @@
     public string? UserId { get; set; }
 
     public ApplicationUser? User { get; set; }
-    public Dictionary<ProjectRole, bool>? AllRoles { get; set; }
+    public Dictionary<ProjectRoleVm, bool>? AllRoles { get; set; }
 
     public class UserWithRoles
     {
@@ -44,21 +45,17 @@
 
     protected override void OnInitialized()
     {
-        User = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
-
-        if (User == null)
-        {
+        if (UserId == null)
             NavigationManager.NavigateTo("/admin/users", true);
-        } 
+
+        User = UserManager.Users.FirstOrDefault(a => a.Id == UserId);
+        if (User == null)
+            NavigationManager.NavigateTo("/admin/users", true);
         else
-        {
-            AllRoles = ProjectRoleService.GetAllRoles().ToDictionary(role => role, _ => false);
-            foreach (var role in User.ProjectRoles)
-                AllRoles[role] = true;
-        }
+            AllRoles = ProjectRoleService.GetAllRolesAndUserAssignment(User);
     }
 
-    public async Task ToggleRoleAsync(ProjectRole role)
+    public async Task ToggleRoleAsync(ProjectRoleVm role)
     {
         await ProjectRoleService.UpdateRoleForUserAsync(User!, role);
     }
