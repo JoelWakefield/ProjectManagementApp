@@ -3,7 +3,7 @@
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @inject IProjectRoleService ProjectRoleService
-@inject UserManager<ApplicationUser> UserManager
+@inject IUserService UserService
 
 
 @if (Owners.Any() == false)
@@ -44,19 +44,19 @@ else
         }
     }
 
-    private IEnumerable<ApplicationUser?> Owners { get; set; } = new List<ApplicationUser>();
+    private IEnumerable<ApplicationUserVm?> Owners { get; set; } = new List<ApplicationUserVm>();
 
     protected override async Task OnInitializedAsync()
     {
         if (FilterByRole ?? false)
             Owners = (await ProjectRoleService.GetUsersWithRoleAsync(RoleFilter)).ToList();
         else
-            Owners = UserManager.Users.ToList();
+            Owners = UserService.GetUsers();
 
 
         if (OwnerSelection == null && Owners.Any())
         {
-            ApplicationUser? user = Owners.FirstOrDefault();
+            ApplicationUserVm? user = Owners.FirstOrDefault();
             Selection = new OwnerSelection(user!.Id, user.UserName);
         } 
         else

@@ -3,6 +3,7 @@
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
@@ -31,7 +32,7 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Phase? Phase { get; set; }
+    public PhaseVm? Phase { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

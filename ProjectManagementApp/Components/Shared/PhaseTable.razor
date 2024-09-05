@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authorization
-@using ProjectManagementApp.Data
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 
@@ -24,7 +24,7 @@
 
 @code {
     [Parameter]
-    public IEnumerable<Phase>? PhaseList { get; set; }
+    public IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     public void Details(string id) => NavigationManager.NavigateTo($"/phases/details/{id}", true);
 }

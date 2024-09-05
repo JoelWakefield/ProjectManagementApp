@@ -10,7 +10,7 @@ namespace ProjectManagementApp.Services
     {
         IEnumerable<ProjectRoleVm> GetAllRoles();
         Dictionary<ProjectRoleVm, bool> GetAllRolesAndUserAssignment(ApplicationUserVm user);
-        Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName);
+        Task<IEnumerable<ApplicationUserVm?>> GetUsersWithRoleAsync(string roleName);
         IEnumerable<UserWithRolesVm> GetAllUsersWithAllRoles();
         Task CreateRoleAsync(string name);
         Task UpdateRoleForUserAsync(ApplicationUserVm user, ProjectRoleVm role);
@@ -22,7 +22,7 @@ namespace ProjectManagementApp.Services
         private UserManager<ApplicationUser> userManager { get; set; } = userManager;
         private IMapper mapper { get; set; } = mapper;
 
-        public IEnumerable<ProjectRoleVm> GetAllRoles() => dbContext.ProjectRoles.Select(r => mapper.Map<ProjectRoleVm>(r));
+        public IEnumerable<ProjectRoleVm> GetAllRoles() => mapper.Map<IEnumerable<ProjectRole>, IEnumerable<ProjectRoleVm>>(dbContext.ProjectRoles);
 
         public IEnumerable<UserWithRolesVm> GetAllUsersWithAllRoles()
         {
@@ -34,18 +34,17 @@ namespace ProjectManagementApp.Services
             }
         }
 
-		public Dictionary<ProjectRoleVm, bool> GetAllRolesAndUserAssignment(ApplicationUserVm user) => dbContext.ProjectRoles
-            .Select(r => mapper.Map<ProjectRoleVm>(r))
+		public Dictionary<ProjectRoleVm, bool> GetAllRolesAndUserAssignment(ApplicationUserVm user) => GetAllRoles()
             .ToDictionary(r => r,user.ProjectRoles.Contains);
 
-        public async Task<IEnumerable<ApplicationUser?>> GetUsersWithRoleAsync(string roleName)
+        public async Task<IEnumerable<ApplicationUserVm?>> GetUsersWithRoleAsync(string roleName)
         {
             ProjectRole? projectRole = await dbContext.ProjectRoles.FirstOrDefaultAsync(r => r.Name == roleName);
 
             if (projectRole == null)
-                return Enumerable.Empty<ApplicationUser>();
+                return Enumerable.Empty<ApplicationUserVm>();
             else
-                return projectRole.Users;
+                return mapper.Map<IEnumerable<ApplicationUser>,IEnumerable<ApplicationUserVm>>(projectRole.Users);
         }
 
         public async Task CreateRoleAsync(string name)

@@ -10,7 +10,6 @@
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IPhaseOwnerService PhaseOwnerService
-@inject PhaseOwnersVm PhaseOwnersVm
 
 
 <PageTitle>Phase Owners</PageTitle>
@@ -61,8 +60,8 @@
 
 	protected override void OnInitialized()
 	{
-		_sections = PhaseOwnersVm.GetOwnerSections();
-		_items = PhaseOwnersVm.GetKanbanItems();
+		_sections = PhaseOwnerService.GetOwnerSections();
+		_items = PhaseOwnerService.GetKanbanItems();
 	}
 
 	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)

@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
+using ProjectManagementApp.ViewModels;
+using static MudBlazor.CategoryTypes;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ProjectManagementApp.Services
 {
 	public interface IPhaseStageService
 	{
-		Task<Stage?> GetStageAsync(string phaseId);
-
+		IEnumerable<KanBanSection> GetStageSections();
+		IEnumerable<KanbanItem> GetKanbanItems();
 		Task AssignStageAsync(string phaseId, string stageId);
 	}
 
@@ -14,24 +17,28 @@ namespace ProjectManagementApp.Services
 	{
 		private ApplicationDbContext dbContext = dbContext;
 
-		public async Task<Stage?> GetStageAsync(string phaseId)
+		public IEnumerable<KanBanSection> GetStageSections()
 		{
-			PhaseStage? phaseStage = await dbContext.PhaseStages
-				.OrderByDescending(o => o.CreatedOn)
-				.FirstOrDefaultAsync(o => o.PhaseId == phaseId);
+			foreach (var stage in dbContext.Stages)
+				yield return new KanBanSection(stage!.Name ?? "USERNAME NOT FOUND", true);
+		}
 
-			if (phaseStage == null) { return null; }
-
-			return await dbContext.Stages.FirstOrDefaultAsync(s => s.Id == phaseStage.StageId);
+		public IEnumerable<KanbanItem> GetKanbanItems()
+		{
+			// Assign each Phase to the owner's section
+			foreach (var phase in dbContext.Phases)
+				yield return new KanbanItem(phase.Name, phase.Id!, phase.Stage.Name!, phase.Stage.Id);
 		}
 
 		public async Task AssignStageAsync(string phaseId, string stageId)
 		{
-			await dbContext.PhaseStages.AddAsync(new PhaseStage()
+			Stage stage = await dbContext.Stages.FirstOrDefaultAsync(s => s.Id == stageId);
+			Phase phase = await dbContext.Phases.FirstOrDefaultAsync(s => s.Id == phaseId);
+
+			if (phase == null || stage == null)
 			{
-				PhaseId = phaseId,
-				StageId = stageId,
-			});
+				return;
+			}
 			await dbContext.SaveChangesAsync();
 		}
 	}

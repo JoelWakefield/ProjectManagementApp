@@ -1,38 +1,51 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
+using ProjectManagementApp.ViewModels;
 
 namespace ProjectManagementApp.Services
 {
     public interface IPhaseService
     {
-        IEnumerable<Phase> GetAllPhases();
-        Task<Phase?> GetPhaseAsync(string id);
-        Task CreatePhaseAsync(Phase phase);
-        Task UpdatePhaseAsync(Phase phase);
+        IEnumerable<PhaseVm> GetAllPhases();
+        Task<PhaseVm?> GetPhaseAsync(string id);
+        Task CreatePhaseAsync(PhaseVm phase);
+        Task UpdatePhaseAsync(PhaseVm phase);
     }
 
-    public class PhaseService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IPhaseService
+    public class PhaseService(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext, IMapper mapper) : IPhaseService
     {
-        private UserManager<ApplicationUser> userManager = userManager;
+        private UserManager<ApplicationUser> userManager { get; set; } = userManager;
         private ApplicationDbContext dbContext = dbContext;
+		private IMapper mapper = mapper;
 
-        public IEnumerable<Phase> GetAllPhases() => dbContext.Phases;
+		public IEnumerable<PhaseVm> GetAllPhases() => dbContext.Phases.Select(mapper.Map<PhaseVm>);
 
-        public async Task<Phase?> GetPhaseAsync(string id) => await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == id);
+        public async Task<PhaseVm?> GetPhaseAsync(string id) => mapper.Map<PhaseVm>(
+            await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == id));
 
-        public async Task CreatePhaseAsync(Phase phase)
+        public async Task CreatePhaseAsync(PhaseVm phaseVm)
         {
+            Phase phase = mapper.Map<Phase>(phaseVm);
+            phase.Owner = await userManager.Users.FirstOrDefaultAsync(u => u.Id == phase.OwnerId);
+            phase.Project = await dbContext.Projects.FirstOrDefaultAsync(p => p.Id == phase.ProjectId);
+            phase.Stage = await dbContext.Stages.OrderBy(p => p.OrderId).FirstOrDefaultAsync();
+
             await dbContext.Phases.AddAsync(phase);
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdatePhaseAsync(Phase phase)
+        public async Task UpdatePhaseAsync(PhaseVm phase)
         {
-            Phase? existingPhase = await GetPhaseAsync(phase.Id);
+            Phase? existingPhase = await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == phase.Id);
             if (existingPhase != null)
             {
-                existingPhase = phase;
+                //  update only edited fields
+                existingPhase.Name = phase.Name;
+                existingPhase.Description = phase.Description;
+                existingPhase.Priority = phase.Priority;
+
                 await dbContext.SaveChangesAsync();
             }
         }

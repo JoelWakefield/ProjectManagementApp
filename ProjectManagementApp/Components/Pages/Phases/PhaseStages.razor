@@ -8,8 +8,6 @@
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseStageService PhaseStageService
-@inject IStageService StageService
-@inject IPhaseService PhaseService
 
 
 <PageTitle>Phase Stages</PageTitle>
@@ -49,45 +47,20 @@
 @code {
 	const string UNSTAGED_SECTION_NAME = "UNSTAGED";
 
-	private IEnumerable<Phase>? PhaseList { get; set; }
 	private IEnumerable<StageVm>? Stages { get; set; } = new List<StageVm>();
 
-	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
-{
-new KanBanSection(UNSTAGED_SECTION_NAME)
-};
+	private IEnumerable<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
+	{
+	new KanBanSection(UNSTAGED_SECTION_NAME)
+	};
 	private MudDropContainer<KanbanItem> _dropContainer { get; set; } = default!;
-	private List<KanbanItem> _items { get; set; } = new List<KanbanItem>();
+	private IEnumerable<KanbanItem> _items { get; set; } = new List<KanbanItem>();
 	private string? Errors { get; set; } = null;
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		PhaseList = PhaseService.GetAllPhases();
-
-		if (PhaseList.Any() == false)
-		{
-			Errors = "There are no Phases - please check your data.";
-		}
-		else
-		{
-			// Add the owner sections
-			Stages = StageService.GetAllStages();
-			// TODO: handle a no user(owner) scenario
-
-			foreach (var stage in Stages)
-				_sections.Add(new KanBanSection(stage!.Name ?? "USERNAME NOT FOUND", true));
-
-			// Assign each Phase to the owner's section
-			foreach (var phase in PhaseList.ToList())
-			{
-				Stage? stage = await PhaseStageService.GetStageAsync(phase.Id);
-
-				if (stage == null)
-					_items.Add(new KanbanItem(phase.Name, phase.Id!, UNSTAGED_SECTION_NAME, String.Empty));
-				else
-					_items.Add(new KanbanItem(phase.Name, phase.Id!, stage.Name!, stage.Id));
-			}
-		}
+		_sections = PhaseStageService.GetStageSections();
+		_items = PhaseStageService.GetKanbanItems();
 	}
 
 	private async Task PhaseUpdatedAsync(MudItemDropInfo<KanbanItem> info)
@@ -99,16 +72,10 @@ new KanBanSection(UNSTAGED_SECTION_NAME)
 		else
 		{
 			// Update the board
-			string ownerName = info.DropzoneIdentifier;
-			info.Item.Category = ownerName;
+			info.Item.Category = info.DropzoneIdentifier;
 
 			// Update the Phase owner
-			string? ownerId = Stages.FirstOrDefault(s => s?.Name == info.Item.Category)?.Id;
-
-			if (ownerId == null)
-				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";
-			else
-				await PhaseStageService.AssignStageAsync(info.Item.ItemId, ownerId);
+			await PhaseStageService.AssignStageAsync(info.Item.ItemId, info.Item.CategoryId);
 		}
 	}
 }

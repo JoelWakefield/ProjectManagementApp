@@ -43,7 +43,7 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Phase? Phase { get; set; }
+    public PhaseVm? Phase { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
@@ -75,7 +75,7 @@
             try
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await PhaseOwnerService.AssignOwnerAsync(Phase, CurrentOwnerSelection.Id);
+                    await PhaseOwnerService.AssignOwnerAsync(Phase.Id, CurrentOwnerSelection.Id);
                 await PhaseService.UpdatePhaseAsync(Phase);
                 NavigationManager.NavigateTo($"/phases/details/{Id}", true);
             }

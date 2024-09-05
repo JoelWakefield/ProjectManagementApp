@@ -6,18 +6,19 @@ namespace ProjectManagementApp
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() {
+        public MappingProfile()
+        {
             CreateMap<ProjectRole, ProjectRoleVm>();
             CreateMap<ProjectRoleVm, ProjectRole>();
             CreateMap<Stage, StageVm>();
-            CreateMap<StageVm,Stage>();
+            CreateMap<StageVm, Stage>();
 
             CreateMap<ApplicationUser, ApplicationUserVm>();
             CreateMap<ApplicationUserVm, ApplicationUser>();
             CreateMap<ApplicationUser, UserWithRolesVm>()
                 .ForMember(
                     dest => dest.User,
-                    opt => opt.MapFrom(src => src)
+                    opt => opt.MapFrom(src => src)  //  don't pass the user, but the user viewmodel
                 )
                 .ForMember(
                     dest => dest.Roles,
@@ -26,6 +27,13 @@ namespace ProjectManagementApp
                             ? string.Join(", ", src.ProjectRoles.Select(r => r.Name))
                             : string.Empty
                 ));
+
+            CreateMap<Phase, PhaseVm>()
+                .ForMember(
+                    dest => dest.OwnerName,
+                    opt => opt.MapFrom(src => src.Owner.UserName)
+                );
+            CreateMap<PhaseVm, Phase>();
         }
     }
 }
