@@ -20,7 +20,7 @@ namespace ProjectManagementApp.Services
         private ApplicationDbContext dbContext = dbContext;
 		private IMapper mapper = mapper;
 
-		public IEnumerable<PhaseVm> GetAllPhases() => dbContext.Phases.Select(mapper.Map<PhaseVm>);
+		public IEnumerable<PhaseVm> GetAllPhases() => mapper.Map<IEnumerable<Phase>,IEnumerable<PhaseVm>>(dbContext.Phases);
 
         public async Task<PhaseVm?> GetPhaseAsync(string id) => mapper.Map<PhaseVm>(
             await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == id));

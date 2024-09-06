@@ -1,8 +1,8 @@
 ﻿@page "/projects/details/{Id}"
 @using Microsoft.AspNetCore.Authorization
 @using ProjectManagementApp.Components.Shared
-@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectService ProjectService
@@ -36,8 +36,8 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Project? Project { get; set; }
-    private IEnumerable<Phase>? PhaseList { get; set; }
+    public ProjectVm? Project { get; set; }
+    private IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

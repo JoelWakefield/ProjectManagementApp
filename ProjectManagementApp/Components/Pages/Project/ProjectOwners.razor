@@ -5,7 +5,6 @@
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
-@inject ProjectOwnersVm ProjectOwnersVm
 
 
 <PageTitle>Project Owners</PageTitle>
@@ -55,8 +54,8 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		_sections = await ProjectOwnersVm.GetOwnerSectionsAsync().ToListAsync();
-		_items = ProjectOwnersVm.GetProjectItems();
+		_sections = await ProjectOwnerService.GetOwnerSectionsAsync().ToListAsync();
+		_items = ProjectOwnerService.GetProjectItems();
 	}
 
 	private async Task ProjectUpdatedAsync(MudItemDropInfo<KanbanItem> info)

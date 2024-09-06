@@ -1,7 +1,6 @@
 ﻿@page "/projects/edit/{Id}"
 @using Microsoft.AspNetCore.Authorization
 @using ProjectManagementApp.Components.Shared
-@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @attribute [Authorize]
@@ -49,7 +48,7 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Project? Project { get; set; }
+    public ProjectVm? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
@@ -68,7 +67,7 @@
                 NavigationManager.NavigateTo($"/projects", true);
             }
 
-            ApplicationUser? user = Project?.Owner;
+            ApplicationUserVm? user = Project?.Owner;
             if (user != null)
             {
                 OldOwnerSelection = new OwnerSelection(user!.Id, user.UserName);
@@ -91,7 +90,7 @@
             try
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await ProjectOwnerService.AssignOwnerAsync(Project, CurrentOwnerSelection.Id);
+                    await ProjectOwnerService.AssignOwnerAsync(Project.Id, CurrentOwnerSelection.Id);
                 await ProjectService.UpdateProjectAsync(Project);
                 NavigationManager.NavigateTo($"/projects/details/{Id}", true);
             }

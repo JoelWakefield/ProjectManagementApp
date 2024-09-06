@@ -33,7 +33,9 @@ namespace ProjectManagementApp
                     dest => dest.OwnerName,
                     opt => opt.MapFrom(src => src.Owner.UserName)
                 );
-            CreateMap<PhaseVm, Phase>();
+            
+            CreateMap<Project, ProjectVm>();
+            CreateMap<ProjectVm, Project>();
         }
     }
 }
