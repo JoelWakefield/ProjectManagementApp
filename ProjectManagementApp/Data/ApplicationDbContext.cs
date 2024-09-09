@@ -31,19 +31,22 @@ namespace ProjectManagementApp.Data
                 .HasMany(p => p.Phases)
                 .WithOne(h => h.Project)
                 .HasForeignKey(h => h.ProjectId)
-                .HasPrincipalKey(p => p.Id);
+                .HasPrincipalKey(p => p.Id)
+                .IsRequired();
 
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.OwnedProjects)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
-                .HasPrincipalKey(o => o.Id);
+                .HasPrincipalKey(o => o.Id)
+                .IsRequired();
 
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.OwnedPhases)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .IsRequired();
 
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.AssignedPhases)
@@ -57,19 +60,22 @@ namespace ProjectManagementApp.Data
                 .HasMany(u => u.Schedules)
                 .WithOne(s => s.User)
                 .HasForeignKey(s => s.UserId)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .IsRequired();
 
             modelBuilder.Entity<Phase>()
                 .HasMany(p => p.Schedules)
                 .WithOne(p => p.Phase)
                 .HasForeignKey(p => p.PhaseId)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .IsRequired();
 
             modelBuilder.Entity<Stage>()
                 .HasMany(s => s.Phases)
                 .WithOne(p => p.Stage)
                 .HasForeignKey(p => p.StageId)
-                .HasPrincipalKey(s => s.Id);
+                .HasPrincipalKey(s => s.Id)
+                .IsRequired();
         }
     }
 }

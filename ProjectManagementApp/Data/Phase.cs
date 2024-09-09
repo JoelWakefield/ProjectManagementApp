@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectManagementApp.Data
 {
@@ -22,6 +23,7 @@ namespace ProjectManagementApp.Data
         public string StageId { get; set; }
         public Stage Stage { get; set; }
         public string OwnerId { get; set; }
+        [ForeignKey(nameof(OwnerId))]
         public ApplicationUser Owner { get; set; }
 
         public List<ApplicationUser> Assignments { get; set; }
