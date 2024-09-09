@@ -32,8 +32,6 @@ builder.Services.AddScoped<IPhaseStageService,PhaseStageService>();
 builder.Services.AddScoped<IPhaseAssignmentService,PhaseAssignmentService>();
 builder.Services.AddScoped<IPhaseScheduleService,PhaseScheduleService>();
 
-builder.Services.AddScoped<ProjectOwnersVm, ProjectOwnersVm>();
-
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddAuthentication(options =>

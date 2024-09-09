@@ -9,8 +9,7 @@ namespace ProjectManagementApp.ViewModels
 		public string? Description { get; set; }
 		public Priority Priority { get; set; } = Priority.Medium;
 		public string ProjectId { get; set; }
-		public string OwnerId { get; set; }
-		public string OwnerName { get; set; }
+		public ApplicationUserVm Owner { get; set; }
         public StageVm Stage { get; set; }
     }
 }

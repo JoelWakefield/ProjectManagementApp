@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectManagementApp.Data;
+﻿using ProjectManagementApp.Data;
 using ProjectManagementApp.ViewModels;
 
 namespace ProjectManagementApp.Services
@@ -11,10 +10,9 @@ namespace ProjectManagementApp.Services
         Task CreateScheduleAsync(PhaseScheduleVm viewModel);
     }
 
-    public class PhaseScheduleService(ApplicationDbContext dbContext, IPhaseService phaseService) : IPhaseScheduleService
+    public class PhaseScheduleService(ApplicationDbContext dbContext) : IPhaseScheduleService
     {
         private ApplicationDbContext dbContext = dbContext;
-        private IPhaseService phaseService = phaseService;
 
         public IEnumerable<PhaseSchedule> GetSchedules() => dbContext.PhaseSchedules;
 
@@ -25,7 +23,7 @@ namespace ProjectManagementApp.Services
         /// <returns></returns>
         public IEnumerable<GanttItem> GetGanttItems()
         {
-            foreach (var phase in phaseService.GetAllPhases())
+            foreach (var phase in dbContext.Phases)
             {
                 foreach (var schedule in phase.Schedules)
                     yield return new GanttItem(schedule, phase.Name);

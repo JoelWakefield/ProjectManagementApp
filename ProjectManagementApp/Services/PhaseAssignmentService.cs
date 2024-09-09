@@ -8,7 +8,7 @@ namespace ProjectManagementApp.Services
 	public interface IPhaseAssignmentService
 	{
 		Task<Dictionary<string,PhaseAssignedRecord>> GetPhaseAssignedRecordsAsync();
-		Task CreatePhaseAssignmentAsync(string phaseId, string userId, bool assigned);
+		Task TogglePhaseAssignmentAsync(string phaseId, string userId, bool assigned);
 	}
 
 	public class PhaseAssignmentService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IPhaseAssignmentService
@@ -25,19 +25,15 @@ namespace ProjectManagementApp.Services
 
 			foreach (var phase in phases)
 			{
-				PhaseAssignedRecord record = new PhaseAssignedRecord(phase.Id,phase.Name);
-				foreach (var user in users)
+				PhaseAssignedRecord record = new PhaseAssignedRecord()
 				{
-					PhaseAssignment? assignment = await dbContext.PhaseAssignments
-						.Where(p => p.PhaseId == phase.Id && p.UserId == user.Id)
-						.OrderByDescending(p => p.CreatedOn)
-						.FirstOrDefaultAsync();
-
-					if (assignment == null)
-						record.Assignments.Add(user.Id, false);
-					else
-						record.Assignments.Add(assignment.UserId, assignment.Assigned);
-				}
+					PhaseId		= phase.Id,
+					Name		= phase.Name,
+					Assignments = users.ToDictionary(
+						u => u.Id,
+						phase.Assignments.Contains
+					)
+				};
 
 				records.Add(phase.Id, record);
 			}
@@ -45,14 +41,21 @@ namespace ProjectManagementApp.Services
 			return records;
 		}
 
-		public async Task CreatePhaseAssignmentAsync(string phaseId, string userId, bool assigned)
+		public async Task TogglePhaseAssignmentAsync(string phaseId, string userId, bool assignment)
 		{
-			await dbContext.PhaseAssignments.AddAsync(new PhaseAssignment()
+			Phase? phase = await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == phaseId);
+			ApplicationUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Id == userId);
+
+			if (user == null || phase == null)
 			{
-				PhaseId = phaseId,
-				UserId = userId,
-				Assigned = assigned
-			});
+				return;
+			}
+
+			if (assignment)
+				phase.Assignments.Add(user);
+			else
+				phase.Assignments.Remove(user);
+
 			await dbContext.SaveChangesAsync();
 		}
 	}

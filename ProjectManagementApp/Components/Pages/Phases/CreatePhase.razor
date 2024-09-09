@@ -82,7 +82,7 @@
         {
             try
             {
-                Phase.OwnerId = CurrentOwnerSelection.Id;
+                Phase.Owner.Id = CurrentOwnerSelection.Id;
                 await PhaseService.CreatePhaseAsync(Phase);
                 await PhaseOwnerService.AssignOwnerAsync(Phase.Id, CurrentOwnerSelection.Id);
                 NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);

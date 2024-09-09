@@ -1,4 +1,6 @@
-﻿namespace ProjectManagementApp.ViewModels
+﻿using ProjectManagementApp.Data;
+
+namespace ProjectManagementApp.ViewModels
 {
 	/// <summary>
 	/// Keeps a record of which users are assigned to a specific phase
@@ -8,12 +10,5 @@
 		public string PhaseId { get; set; }
 		public string Name { get; set; }
         public Dictionary<string, bool> Assignments { get; set; }
-
-		public PhaseAssignedRecord(string phaseId, string name)
-		{
-			PhaseId = phaseId;
-			Name = name;
-			Assignments = new Dictionary<string, bool>();
-		}
     }
 }

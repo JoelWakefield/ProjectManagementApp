@@ -28,11 +28,8 @@ namespace ProjectManagementApp
                             : string.Empty
                 ));
 
-            CreateMap<Phase, PhaseVm>()
-                .ForMember(
-                    dest => dest.OwnerName,
-                    opt => opt.MapFrom(src => src.Owner.UserName)
-                );
+            CreateMap<Phase, PhaseVm>();
+            CreateMap<PhaseVm, Phase>();
             
             CreateMap<Project, ProjectVm>();
             CreateMap<ProjectVm, Project>();
