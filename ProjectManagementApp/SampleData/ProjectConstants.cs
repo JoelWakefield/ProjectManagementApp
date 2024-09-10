@@ -13,6 +13,7 @@ namespace ProjectManagementApp.SampleData
             Description = "A Project with one worker and one phase.",
             ProjectedStart = DateTime.UtcNow.AddDays(10),
             ProjectedEnd = DateTime.UtcNow.AddDays(14),
+            OwnerId = Users.Mylo.Id,
         };
         public static Project MultiPhaseProject { get; set; } = new Project()
         {
@@ -23,6 +24,7 @@ namespace ProjectManagementApp.SampleData
             Description = "A Project with one worker and multiple phases.",
             ProjectedStart = DateTime.UtcNow.AddDays(12),
             ProjectedEnd = DateTime.UtcNow.AddDays(22),
+            OwnerId = Users.Mylo.Id,
         };
         public static Project MultiPersonProject { get; set; } = new Project()
         {
@@ -33,6 +35,7 @@ namespace ProjectManagementApp.SampleData
             Description = "A Project with multiple workers, and one phase.",
             ProjectedStart = DateTime.UtcNow.AddDays(13),
             ProjectedEnd = DateTime.UtcNow.AddDays(14),
+            OwnerId = Users.Alayah.Id,
         };
         public static Project MultiPersonMultiPhaseProject { get; set; } = new Project()
         {
@@ -43,6 +46,7 @@ namespace ProjectManagementApp.SampleData
             Description = "A Project with multiple workers, and multiple phases.",
             ProjectedStart = DateTime.UtcNow.AddDays(16),
             ProjectedEnd = DateTime.UtcNow.AddDays(30),
+            OwnerId = Users.Alayah.Id,
         };
     }
 }

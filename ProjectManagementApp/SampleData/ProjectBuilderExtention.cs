@@ -13,6 +13,7 @@ namespace ProjectManagementApp.SampleData
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+
             //  Create initial roles (for identity and project)
             if (roleManager.RoleExistsAsync(IdentityRoles.Admin).Result == false)
                 await roleManager.CreateAsync(new IdentityRole(IdentityRoles.Admin));
@@ -26,7 +27,12 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.ProjectRoles.Any(r => r.Name == ProjectRoles.Member) == false)
                 dbContext.ProjectRoles.Add(new ProjectRole() { Name = ProjectRoles.Member });
 
-            //  Create initial users
+            ProjectRole managerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Manager)!;
+            ProjectRole ownerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Owner)!;
+            ProjectRole memberRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Member)!;
+
+
+            //  Add/Update Users
             if (userManager.Users.Any(u => u.UserName == Users.Bert.UserName) == false)
                 await userManager.CreateAsync(Users.Bert);
             if (userManager.Users.Any(u => u.UserName == Users.Mylo.UserName) == false)
@@ -35,21 +41,13 @@ namespace ProjectManagementApp.SampleData
                 await userManager.CreateAsync(Users.Alayah);
             if (userManager.Users.Any(u => u.UserName == Users.Zahir.UserName) == false)
                 await userManager.CreateAsync(Users.Zahir);
-
-            //  Save all updates
+            
             await dbContext.SaveChangesAsync();
 
-
-            //  Pull the updated/pre-existing user data
             Users.Bert = userManager.Users.FirstOrDefault(u => u.UserName == Users.Bert.UserName)!;
             Users.Mylo = userManager.Users.FirstOrDefault(u => u.UserName == Users.Mylo.UserName)!;
             Users.Alayah = userManager.Users.FirstOrDefault(u => u.UserName == Users.Alayah.UserName)!;
             Users.Zahir = userManager.Users.FirstOrDefault(u => u.UserName == Users.Zahir.UserName)!;
-
-            //  Pull the updated/pre-existing project role data
-            ProjectRole managerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Manager)!;
-            ProjectRole ownerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Owner)!;
-            ProjectRole memberRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Member)!;
 
 
             //  Assign identity roles to new users
@@ -64,6 +62,7 @@ namespace ProjectManagementApp.SampleData
                 await userManager.AddToRoleAsync(Users.Alayah, IdentityRoles.User);
             if ((await userManager.GetRolesAsync(Users.Zahir)).Contains(IdentityRoles.User) == false)
                 await userManager.AddToRoleAsync(Users.Zahir, IdentityRoles.User);
+
 
             //  Assign project roles to new users
             if (Users.Mylo.ProjectRoles.Any(r => r.Id == managerRole.Id) == false)
@@ -83,7 +82,8 @@ namespace ProjectManagementApp.SampleData
             if (Users.Zahir.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
                 Users.Zahir.ProjectRoles.Add(memberRole);
 
-            //  Setup initial projects
+
+            //  Add/Update Projects
             if (dbContext.Projects.Any(p => p.Name == Projects.SimpleProject.Name) == false)
                 dbContext.Projects.Add(Projects.SimpleProject);
             if (dbContext.Projects.Any(p => p.Name == Projects.MultiPhaseProject.Name) == false)
@@ -93,27 +93,15 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.Projects.Any(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name) == false)
                 dbContext.Projects.Add(Projects.MultiPersonMultiPhaseProject);
 
-            //  Save all updates
             await dbContext.SaveChangesAsync();
 
-
-            //  Pull the updated/pre-existing project info
             Projects.SimpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
             Projects.MultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
             Projects.MultiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
             Projects.MultiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
 
-            //  Setup owners with projects (if a project exists, then it already has an owner - no need to add another record)
-            if (Projects.SimpleProject.Owner.Id != Users.Mylo.Id)
-                Projects.SimpleProject.Owner = Users.Mylo;
-            if (Projects.MultiPhaseProject.Owner.Id != Users.Mylo.Id)
-                Projects.MultiPhaseProject.Owner = Users.Mylo;
-            if (Projects.MultiPersonProject.Owner.Id != Users.Alayah.Id)
-                Projects.MultiPersonProject.Owner = Users.Alayah;
-            if (Projects.MultiPersonMultiPhaseProject.Owner.Id != Users.Alayah.Id)
-                Projects.MultiPersonMultiPhaseProject.Owner = Users.Alayah;
 
-            //  Add Stages
+            //  Add/Update Stages
             if (dbContext.Stages.Any(s => s.Name == Stages.Backlog.Name) == false)
                 dbContext.Stages.Add(Stages.Backlog);
             if (dbContext.Stages.Any(s => s.Name == Stages.ToDo.Name) == false)
@@ -127,11 +115,8 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.Stages.Any(s => s.Name == Stages.Canceled.Name) == false)
                 dbContext.Stages.Add(Stages.Canceled);
 
-            //  Save all updates
             await dbContext.SaveChangesAsync();
-
-
-            //  Pull stage data
+            
             Stages.Backlog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
             Stages.ToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
             Stages.InProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
@@ -139,7 +124,8 @@ namespace ProjectManagementApp.SampleData
             Stages.Complete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
             Stages.Canceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
 
-            //  Add Phases
+
+            //  Add/Update Phases
             if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePlanning.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePlanning);
             if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleSetup.Name) == false)
@@ -153,52 +139,14 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePostAnalytics.Name) == false)
                 dbContext.Phases.Add(Phases.SimplePostAnalytics);
 
-            //  Save all updates
             await dbContext.SaveChangesAsync();
 
-
-            //  Pull most up to date phase data
             Phases.SimplePlanning = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePlanning.Name)!;
             Phases.SimpleSetup = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleSetup.Name)!;
             Phases.SimpleDataEntry = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleDataEntry.Name)!;
             Phases.SimpleQA = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleQA.Name)!;
             Phases.SimpleNotifyCompletion = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleNotifyCompletion.Name)!;
             Phases.SimplePostAnalytics = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePostAnalytics.Name)!;
-
-            //  Add phase owners
-            if (Phases.SimplePlanning.Owner == Users.Bert)
-                Phases.SimplePlanning.Owner = Users.Bert;
-            if (Phases.SimpleSetup.Owner == Users.Zahir)
-                Phases.SimpleSetup.Owner = Users.Zahir;
-            if (Phases.SimpleDataEntry.Owner == Users.Alayah)
-                Phases.SimpleDataEntry.Owner = Users.Alayah;
-            if (Phases.SimpleQA.Owner == Users.Bert)
-                Phases.SimpleQA.Owner = Users.Bert;
-            if (Phases.SimpleNotifyCompletion.Owner == Users.Alayah)
-                Phases.SimpleNotifyCompletion.Owner = Users.Alayah;
-            if (Phases.SimplePostAnalytics.Owner == Users.Zahir)
-                Phases.SimplePostAnalytics.Owner = Users.Zahir;
-
-            //  Save all updates
-            await dbContext.SaveChangesAsync();
-
-
-            //  Add phase stages
-            if (Phases.SimplePlanning.Stage == Stages.Complete)
-                Phases.SimplePlanning.Stage = Stages.Complete;
-            if (Phases.SimpleSetup.Stage == Stages.Review)
-                Phases.SimpleSetup.Stage = Stages.Review;
-            if (Phases.SimpleDataEntry.Stage == Stages.InProgress)
-                Phases.SimpleDataEntry.Stage = Stages.InProgress;
-            if (Phases.SimpleQA.Stage == Stages.ToDo)
-                Phases.SimpleQA.Stage = Stages.ToDo;
-            if (Phases.SimpleNotifyCompletion.Stage == Stages.Backlog)
-                Phases.SimpleNotifyCompletion.Stage = Stages.Backlog;
-            if (Phases.SimplePostAnalytics.Stage == Stages.Canceled)
-                Phases.SimplePostAnalytics.Stage = Stages.Canceled;
-
-            //  Save all updates
-            await dbContext.SaveChangesAsync();
 
 
             //  Assign users to phases
@@ -226,7 +174,6 @@ namespace ProjectManagementApp.SampleData
             if (Phases.SimplePostAnalytics.Assignments.Any(a => a.Id == Users.Alayah.Id) == false)
                 Phases.SimplePostAnalytics.Assignments.Add(Users.Alayah);
 
-            //  Save all updates
             await dbContext.SaveChangesAsync();
 
 
@@ -244,7 +191,6 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id) == false)
                 dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimplePostAnalytics.Id, Start = DateTime.UtcNow.AddDays(7), End = DateTime.UtcNow.AddDays(10) });
 
-            //  Save all updates
             await dbContext.SaveChangesAsync();
         }
     }

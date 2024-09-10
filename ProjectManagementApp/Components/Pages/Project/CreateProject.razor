@@ -37,7 +37,7 @@
 
 
 @code {
-    public ProjectVm? Project { get; set; } = new ProjectVm();
+    public CreateProjectVm? Project { get; set; } = new ProjectVm();
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
@@ -55,9 +55,9 @@
         {
             try
             {
-                await ProjectService.CreateAsync(Project);
-                await ProjectOwnerService.AssignOwnerAsync(Project.Id, CurrentOwnerSelection.Id);
-                NavigationManager.NavigateTo($"/projects/details/{Project?.Id}", true);
+                string projectId = await ProjectService.CreateAsync(Project);
+                await ProjectOwnerService.AssignOwnerAsync(projectId, CurrentOwnerSelection.Id);
+                NavigationManager.NavigateTo($"/projects/details/{projectId}", true);
             }
             catch (Exception ex)
             {

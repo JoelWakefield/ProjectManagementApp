@@ -10,14 +10,13 @@ namespace ProjectManagementApp.Services
     {
         IEnumerable<ProjectVm> GetProjects();
         Task<ProjectVm?> GetProjectAsync(string id);
-        Task CreateAsync(ProjectVm project);
+        Task<string> CreateAsync(CreateProjectVm project);
         Task UpdateProjectAsync(ProjectVm project);
     }
 
-    public class ProjectService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IMapper mapper) : IProjectService
+    public class ProjectService(ApplicationDbContext dbContext, IMapper mapper) : IProjectService
     {
         private ApplicationDbContext dbContext = dbContext;
-        private UserManager<ApplicationUser> userManager { get; set; } = userManager;
         private IMapper mapper { get; set; } = mapper;
 
         public IEnumerable<ProjectVm> GetProjects() => mapper.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(dbContext.Projects);
@@ -25,42 +24,22 @@ namespace ProjectManagementApp.Services
         public async Task<ProjectVm?> GetProjectAsync(string id) => mapper.Map<ProjectVm>(
             await dbContext.Projects.FirstOrDefaultAsync(p => p.Id == id));
 
-        public async Task CreateAsync(ProjectVm projectVm)
+        public async Task<string> CreateAsync(CreateProjectVm projectVm)
         {
-            Project project = new Project()
-            {
-                Id = Guid.NewGuid().ToString(),
-                CreatedBy = Environment.UserName,
-                CreatedOn = DateTime.UtcNow,
-
-                Name = projectVm.Name,
-                Description = projectVm.Description,
-                ProjectedStart = projectVm.ProjectedStart,
-                ProjectedEnd = projectVm.ProjectedEnd,
-                ActualStart = projectVm.ActualStart,
-                ActualEnd = projectVm.ActualEnd,
-                TotalWorkHours = projectVm.TotalWorkHours,
-            };
+            Project project = mapper.Map<Project>(projectVm);
 
             await dbContext.Projects.AddAsync(project);
             await dbContext.SaveChangesAsync();
+
+            return project.Id;
         }
 
-        public async Task UpdateProjectAsync(ProjectVm project)
+        public async Task UpdateProjectAsync(ProjectVm projectVm)
         {
-            Project? existingProject = await dbContext.Projects.FirstOrDefaultAsync(p => p.Id == project.Id);
-            if (existingProject != null)
-            {
-                existingProject.Name = project.Name;
-                existingProject.Description = project.Description;
-                existingProject.ProjectedStart = project.ProjectedStart;
-                existingProject.ProjectedEnd = project.ProjectedEnd;
-                existingProject.ActualStart = project.ActualStart;
-                existingProject.ActualEnd = project.ActualEnd;
-                existingProject.TotalWorkHours = project.TotalWorkHours;
-
-                await dbContext.SaveChangesAsync();
-            }
+            Project project = mapper.Map<Project>(projectVm);
+            dbContext.Projects.Attach(project);
+            dbContext.Entry(project).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
         }
     }
 }

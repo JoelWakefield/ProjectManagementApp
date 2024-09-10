@@ -46,7 +46,7 @@
     [Parameter]
     public string? ProjectId { get; set; }
 
-    public PhaseVm? Phase { get; set; }
+    public CreatePhaseVm? Phase { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
@@ -63,7 +63,7 @@
             if (project == null)
                 NavigationManager.NavigateTo($"/projects", true);
             else
-                Phase = new PhaseVm
+                Phase = new CreatePhaseVm
                 {
                     ProjectId = ProjectId,
                 };
@@ -82,10 +82,10 @@
         {
             try
             {
-                Phase.Owner.Id = CurrentOwnerSelection.Id;
-                await PhaseService.CreatePhaseAsync(Phase);
-                await PhaseOwnerService.AssignOwnerAsync(Phase.Id, CurrentOwnerSelection.Id);
-                NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);
+                Phase.OwnerId = CurrentOwnerSelection.Id;
+                string phaseId = await PhaseService.CreatePhaseAsync(Phase);
+                await PhaseOwnerService.AssignOwnerAsync(phaseId, CurrentOwnerSelection.Id);
+                NavigationManager.NavigateTo($"/phases/details/{phaseId}", true);
             }
             catch (Exception ex)
             {

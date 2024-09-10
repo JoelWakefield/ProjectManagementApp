@@ -8,17 +8,14 @@ namespace ProjectManagementApp
     {
         public MappingProfile()
         {
-            CreateMap<ProjectRole, ProjectRoleVm>();
-            CreateMap<ProjectRoleVm, ProjectRole>();
-            CreateMap<Stage, StageVm>();
-            CreateMap<StageVm, Stage>();
+            CreateMap<ProjectRole, ProjectRoleVm>().ReverseMap();
+            CreateMap<Stage, StageVm>().ReverseMap();
 
-            CreateMap<ApplicationUser, ApplicationUserVm>();
-            CreateMap<ApplicationUserVm, ApplicationUser>();
+            CreateMap<ApplicationUser, ApplicationUserVm>().ReverseMap();
             CreateMap<ApplicationUser, UserWithRolesVm>()
                 .ForMember(
                     dest => dest.User,
-                    opt => opt.MapFrom(src => src)  //  don't pass the user, but the user viewmodel
+                    opt => opt.MapFrom(src => src)
                 )
                 .ForMember(
                     dest => dest.Roles,
@@ -28,11 +25,10 @@ namespace ProjectManagementApp
                             : string.Empty
                 ));
 
-            CreateMap<Phase, PhaseVm>();
-            CreateMap<PhaseVm, Phase>();
-            
-            CreateMap<Project, ProjectVm>();
-            CreateMap<ProjectVm, Project>();
+            CreateMap<Phase, PhaseVm>().ReverseMap();
+            CreateMap<Phase, CreatePhaseVm>().ReverseMap();
+            CreateMap<Project, ProjectVm>().ReverseMap();
+            CreateMap<Project, CreateProjectVm>().ReverseMap();
         }
     }
 }
