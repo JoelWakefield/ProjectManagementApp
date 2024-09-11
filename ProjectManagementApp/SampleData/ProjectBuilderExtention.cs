@@ -27,6 +27,8 @@ namespace ProjectManagementApp.SampleData
             if (dbContext.ProjectRoles.Any(r => r.Name == ProjectRoles.Member) == false)
                 dbContext.ProjectRoles.Add(new ProjectRole() { Name = ProjectRoles.Member });
 
+            await dbContext.SaveChangesAsync();
+
             ProjectRole managerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Manager)!;
             ProjectRole ownerRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Owner)!;
             ProjectRole memberRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == ProjectRoles.Member)!;
@@ -63,24 +65,49 @@ namespace ProjectManagementApp.SampleData
             if ((await userManager.GetRolesAsync(Users.Zahir)).Contains(IdentityRoles.User) == false)
                 await userManager.AddToRoleAsync(Users.Zahir, IdentityRoles.User);
 
+            await dbContext.SaveChangesAsync();
+
 
             //  Assign project roles to new users
             if (Users.Mylo.ProjectRoles.Any(r => r.Id == managerRole.Id) == false)
+            {
                 Users.Mylo.ProjectRoles.Add(managerRole);
+                managerRole.Users.Add(Users.Mylo);
+            }
 
             if (Users.Mylo.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
+            {
                 Users.Mylo.ProjectRoles.Add(ownerRole);
+                ownerRole.Users.Add(Users.Mylo);
+            }
             if (Users.Alayah.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
+            {
                 Users.Alayah.ProjectRoles.Add(ownerRole);
+                ownerRole.Users.Add(Users.Alayah);
+            }
 
             if (Users.Mylo.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+            {
                 Users.Mylo.ProjectRoles.Add(memberRole);
+                managerRole.Users.Add(Users.Mylo);
+            }
             if (Users.Bert.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+            {
                 Users.Bert.ProjectRoles.Add(memberRole);
+                memberRole.Users.Add(Users.Bert);
+            }
             if (Users.Alayah.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+            {
                 Users.Alayah.ProjectRoles.Add(memberRole);
+                memberRole.Users.Add(Users.Alayah);
+            }
             if (Users.Zahir.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+            {
                 Users.Zahir.ProjectRoles.Add(memberRole);
+                memberRole.Users.Add(Users.Zahir);
+            }
+
+            await dbContext.SaveChangesAsync();
 
 
             //  Add/Update Projects

@@ -11,7 +11,7 @@ namespace ProjectManagementApp.Data
         public string Id { get; set; } = Guid.NewGuid().ToString();
         [Required]
         public required string Name { get; set; }
-        public IEnumerable<ApplicationUser> Users { get; set; } = Enumerable.Empty<ApplicationUser>();
+        public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 
     public class ProjectRoleArchive
