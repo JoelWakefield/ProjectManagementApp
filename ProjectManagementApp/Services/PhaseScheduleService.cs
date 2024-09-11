@@ -1,4 +1,5 @@
-﻿using ProjectManagementApp.Data;
+﻿using AutoMapper;
+using ProjectManagementApp.Data;
 using ProjectManagementApp.ViewModels;
 
 namespace ProjectManagementApp.Services
@@ -10,11 +11,12 @@ namespace ProjectManagementApp.Services
         Task CreateScheduleAsync(PhaseScheduleVm viewModel);
     }
 
-    public class PhaseScheduleService(ApplicationDbContext dbContext) : IPhaseScheduleService
+    public class PhaseScheduleService(ApplicationDbContext dbContext, IMapper mapper) : IPhaseScheduleService
     {
         private ApplicationDbContext dbContext = dbContext;
+		private IMapper mapper { get; set; } = mapper;
 
-        public IEnumerable<PhaseSchedule> GetSchedules() => dbContext.PhaseSchedules;
+		public IEnumerable<PhaseSchedule> GetSchedules() => dbContext.PhaseSchedules;
 
         /// <summary>
         /// Returns all schedules in the form of a gantt chart item.
@@ -32,12 +34,7 @@ namespace ProjectManagementApp.Services
 
         public async Task CreateScheduleAsync(PhaseScheduleVm viewModel)
         {
-            PhaseSchedule schedule = new PhaseSchedule()
-            {
-                PhaseId = viewModel.PhaseId,
-                Start = viewModel.Start.ToDateTime(TimeOnly.MinValue),
-                End = viewModel.End.ToDateTime(TimeOnly.MinValue),
-            };
+            PhaseSchedule schedule = mapper.Map<PhaseSchedule>(viewModel);
             await dbContext.PhaseSchedules.AddAsync(schedule);
             await dbContext.SaveChangesAsync();
         }

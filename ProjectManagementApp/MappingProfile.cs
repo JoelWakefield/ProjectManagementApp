@@ -29,6 +29,8 @@ namespace ProjectManagementApp
             CreateMap<Phase, CreatePhaseVm>().ReverseMap();
             CreateMap<Project, ProjectVm>().ReverseMap();
             CreateMap<Project, CreateProjectVm>().ReverseMap();
+
+            CreateMap<PhaseSchedule, PhaseScheduleVm>().ReverseMap();
         }
     }
 }

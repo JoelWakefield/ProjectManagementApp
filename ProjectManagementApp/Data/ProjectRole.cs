@@ -1,4 +1,6 @@
-﻿namespace ProjectManagementApp.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectManagementApp.Data
 {
     /// <summary>
     /// Project roles allow the team to make adjustments without having access to 
@@ -7,9 +9,9 @@
     public class ProjectRole
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
-        public string Name { get; set; }
-        public IEnumerable<ApplicationUser> Users { get; set; }
+        [Required]
+        public required string Name { get; set; }
+        public IEnumerable<ApplicationUser> Users { get; set; } = Enumerable.Empty<ApplicationUser>();
     }
 
     public class ProjectRoleArchive

@@ -20,7 +20,8 @@ namespace ProjectManagementApp.Services
 
         public async Task CreateStageAsync(string name)
         {
-            await dbContext.Stages.AddAsync(new Stage { Name = name });
+            int lastOrderId = dbContext.Stages.OrderBy(s => s.OrderId).FirstOrDefault().OrderId;
+            await dbContext.Stages.AddAsync(new Stage { Name = name, OrderId = lastOrderId + 1 });
             await dbContext.SaveChangesAsync();
         }
     }

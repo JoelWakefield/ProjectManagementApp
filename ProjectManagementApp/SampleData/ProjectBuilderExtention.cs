@@ -41,7 +41,7 @@ namespace ProjectManagementApp.SampleData
                 await userManager.CreateAsync(Users.Alayah);
             if (userManager.Users.Any(u => u.UserName == Users.Zahir.UserName) == false)
                 await userManager.CreateAsync(Users.Zahir);
-            
+
             await dbContext.SaveChangesAsync();
 
             Users.Bert = userManager.Users.FirstOrDefault(u => u.UserName == Users.Bert.UserName)!;
@@ -116,7 +116,7 @@ namespace ProjectManagementApp.SampleData
                 dbContext.Stages.Add(Stages.Canceled);
 
             await dbContext.SaveChangesAsync();
-            
+
             Stages.Backlog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
             Stages.ToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
             Stages.InProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
@@ -178,18 +178,35 @@ namespace ProjectManagementApp.SampleData
 
 
             //  Create Schedules for phases
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimplePlanning.Id, Start = DateTime.UtcNow.AddDays(-8), End = DateTime.UtcNow.AddDays(-6) });
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleSetup.Id, Start = DateTime.UtcNow.AddDays(-5), End = DateTime.UtcNow.AddDays(-2) });
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleDataEntry.Id, Start = DateTime.UtcNow.AddDays(-1), End = DateTime.UtcNow.AddDays(4) });
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleQA.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleQA.Id, Start = DateTime.UtcNow.AddDays(5), End = DateTime.UtcNow.AddDays(6) });
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimpleNotifyCompletion.Id, Start = DateTime.UtcNow.AddDays(7), End = DateTime.UtcNow.AddDays(7) });
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id) == false)
-                dbContext.PhaseSchedules.Add(new PhaseSchedule { PhaseId = Phases.SimplePostAnalytics.Id, Start = DateTime.UtcNow.AddDays(7), End = DateTime.UtcNow.AddDays(10) });
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Alayah.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningAlayahSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Bert.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningBertSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Zahir.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningZahirSchedule);
+
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.UserId == Users.Alayah.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupAlayahSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.UserId == Users.Zahir.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupZahirSchedule);
+
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Alayah.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryAlayahSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Zahir.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryZahirSchedule);
+
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleQA.Id && p.UserId == Users.Bert.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleQABertSchedule);
+
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.UserId == Users.Alayah.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionAlayahSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.UserId == Users.Mylo.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionMyloSchedule);
+
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.UserId == Users.Alayah.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsAlayahSchedule);
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.UserId == Users.Zahir.Id) == false)
+                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsZahirSchedule);
 
             await dbContext.SaveChangesAsync();
         }

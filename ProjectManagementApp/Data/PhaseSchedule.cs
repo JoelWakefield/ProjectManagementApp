@@ -1,13 +1,17 @@
-﻿namespace ProjectManagementApp.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectManagementApp.Data
 {
 	public class PhaseSchedule
 	{
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
-        public string PhaseId { get; set; }
-        public Phase Phase { get; set; }
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+		[Required]
+		public string Id { get; set; } = Guid.NewGuid().ToString();
+		[Required]
+        public required string PhaseId { get; set; }
+        public Phase? Phase { get; set; }
+		[Required]
+        public required string UserId { get; set; }
+        public ApplicationUser? User { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
     }

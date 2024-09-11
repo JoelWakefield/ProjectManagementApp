@@ -10,13 +10,12 @@ namespace ProjectManagementApp.Data
     {
         [Required]
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string ArchiveId { get; set; }
         [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
         [Required]
-        public int OrderId { get; set; }
+        public required int OrderId { get; set; }
 
-        public IEnumerable<Phase> Phases { get; set; }
+        public IEnumerable<Phase> Phases { get; set; } = Enumerable.Empty<Phase>();
     }
 
     public class StageArchive
