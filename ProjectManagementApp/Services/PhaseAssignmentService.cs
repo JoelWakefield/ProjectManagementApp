@@ -41,9 +41,9 @@ namespace ProjectManagementApp.Services
 			return records;
 		}
 
-		public async Task TogglePhaseAssignmentAsync(string phaseId, string userId, bool assignment)
+		public async Task TogglePhaseAssignmentAsync(string phaseId, string userId, bool isAssigned)
 		{
-			Phase? phase = await dbContext.Phases.FirstOrDefaultAsync(p => p.Id == phaseId);
+			Phase? phase = await dbContext.Phases.Include(p => p.Assignments).FirstOrDefaultAsync(p => p.Id == phaseId);
 			ApplicationUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Id == userId);
 
 			if (user == null || phase == null)
@@ -51,10 +51,14 @@ namespace ProjectManagementApp.Services
 				return;
 			}
 
-			if (assignment)
-				phase.Assignments.Add(user);
-			else
+			if (isAssigned)
+			{
 				phase.Assignments.Remove(user);
+			}
+			else
+			{
+				phase.Assignments.Add(user);
+			}
 
 			await dbContext.SaveChangesAsync();
 		}

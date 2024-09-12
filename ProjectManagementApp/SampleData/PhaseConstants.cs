@@ -2,9 +2,9 @@
 
 namespace ProjectManagementApp.SampleData
 {
-    public static class Phases
+    public static class PhaseData
     {
-        public static Phase SimplePlanning { get; set; } = new Phase
+        public static Phase SimplePlanning() => new Data.Phase
         {
             Name = "Simple Planning",
             Description = "a complete phase for simple project",

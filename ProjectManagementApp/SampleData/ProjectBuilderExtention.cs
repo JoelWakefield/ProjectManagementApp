@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.SampleData
@@ -46,66 +47,55 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            Users.Bert = userManager.Users.FirstOrDefault(u => u.UserName == Users.Bert.UserName)!;
-            Users.Mylo = userManager.Users.FirstOrDefault(u => u.UserName == Users.Mylo.UserName)!;
-            Users.Alayah = userManager.Users.FirstOrDefault(u => u.UserName == Users.Alayah.UserName)!;
-            Users.Zahir = userManager.Users.FirstOrDefault(u => u.UserName == Users.Zahir.UserName)!;
+            ApplicationUser bert = userManager.Users.FirstOrDefault(u => u.UserName == Users.Bert.UserName)!;
+            ApplicationUser mylo = userManager.Users.FirstOrDefault(u => u.UserName == Users.Mylo.UserName)!;
+            ApplicationUser alayah = userManager.Users.FirstOrDefault(u => u.UserName == Users.Alayah.UserName)!;
+            ApplicationUser zahir = userManager.Users.FirstOrDefault(u => u.UserName == Users.Zahir.UserName)!;
 
 
             //  Assign identity roles to new users
-            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(IdentityRoles.Admin) == false)
-                await userManager.AddToRoleAsync(Users.Mylo, IdentityRoles.Admin);
+            if ((await userManager.GetRolesAsync(mylo)).Contains(IdentityRoles.Admin) == false)
+                await userManager.AddToRoleAsync(mylo, IdentityRoles.Admin);
 
-            if ((await userManager.GetRolesAsync(Users.Mylo)).Contains(IdentityRoles.User) == false)
-                await userManager.AddToRoleAsync(Users.Mylo, IdentityRoles.User);
-            if ((await userManager.GetRolesAsync(Users.Bert)).Contains(IdentityRoles.User) == false)
-                await userManager.AddToRoleAsync(Users.Bert, IdentityRoles.User);
-            if ((await userManager.GetRolesAsync(Users.Alayah)).Contains(IdentityRoles.User) == false)
-                await userManager.AddToRoleAsync(Users.Alayah, IdentityRoles.User);
-            if ((await userManager.GetRolesAsync(Users.Zahir)).Contains(IdentityRoles.User) == false)
-                await userManager.AddToRoleAsync(Users.Zahir, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(mylo)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(mylo, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(bert)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(bert, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(alayah)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(alayah, IdentityRoles.User);
+            if ((await userManager.GetRolesAsync(zahir)).Contains(IdentityRoles.User) == false)
+                await userManager.AddToRoleAsync(zahir, IdentityRoles.User);
 
             await dbContext.SaveChangesAsync();
 
+            bert = userManager.Users.Include(u => u.ProjectRoles).FirstOrDefault(u => u.UserName == bert.UserName)!;
+            mylo = userManager.Users.Include(u => u.ProjectRoles).FirstOrDefault(u => u.UserName == mylo.UserName)!;
+            alayah = userManager.Users.Include(u => u.ProjectRoles).FirstOrDefault(u => u.UserName == alayah.UserName)!;
+            zahir = userManager.Users.Include(u => u.ProjectRoles).FirstOrDefault(u => u.UserName == zahir.UserName)!;
 
             //  Assign project roles to new users
-            if (Users.Mylo.ProjectRoles.Any(r => r.Id == managerRole.Id) == false)
-            {
-                Users.Mylo.ProjectRoles.Add(managerRole);
-                managerRole.Users.Add(Users.Mylo);
-            }
+            if (mylo.ProjectRoles.Any(r => r.Id == managerRole.Id) == false)
+                mylo.ProjectRoles.Add(managerRole);
+            await dbContext.SaveChangesAsync();
 
-            if (Users.Mylo.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
-            {
-                Users.Mylo.ProjectRoles.Add(ownerRole);
-                ownerRole.Users.Add(Users.Mylo);
-            }
-            if (Users.Alayah.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
-            {
-                Users.Alayah.ProjectRoles.Add(ownerRole);
-                ownerRole.Users.Add(Users.Alayah);
-            }
+            if (mylo.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
+                mylo.ProjectRoles.Add(ownerRole);
+            await dbContext.SaveChangesAsync();
+            if (alayah.ProjectRoles.Any(r => r.Id == ownerRole.Id) == false)
+                alayah.ProjectRoles.Add(ownerRole);
+            await dbContext.SaveChangesAsync();
 
-            if (Users.Mylo.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
-            {
-                Users.Mylo.ProjectRoles.Add(memberRole);
-                managerRole.Users.Add(Users.Mylo);
-            }
-            if (Users.Bert.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
-            {
-                Users.Bert.ProjectRoles.Add(memberRole);
-                memberRole.Users.Add(Users.Bert);
-            }
-            if (Users.Alayah.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
-            {
-                Users.Alayah.ProjectRoles.Add(memberRole);
-                memberRole.Users.Add(Users.Alayah);
-            }
-            if (Users.Zahir.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
-            {
-                Users.Zahir.ProjectRoles.Add(memberRole);
-                memberRole.Users.Add(Users.Zahir);
-            }
+            if (mylo.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+                mylo.ProjectRoles.Add(memberRole);
+            await dbContext.SaveChangesAsync();
+            if (bert.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+                bert.ProjectRoles.Add(memberRole);
+            await dbContext.SaveChangesAsync();
+            if (alayah.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+                alayah.ProjectRoles.Add(memberRole);
+            await dbContext.SaveChangesAsync();
+            if (zahir.ProjectRoles.Any(r => r.Id == memberRole.Id) == false)
+                zahir.ProjectRoles.Add(memberRole);
 
             await dbContext.SaveChangesAsync();
 
@@ -122,10 +112,10 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            Projects.SimpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
-            Projects.MultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
-            Projects.MultiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
-            Projects.MultiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
+            var simpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
+            var multiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
+            var multiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
+            var multiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
 
 
             //  Add/Update Stages
@@ -144,95 +134,95 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            Stages.Backlog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
-            Stages.ToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
-            Stages.InProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
-            Stages.Review = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Review.Name)!;
-            Stages.Complete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
-            Stages.Canceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
+            var stageBacklog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
+            var stagesToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
+            var stagesInProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
+            var stagesReview = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Review.Name)!;
+            var stageComplete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
+            var stagesCanceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
 
 
             //  Add/Update Phases
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePlanning.Name) == false)
-                dbContext.Phases.Add(Phases.SimplePlanning);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleSetup.Name) == false)
-                dbContext.Phases.Add(Phases.SimpleSetup);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleDataEntry.Name) == false)
-                dbContext.Phases.Add(Phases.SimpleDataEntry);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleQA.Name) == false)
-                dbContext.Phases.Add(Phases.SimpleQA);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimpleNotifyCompletion.Name) == false)
-                dbContext.Phases.Add(Phases.SimpleNotifyCompletion);
-            if (dbContext.Phases.Any(p => p.ProjectId == Projects.SimpleProject.Id && p.Name == Phases.SimplePostAnalytics.Name) == false)
-                dbContext.Phases.Add(Phases.SimplePostAnalytics);
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePlanning().Name) == false)
+            {
+                //var project = dbContext.Projects.Include(p => p.Phases).Where(p => p.Id == simpleProject.Id).First();
+                var temp = PhaseData.SimplePlanning();
+                dbContext.Add(new Phase { Description = "desc", Name = "name", OwnerId = $"{temp.OwnerId}", ProjectId = $"{simpleProject.Id}", StageId = $"{stageComplete.Id}" });
+                await dbContext.SaveChangesAsync();
+            }
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleSetup.Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleSetup);
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleDataEntry.Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleDataEntry);
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleQA.Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleQA);
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleNotifyCompletion.Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleNotifyCompletion);
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePostAnalytics.Name) == false)
+                dbContext.Phases.Add(PhaseData.SimplePostAnalytics);
 
             await dbContext.SaveChangesAsync();
 
-            Phases.SimplePlanning = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePlanning.Name)!;
-            Phases.SimpleSetup = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleSetup.Name)!;
-            Phases.SimpleDataEntry = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleDataEntry.Name)!;
-            Phases.SimpleQA = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleQA.Name)!;
-            Phases.SimpleNotifyCompletion = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimpleNotifyCompletion.Name)!;
-            Phases.SimplePostAnalytics = dbContext.Phases.FirstOrDefault(p => p.Name == Phases.SimplePostAnalytics.Name)!;
+            Phase simplePlanningPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePlanning().Name)!;
+            Phase simpleSetupPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleSetup.Name)!;
+            Phase simpleDataEntryPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleDataEntry.Name)!;
+            Phase simpleQAPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleQA.Name)!;
+            Phase simpleNotifyCompletionPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleNotifyCompletion.Name)!;
+            Phase simplePostAnalyticsPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePostAnalytics.Name)!;
 
 
             //  Assign users to phases
-            if (Phases.SimplePlanning.Assignments.Any(a => a.Id == Users.Alayah.Id) == false)
-                Phases.SimplePlanning.Assignments.Add(Users.Alayah);
-            if (Phases.SimplePlanning.Assignments.Any(a => a.Id == Users.Bert.Id) == false)
-                Phases.SimplePlanning.Assignments.Add(Users.Bert);
-            if (Phases.SimplePlanning.Assignments.Any(a => a.Id == Users.Zahir.Id) == false)
-                Phases.SimplePlanning.Assignments.Add(Users.Zahir);
-
-            if (Phases.SimpleSetup.Assignments.Any(a => a.Id == Users.Alayah.Id) == false)
-                Phases.SimpleSetup.Assignments.Add(Users.Alayah);
-
-            if (Phases.SimpleDataEntry.Assignments.Any(a => a.Id == Users.Zahir.Id) == false)
-                Phases.SimpleDataEntry.Assignments.Add(Users.Zahir);
-            if (Phases.SimpleDataEntry.Assignments.Any(a => a.Id == Users.Alayah.Id) == false)
-                Phases.SimpleDataEntry.Assignments.Add(Users.Alayah);
-
-            if (Phases.SimpleQA.Assignments.Any(a => a.Id == Users.Bert.Id) == false)
-                Phases.SimpleQA.Assignments.Add(Users.Bert);
-
-            if (Phases.SimpleNotifyCompletion.Assignments.Any(a => a.Id == Users.Mylo.Id) == false)
-                Phases.SimpleNotifyCompletion.Assignments.Add(Users.Mylo);
-
-            if (Phases.SimplePostAnalytics.Assignments.Any(a => a.Id == Users.Alayah.Id) == false)
-                Phases.SimplePostAnalytics.Assignments.Add(Users.Alayah);
+            if (simplePlanningPhase.Assignments.Any(a => a.Id == alayah.Id) == false)
+                simplePlanningPhase.Assignments.Add(alayah);
+            if (simplePlanningPhase.Assignments.Any(a => a.Id == bert.Id) == false)
+                simplePlanningPhase.Assignments.Add(bert);
+            if (simplePlanningPhase.Assignments.Any(a => a.Id == zahir.Id) == false)
+                simplePlanningPhase.Assignments.Add(zahir);
+            if (simpleSetupPhase.Assignments.Any(a => a.Id == alayah.Id) == false)
+                simpleSetupPhase.Assignments.Add(alayah);
+            if (simpleDataEntryPhase.Assignments.Any(a => a.Id == zahir.Id) == false)
+                simpleDataEntryPhase.Assignments.Add(zahir);
+            if (simpleDataEntryPhase.Assignments.Any(a => a.Id == alayah.Id) == false)
+                simpleDataEntryPhase.Assignments.Add(alayah);
+            if (simpleQAPhase.Assignments.Any(a => a.Id == bert.Id) == false)
+                simpleQAPhase.Assignments.Add(bert);
+            if (simpleNotifyCompletionPhase.Assignments.Any(a => a.Id == mylo.Id) == false)
+                simpleNotifyCompletionPhase.Assignments.Add(mylo);
+            if (simplePostAnalyticsPhase.Assignments.Any(a => a.Id == alayah.Id) == false)
+                simplePostAnalyticsPhase.Assignments.Add(alayah);
 
             await dbContext.SaveChangesAsync();
 
 
             //  Create Schedules for phases
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Alayah.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == alayah.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningAlayahSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Bert.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == bert.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningBertSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePlanning.Id && p.UserId == Users.Zahir.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == zahir.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningZahirSchedule);
 
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.UserId == Users.Alayah.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleSetupPhase.Id && p.UserId == alayah.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupAlayahSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleSetup.Id && p.UserId == Users.Zahir.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleSetupPhase.Id && p.UserId == zahir.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupZahirSchedule);
 
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Alayah.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleDataEntryPhase.Id && p.UserId == alayah.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryAlayahSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleDataEntry.Id && p.UserId == Users.Zahir.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleDataEntryPhase.Id && p.UserId == zahir.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryZahirSchedule);
 
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleQA.Id && p.UserId == Users.Bert.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleQAPhase.Id && p.UserId == bert.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleQABertSchedule);
 
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.UserId == Users.Alayah.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleNotifyCompletionPhase.Id && p.UserId == alayah.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionAlayahSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimpleNotifyCompletion.Id && p.UserId == Users.Mylo.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleNotifyCompletionPhase.Id && p.UserId == mylo.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionMyloSchedule);
 
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.UserId == Users.Alayah.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePostAnalyticsPhase.Id && p.UserId == alayah.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsAlayahSchedule);
-            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == Phases.SimplePostAnalytics.Id && p.UserId == Users.Zahir.Id) == false)
+            if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePostAnalyticsPhase.Id && p.UserId == zahir.Id) == false)
                 dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsZahirSchedule);
 
             await dbContext.SaveChangesAsync();

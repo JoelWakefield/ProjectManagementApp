@@ -30,7 +30,7 @@ namespace ProjectManagementApp.Data
         public required string OwnerId { get; set; }
         public ApplicationUser? Owner { get; set; }
 
-        public IEnumerable<Phase>? Phases { get; set; } = new List<Phase>();
+        public List<Phase>? Phases { get; set; } = new List<Phase>();
     }
 
     public class ProjectArchive
