@@ -14,6 +14,15 @@ namespace ProjectManagementApp.SampleData
             ProjectedStart = DateTime.UtcNow.AddDays(10),
             ProjectedEnd = DateTime.UtcNow.AddDays(14),
             OwnerId = Users.Mylo.Id,
+            Phases = new List<Phase>
+            {
+                PhaseData.SimplePlanning(),
+                PhaseData.SimpleSetup(),
+                PhaseData.SimpleDataEntry(),
+                PhaseData.SimpleQA(),
+                PhaseData.SimpleNotifyCompletion(),
+                PhaseData.SimplePostAnalytics(),
+            }
         };
         public static Project MultiPhaseProject { get; set; } = new Project()
         {

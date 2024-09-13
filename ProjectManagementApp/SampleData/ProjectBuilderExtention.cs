@@ -112,10 +112,10 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            var simpleProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
-            var multiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
-            var multiPersonProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
-            var multiPersonMultiPhaseProject = dbContext.Projects.FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
+            var simpleProject = dbContext.Projects.Include(p => p.Phases).FirstOrDefault(p => p.Name == Projects.SimpleProject.Name)!;
+            var multiPhaseProject = dbContext.Projects.Include(p => p.Phases).FirstOrDefault(p => p.Name == Projects.MultiPhaseProject.Name)!;
+            var multiPersonProject = dbContext.Projects.Include(p => p.Phases).FirstOrDefault(p => p.Name == Projects.MultiPersonProject.Name)!;
+            var multiPersonMultiPhaseProject = dbContext.Projects.Include(p => p.Phases).FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
 
 
             //  Add/Update Stages
@@ -144,31 +144,26 @@ namespace ProjectManagementApp.SampleData
 
             //  Add/Update Phases
             if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePlanning().Name) == false)
-            {
-                //var project = dbContext.Projects.Include(p => p.Phases).Where(p => p.Id == simpleProject.Id).First();
-                var temp = PhaseData.SimplePlanning();
-                dbContext.Add(new Phase { Description = "desc", Name = "name", OwnerId = $"{temp.OwnerId}", ProjectId = $"{simpleProject.Id}", StageId = $"{stageComplete.Id}" });
-                await dbContext.SaveChangesAsync();
-            }
-            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleSetup.Name) == false)
-                dbContext.Phases.Add(PhaseData.SimpleSetup);
-            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleDataEntry.Name) == false)
-                dbContext.Phases.Add(PhaseData.SimpleDataEntry);
-            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleQA.Name) == false)
-                dbContext.Phases.Add(PhaseData.SimpleQA);
-            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleNotifyCompletion.Name) == false)
-                dbContext.Phases.Add(PhaseData.SimpleNotifyCompletion);
-            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePostAnalytics.Name) == false)
-                dbContext.Phases.Add(PhaseData.SimplePostAnalytics);
+                dbContext.Phases.Add(PhaseData.SimplePlanning());
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleSetup().Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleSetup());
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleDataEntry().Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleDataEntry());
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleQA().Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleQA());
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimpleNotifyCompletion().Name) == false)
+                dbContext.Phases.Add(PhaseData.SimpleNotifyCompletion());
+            if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePostAnalytics().Name) == false)
+                dbContext.Phases.Add(PhaseData.SimplePostAnalytics());
 
             await dbContext.SaveChangesAsync();
 
             Phase simplePlanningPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePlanning().Name)!;
-            Phase simpleSetupPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleSetup.Name)!;
-            Phase simpleDataEntryPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleDataEntry.Name)!;
-            Phase simpleQAPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleQA.Name)!;
-            Phase simpleNotifyCompletionPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleNotifyCompletion.Name)!;
-            Phase simplePostAnalyticsPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePostAnalytics.Name)!;
+            Phase simpleSetupPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleSetup().Name)!;
+            Phase simpleDataEntryPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleDataEntry().Name)!;
+            Phase simpleQAPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleQA().Name)!;
+            Phase simpleNotifyCompletionPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleNotifyCompletion().Name)!;
+            Phase simplePostAnalyticsPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePostAnalytics().Name)!;
 
 
             //  Assign users to phases
