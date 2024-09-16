@@ -69,7 +69,7 @@ else
 }
 
 // Setup initial data for the projects 
-await app.BuildFakeProject();
+//await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 

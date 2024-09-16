@@ -134,12 +134,13 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            var stageBacklog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
-            var stagesToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
-            var stagesInProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
-            var stagesReview = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Review.Name)!;
-            var stageComplete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
-            var stagesCanceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
+            var stages = dbContext.Stages;
+            var stageBacklog = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
+            var stagesToDo = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
+            var stagesInProgress = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
+            var stagesReview = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Review.Name)!;
+            var stageComplete = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
+            var stagesCanceled = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
 
 
             //  Add/Update Phases
