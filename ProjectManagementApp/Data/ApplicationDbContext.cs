@@ -27,9 +27,9 @@ namespace ProjectManagementApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
 			modelBuilder.Entity<Phase>(entity =>
 			{
+				//	Filled
 				entity.HasIndex(e => e.OwnerId, "IX_Phases_OwnerId");
 				entity.HasIndex(e => e.ProjectId, "IX_Phases_ProjectId");
 				entity.HasIndex(e => e.StageId, "IX_Phases_StageId");
@@ -40,32 +40,32 @@ namespace ProjectManagementApp.Data
 
 				entity.HasOne(d => d.Owner).WithMany(p => p.OwnedPhases).HasForeignKey(d => d.OwnerId);
 				entity.HasOne(d => d.Project).WithMany(p => p.Phases).HasForeignKey(d => d.ProjectId);
-				entity.HasOne(d => d.Stage).WithMany(p => p.Phases).HasForeignKey(d => d.StageId);
+				entity.HasOne(d => d.Stage).WithMany(p => p.Phases).HasForeignKey(d => d.StageId).HasPrincipalKey(s => s.Id);
 
+				//	No Data - checking
 				entity.HasMany(d => d.Assignments).WithMany(p => p.AssignedPhases)
 					.UsingEntity<Dictionary<string, object>>(
 						"ApplicationUserPhase",
-						r => r.HasOne<ApplicationUser>().WithMany().HasForeignKey("AssignmentsId"),
-						l => l.HasOne<Phase>().WithMany().HasForeignKey("AssignedPhasesId"),
-						j =>
-						{
-							j.HasKey("AssignedPhasesId", "AssignmentsId");
-							j.ToTable("ApplicationUserPhase");
-							j.HasIndex(new[] { "AssignmentsId" }, "IX_ApplicationUserPhase_AssignmentsId");
-						});
+						r => r.HasOne<ApplicationUser>().WithMany().HasForeignKey("UserId").HasPrincipalKey(nameof(ApplicationUser.Id)),
+						l => l.HasOne<Phase>().WithMany().HasForeignKey("PhaseId").HasPrincipalKey(nameof(Phase.Id)),
+						j => j.HasKey("PhaseId", "UserId")
+					);
 			});
 
+			//	No Data
 			modelBuilder.Entity<PhaseSchedule>(entity =>
 			{
 				entity.HasIndex(e => e.PhaseId, "IX_PhaseSchedules_PhaseId");
 				entity.HasIndex(e => e.UserId, "IX_PhaseSchedules_UserId");
 
+				entity.Property(e => e.PhaseId).HasDefaultValueSql("''::text");
 				entity.Property(e => e.UserId).HasDefaultValueSql("''::text");
-
-				entity.HasOne(d => d.Phase).WithMany(p => p.Schedules).HasForeignKey(d => d.PhaseId);
-				entity.HasOne(d => d.User).WithMany(p => p.Schedules).HasForeignKey(d => d.UserId);
+																			  
+				entity.HasOne(d => d.Phase).WithMany(p => p.Schedules).HasForeignKey(d => d.PhaseId).HasPrincipalKey(p => p.Id);
+				entity.HasOne(d => d.User).WithMany(p => p.Schedules).HasForeignKey(d => d.UserId).HasPrincipalKey(u => u.Id);
 			});
 
+			//	Filled
 			modelBuilder.Entity<Project>(entity =>
 			{
 				entity.HasIndex(e => e.OwnerId, "IX_Projects_OwnerId");
@@ -78,6 +78,7 @@ namespace ProjectManagementApp.Data
 				entity.HasOne(d => d.Owner).WithMany(p => p.OwnedProjects).HasForeignKey(d => d.OwnerId);
 			});
 
+			//	Filled
 			modelBuilder.Entity<ProjectRole>(entity =>
 			{
 				entity.HasMany(d => d.Users).WithMany(p => p.ProjectRoles)
@@ -93,6 +94,7 @@ namespace ProjectManagementApp.Data
 						});
 			});
 
+			//	Filled
 			modelBuilder.Entity<Stage>(entity =>
 			{
 				entity.Property(e => e.OrderId).HasDefaultValue(0);

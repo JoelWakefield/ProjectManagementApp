@@ -118,31 +118,6 @@ namespace ProjectManagementApp.SampleData
             var multiPersonMultiPhaseProject = dbContext.Projects.Include(p => p.Phases).FirstOrDefault(p => p.Name == Projects.MultiPersonMultiPhaseProject.Name)!;
 
 
-            //  Add/Update Stages
-            if (dbContext.Stages.Any(s => s.Name == Stages.Backlog.Name) == false)
-                dbContext.Stages.Add(Stages.Backlog);
-            if (dbContext.Stages.Any(s => s.Name == Stages.ToDo.Name) == false)
-                dbContext.Stages.Add(Stages.ToDo);
-            if (dbContext.Stages.Any(s => s.Name == Stages.InProgress.Name) == false)
-                dbContext.Stages.Add(Stages.InProgress);
-            if (dbContext.Stages.Any(s => s.Name == Stages.Review.Name) == false)
-                dbContext.Stages.Add(Stages.Review);
-            if (dbContext.Stages.Any(s => s.Name == Stages.Complete.Name) == false)
-                dbContext.Stages.Add(Stages.Complete);
-            if (dbContext.Stages.Any(s => s.Name == Stages.Canceled.Name) == false)
-                dbContext.Stages.Add(Stages.Canceled);
-
-            await dbContext.SaveChangesAsync();
-
-            var stages = dbContext.Stages;
-            var stageBacklog = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
-            var stagesToDo = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
-            var stagesInProgress = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
-            var stagesReview = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Review.Name)!;
-            var stageComplete = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
-            var stagesCanceled = dbContext.Stages.Include(s => s.Phases).FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
-
-
             //  Add/Update Phases
             if (dbContext.Phases.Any(p => p.ProjectId == simpleProject.Id && p.Name == PhaseData.SimplePlanning().Name) == false)
                 dbContext.Phases.Add(PhaseData.SimplePlanning());
@@ -159,12 +134,12 @@ namespace ProjectManagementApp.SampleData
 
             await dbContext.SaveChangesAsync();
 
-            Phase simplePlanningPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePlanning().Name)!;
-            Phase simpleSetupPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleSetup().Name)!;
-            Phase simpleDataEntryPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleDataEntry().Name)!;
-            Phase simpleQAPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleQA().Name)!;
-            Phase simpleNotifyCompletionPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimpleNotifyCompletion().Name)!;
-            Phase simplePostAnalyticsPhase = dbContext.Phases.FirstOrDefault(p => p.Name == PhaseData.SimplePostAnalytics().Name)!;
+            Phase simplePlanningPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimplePlanning().Name)!;
+            Phase simpleSetupPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimpleSetup().Name)!;
+            Phase simpleDataEntryPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimpleDataEntry().Name)!;
+            Phase simpleQAPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimpleQA().Name)!;
+            Phase simpleNotifyCompletionPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimpleNotifyCompletion().Name)!;
+            Phase simplePostAnalyticsPhase = dbContext.Phases.Include(p => p.Assignments).FirstOrDefault(p => p.Name == PhaseData.SimplePostAnalytics().Name)!;
 
 
             //  Assign users to phases
@@ -192,36 +167,132 @@ namespace ProjectManagementApp.SampleData
 
             //  Create Schedules for phases
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == alayah.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningAlayahSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simplePlanningPhase.Id,
+                    UserId = alayah.Id,
+                    Start = DateTime.UtcNow.AddDays(-8),
+                    End = DateTime.UtcNow.AddDays(-6)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == bert.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningBertSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simplePlanningPhase.Id,
+                    UserId = bert.Id,
+                    Start = DateTime.UtcNow.AddDays(-9),
+                    End = DateTime.UtcNow.AddDays(-6)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePlanningPhase.Id && p.UserId == zahir.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePlanningZahirSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simplePlanningPhase.Id,
+                    UserId = zahir.Id,
+                    Start = DateTime.UtcNow.AddDays(-10),
+                    End = DateTime.UtcNow.AddDays(-6)
+                });
 
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleSetupPhase.Id && p.UserId == alayah.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupAlayahSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleSetupPhase.Id,
+                    UserId = alayah.Id,
+                    Start = DateTime.UtcNow.AddDays(-5),
+                    End = DateTime.UtcNow.AddDays(-2)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleSetupPhase.Id && p.UserId == zahir.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleSetupZahirSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleSetupPhase.Id,
+                    UserId = zahir.Id,
+                    Start = DateTime.UtcNow.AddDays(-4),
+                    End = DateTime.UtcNow.AddDays(-3)
+                });
 
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleDataEntryPhase.Id && p.UserId == alayah.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryAlayahSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleDataEntryPhase.Id,
+                    UserId = alayah.Id,
+                    Start = DateTime.UtcNow.AddDays(-1),
+                    End = DateTime.UtcNow.AddDays(4)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleDataEntryPhase.Id && p.UserId == zahir.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleDataEntryZahirSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleDataEntryPhase.Id,
+                    UserId = zahir.Id,
+                    Start = DateTime.UtcNow.AddDays(-4),
+                    End = DateTime.UtcNow.AddDays(2)
+                });
 
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleQAPhase.Id && p.UserId == bert.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleQABertSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleQAPhase.Id,
+                    UserId = bert.Id,
+                    Start = DateTime.UtcNow.AddDays(5),
+                    End = DateTime.UtcNow.AddDays(6)
+                });
 
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleNotifyCompletionPhase.Id && p.UserId == alayah.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionAlayahSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleNotifyCompletionPhase.Id,
+                    UserId = alayah.Id,
+                    Start = DateTime.UtcNow.AddDays(7),
+                    End = DateTime.UtcNow.AddDays(7)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simpleNotifyCompletionPhase.Id && p.UserId == mylo.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimpleNotifyCompletionMyloSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simpleNotifyCompletionPhase.Id,
+                    UserId = mylo.Id,
+                    Start = DateTime.UtcNow.AddDays(5),
+                    End = DateTime.UtcNow.AddDays(8)
+                });
 
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePostAnalyticsPhase.Id && p.UserId == alayah.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsAlayahSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simplePostAnalyticsPhase.Id,
+                    UserId = alayah.Id,
+                    Start = DateTime.UtcNow.AddDays(9),
+                    End = DateTime.UtcNow.AddDays(10)
+                });
             if (dbContext.PhaseSchedules.Any(p => p.PhaseId == simplePostAnalyticsPhase.Id && p.UserId == zahir.Id) == false)
-                dbContext.PhaseSchedules.Add(PhaseSchedules.SimplePostAnalyticsZahirSchedule);
+                dbContext.PhaseSchedules.Add(new PhaseSchedule
+                {
+                    PhaseId = simplePostAnalyticsPhase.Id,
+                    UserId = zahir.Id,
+                    Start = DateTime.UtcNow.AddDays(7),
+                    End = DateTime.UtcNow.AddDays(10)
+                });
 
             await dbContext.SaveChangesAsync();
+
+
+            //  Add/Update Stages
+            if (dbContext.Stages.Any(s => s.Name == Stages.Backlog.Name) == false)
+                dbContext.Stages.Add(Stages.Backlog);
+            if (dbContext.Stages.Any(s => s.Name == Stages.ToDo.Name) == false)
+                dbContext.Stages.Add(Stages.ToDo);
+            if (dbContext.Stages.Any(s => s.Name == Stages.InProgress.Name) == false)
+                dbContext.Stages.Add(Stages.InProgress);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Review.Name) == false)
+                dbContext.Stages.Add(Stages.Review);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Complete.Name) == false)
+                dbContext.Stages.Add(Stages.Complete);
+            if (dbContext.Stages.Any(s => s.Name == Stages.Canceled.Name) == false)
+                dbContext.Stages.Add(Stages.Canceled);
+
+            await dbContext.SaveChangesAsync();
+
+            var stageBacklog = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Backlog.Name)!;
+            var stagesToDo = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.ToDo.Name)!;
+            var stagesInProgress = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.InProgress.Name)!;
+            var stagesReview = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Review.Name)!;
+            var stageComplete = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Complete.Name)!;
+            var stagesCanceled = dbContext.Stages.FirstOrDefault(s => s.Name == Stages.Canceled.Name)!;
         }
     }
 }

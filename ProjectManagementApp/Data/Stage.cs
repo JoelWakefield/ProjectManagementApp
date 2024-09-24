@@ -15,7 +15,7 @@ namespace ProjectManagementApp.Data
         [Required]
         public required int OrderId { get; set; }
 
-        public IEnumerable<Phase> Phases { get; set; } = Enumerable.Empty<Phase>();
+        public List<Phase> Phases { get; set; } = new List<Phase>();
     }
 
     public class StageArchive
