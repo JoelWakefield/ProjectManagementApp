@@ -2,7 +2,7 @@
 
 This app is an example of what a project management app could look like. It is meant as an example, but currently lacks many features which would make it production ready; the main goal of the project is to have something to work on during unemployment, because any experience is good experience.
 
-> NOTE: Currently, there is a login issue with the project as is. For this reason, and for the sake of gaining more experience as a developer, the project will be switching from `Blazor` to `React`.
+> NOTE: Currently, there is a login issue with the project; I've spent dozens of hours trying to resolve this issue, but no progress has been made. For this reason, and for the sake of gaining more experience as a developer, the project will be switching from `Blazor` to `React`.
 
 ## Instructions
 
