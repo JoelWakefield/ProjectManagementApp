@@ -7,24 +7,30 @@ export default function Users() {
     populateUserData();
   }, []);
 
+  const content = users 
+  ? <ul id="user-list">
+      {users.map(user => 
+        <li key={user.id}>
+          {user.name}
+        </li>
+      )}
+    </ul>
+  : <>loading...</> ;
+
+  console.log(content);
+
   return (
     <>
       <h2>
         Users
       </h2>
 
-      <ul>
-        {users.map(user => 
-          <li key={user.id}>
-            {user.name}
-          </li>
-        )}
-      </ul>
+      {content}
     </>
   )
 
   async function populateUserData() {
-    const response = await fetch('users');
+    const response = await fetch('user');
     const data = await response.json();
     setUsers(data);
   }

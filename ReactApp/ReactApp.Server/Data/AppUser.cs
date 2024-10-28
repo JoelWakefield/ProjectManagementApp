@@ -6,7 +6,7 @@ namespace ReactApp.Server.Data
     public class AppUser
     {
         public string Id { get; set; }
-        [Column("username")]
+        [Column("UserName")]
         public string Name { get; set; }
     }
 }
