@@ -8,5 +8,7 @@ namespace ReactApp.Server.Data
         public string Id { get; set; }
         [Column("UserName")]
         public string Name { get; set; }
+
+        //public ICollection<ProjectRole> ProjectRoles { get; set; }
     }
 }

@@ -30,7 +30,7 @@ export default function Users() {
   )
 
   async function populateUserData() {
-    const response = await fetch('user');
+    const response = await fetch('users');
     const data = await response.json();
     setUsers(data);
   }
