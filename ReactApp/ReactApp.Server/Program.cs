@@ -28,6 +28,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Setup initial data for the projects 
+await app.BuildFakeProject();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
