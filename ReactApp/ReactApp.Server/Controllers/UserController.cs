@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReactApp.Server.Data;
+using ReactApp.Server.ViewModels;
 
 namespace ReactApp.Server.Controllers
 {
@@ -10,9 +12,14 @@ namespace ReactApp.Server.Controllers
         private ApplicationDbContext dbContext = dbContext;
 
         [HttpGet(Name = "GetUsers")]
-        public IEnumerable<AppUser> GetUsers()
+        public IEnumerable<UserDetails> GetUsers()
         {
-            return dbContext.Users;
+            return dbContext.Users.Include(u => u.ProjectRoles).Select(u => new UserDetails
+            {
+                Id = u.Id,
+                Name = u.Name,
+                ProjectRoles = String.Join(", ", u.ProjectRoles.Select(r => r.Name)),
+            });
         }
     }
 }

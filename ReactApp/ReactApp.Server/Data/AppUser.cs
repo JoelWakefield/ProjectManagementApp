@@ -9,6 +9,6 @@ namespace ReactApp.Server.Data
         [Column("UserName")]
         public string Name { get; set; }
 
-        //public ICollection<ProjectRole> ProjectRoles { get; set; }
+        public ICollection<ProjectRole> ProjectRoles { get; set; }
     }
 }

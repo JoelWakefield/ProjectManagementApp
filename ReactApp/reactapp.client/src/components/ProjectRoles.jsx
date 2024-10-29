@@ -17,8 +17,6 @@ export default function ProjectRoles() {
     </ul>
   : <>loading...</> ;
 
-  console.log(content);
-
   return (
     <>
       <h2>
@@ -30,7 +28,7 @@ export default function ProjectRoles() {
   )
 
   async function populateProjectRoleData() {
-    const response = await fetch('projectroles');
+    const response = await fetch('projectrole');
     const data = await response.json();
     setRoles(data);
   }
