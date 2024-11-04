@@ -11,13 +11,13 @@ export default function Users() {
   ? <ul id="user-list">
       {users.map(user => 
         <li key={user.id}>
-          {user.name}
+          <span>
+            {user.name} - {user.projectRoles}
+          </span>
         </li>
       )}
     </ul>
   : <>loading...</> ;
-
-  console.log(content);
 
   return (
     <>
@@ -32,6 +32,7 @@ export default function Users() {
   async function populateUserData() {
     const response = await fetch('user');
     const data = await response.json();
+    console.log(data);
     setUsers(data);
   }
 }

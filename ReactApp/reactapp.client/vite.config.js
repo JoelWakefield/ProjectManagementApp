@@ -46,7 +46,11 @@ export default defineConfig({
             '^/user': {
                 target,
                 secure: false
-            }
+            },
+            '^/projectrole': {
+                target,
+                secure: false
+            },
         },
         port: 5173,
         https: {

@@ -1,4 +1,5 @@
-import Users from './components/users';
+import Users from './components/Users';
+import ProjectRoles from './components/ProjectRoles';
 import './App.css';
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
         <div>
             <h1 id="tableLabel">Dashboard</h1>
             <Users />
+            <ProjectRoles />
         </div>
     );
 
