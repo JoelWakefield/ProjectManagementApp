@@ -5,5 +5,10 @@ Accept: application/json
 
 ###
 
+GET {{ReactApp.Server_HostAddress}}/user/{id}
+Accept: application/json
+
+###
+
 GET {{ReactApp.Server_HostAddress}}/projectrole/
 Accept: application/json
