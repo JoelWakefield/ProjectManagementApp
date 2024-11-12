@@ -1,20 +1,31 @@
-import { useLoaderData } from "react-router-dom";
-
-export async function loader({ params }) {
-  const response = await fetch(`user/${params.userId}`);
-  const data = await response.json();
-  console.log(data);
-  return { data };
-}
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export default function User() {
-  const { user } = useLoaderData();
+  const [user, setUser] = useState();
+  const { userId } = useParams();
+  
+  useEffect(() => {
+    userLoader(userId);
+  }, [userId]);
 
+  console.log(user);
   const content = user
-  ? <>{user.name}</>
+  ? <div>{user.name}</div>
   : <>Loading...</>;
-
+  
   return (
-    {content}
+    <>
+      {content}
+    </>
   );
+
+  async function userLoader(userId) {
+    console.log(userId);
+    const response = await fetch(`/user/${userId}`);
+    console.log(response.url);
+    const data = await response.json();
+    console.log(data);
+    setUser(data);
+  }  
 }

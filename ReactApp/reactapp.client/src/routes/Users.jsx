@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 export default function Users() {
   const [users, setUsers] = useState();
@@ -12,9 +12,9 @@ export default function Users() {
   ? <ul id="user-list">
       {users.map(user => 
         <li key={user.id}>
-          <span>
+          <Link to={`${user.id}`}>
             {user.name} - {user.projectRoles}
-          </span>
+          </Link>
         </li>
       )}
     </ul>
@@ -37,7 +37,6 @@ export default function Users() {
   async function populateUserData() {
     const response = await fetch('user');
     const data = await response.json();
-    console.log(data);
     setUsers(data);
   }
 }

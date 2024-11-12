@@ -8,7 +8,7 @@ import Root from './routes/Root.jsx';
 import Home from './routes/Home.jsx'
 import ProjectRoles from './routes/ProjectRoles';
 import Users from './routes/Users';
-import User, { loader as userLoader } from './components/User';
+import User from './components/User';
 import ErrorPage from './error-page';
 import './index.css'
 
@@ -34,9 +34,8 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
           {
-            path: "users/:userId",
+            path: ":userId",
             element: <User />,
-            loader: userLoader,
             errorElement: <ErrorPage />,
           },
         ],
