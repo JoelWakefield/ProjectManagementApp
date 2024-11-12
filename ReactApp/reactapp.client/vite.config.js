@@ -47,6 +47,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/user/{id}': {
+                target,
+                secure: false
+            },
             '^/projectrole': {
                 target,
                 secure: false

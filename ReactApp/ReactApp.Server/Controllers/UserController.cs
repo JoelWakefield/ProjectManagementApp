@@ -20,5 +20,13 @@ namespace ReactApp.Server.Controllers
                 .Include(u => u.ProjectRoles)
                 .Select(u => mapper.Map<AppUser, UserDetails>(u));
         }
+
+        [HttpGet("{id}")]
+        public UserDetails GetUser(string id)
+        {
+            return mapper.Map<AppUser, UserDetails>(
+                dbContext.Users.Single(u => u.Id == id)
+            );
+        }
     }
 }

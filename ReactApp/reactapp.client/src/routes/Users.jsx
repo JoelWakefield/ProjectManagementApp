@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Outlet } from "react-router-dom";
 
 export default function Users() {
   const [users, setUsers] = useState();
@@ -26,6 +27,10 @@ export default function Users() {
       </h2>
 
       {content}
+
+      <div>
+        <Outlet />
+      </div>
     </>
   )
 
