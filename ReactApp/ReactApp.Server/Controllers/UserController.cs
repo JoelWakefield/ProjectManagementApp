@@ -22,11 +22,35 @@ namespace ReactApp.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public UserDetails GetUser(string id)
+        public async Task<UserDetails> GetUser(string id)
         {
-            return mapper.Map<AppUser, UserDetails>(
-                dbContext.Users.Single(u => u.Id == id)
-            );
+            var user = await dbContext.Users
+                .Include(u => u.ProjectRoles)
+                .SingleAsync(u => u.Id == id);
+
+            return mapper.Map<AppUser, UserDetails>(user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUserAsync(string id, UpdateUserRequest request)
+        {
+            try
+            {
+                var user = await dbContext.Users.SingleOrDefaultAsync(u => u.Id == id);
+                if (user == null)
+                {
+                    return NotFound(new { message = $"User with id ({id}) not found." });
+                }
+
+                user.Name = request.Name;
+                await dbContext.SaveChangesAsync();
+
+                return Ok(new { message = $" Todo Item  with id ({id}) successfully updated" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"An error occurred while updating user with id ({id})", error = ex.Message });
+            }
         }
     }
 }
