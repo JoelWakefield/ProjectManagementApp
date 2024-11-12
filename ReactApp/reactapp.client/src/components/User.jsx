@@ -9,7 +9,6 @@ export default function User() {
     userLoader(userId);
   }, [userId]);
 
-  console.log(user);
   const content = user
   ? <div>{user.name}</div>
   : <>Loading...</>;
@@ -21,11 +20,8 @@ export default function User() {
   );
 
   async function userLoader(userId) {
-    console.log(userId);
     const response = await fetch(`/user/${userId}`);
-    console.log(response.url);
     const data = await response.json();
-    console.log(data);
     setUser(data);
   }  
 }

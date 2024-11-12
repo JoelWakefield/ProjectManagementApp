@@ -1,8 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
+import "./Root.css"
 
 function Root() {
 	return (
-		<div>
+		<div id="root-layout">
 			<header>
 				<nav>
 					<NavLink to="/">Home</NavLink>
