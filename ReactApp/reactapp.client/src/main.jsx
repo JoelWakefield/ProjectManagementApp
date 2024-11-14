@@ -11,6 +11,7 @@ import Users from './routes/Users';
 import User from './components/User';
 import ErrorPage from './error-page';
 import './index.css'
+import EditUser from './components/EditUser';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,11 @@ const router = createBrowserRouter([
           {
             path: ":userId",
             element: <User />,
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: ":userId/edit",
+            element: <EditUser />,
             errorElement: <ErrorPage />,
           },
         ],
