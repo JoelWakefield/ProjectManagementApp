@@ -1,31 +1,40 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Form, useLoaderData, useNavigate } from "react-router-dom";
 
 export default function EditUser() {
-  const [user, setUser] = useState();
-  const { userId } = useParams();
-  
-  useEffect(() => {
-    userLoader(userId);
-  }, [userId]);
+  const user = useLoaderData();
+  const navigate = useNavigate();
 
-  const content = user
-  ? <div>
-      <h2>{user.name}</h2>
-      <h3>Project Roles</h3>
-      <p>{user.projectRoles}</p>
-    </div>
-  : <>Loading...</>;
-  
   return (
-    <>
-      {content}
-    </>
+    <Form method="post" id="user-form">
+      <p>
+        <input
+          hidden
+          placeholder="userId"
+          aria-label="userId"
+          type="text"
+          name="id"
+          defaultValue={user?.id}
+        />
+      </p>
+      <p>
+        <span>Name</span>
+        <input
+          placeholder="Name"
+          aria-label="Name"
+          type="text"
+          name="name"
+          defaultValue={user?.name}
+        />
+      </p>
+      <p>
+        <button type="submit">Save</button>
+        <button 
+          type="button" 
+          onClick={() => { navigate(-1); }}
+        >
+          Cancel
+        </button>
+      </p>
+    </Form>
   );
-
-  async function userLoader(userId) {
-    const response = await fetch(`/user/${userId}`);
-    const data = await response.json();
-    setUser(data);
-  }  
 }
