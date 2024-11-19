@@ -30,14 +30,15 @@ export default function EditUser() {
       <div>
         <h3>Project Roles</h3>
         {user.projectRoles.map(role => 
-          <p key={role}>
-            <span>{role}</span>
+          <p key={role.name}>
+            <span>{role.name}</span>
             <input
-              placeholder={`project-role-${role}`}
-              aria-label={`project-role-${role}`}
+              placeholder={`project-role-${role.name}`}
+              aria-label={`project-role-${role.name}`}
               type="checkbox"
-              name={`role-${role}`}
-              defaultValue={user?.name}
+              name={`role-${role.name}`}
+              checked={role?.value}
+              //  need a way to toggle checked value safely
             />
           </p>
         )}
