@@ -16,7 +16,7 @@ namespace ReactApp.Server
                 dbContext.ProjectRoles.Add(new ProjectRole() { Name = "manager" });
             if (dbContext.ProjectRoles.Any(r => r.Name == "owner") == false)
                 dbContext.ProjectRoles.Add(new ProjectRole() { Name = "owner" });
-            if (dbContext.ProjectRoles.Any(r => r.Name == "memeber") == false)
+            if (dbContext.ProjectRoles.Any(r => r.Name == "member") == false)
                 dbContext.ProjectRoles.Add(new ProjectRole() { Name = "member" });
 
             //  Pull the updated/pre-existing project role data
