@@ -9,15 +9,11 @@ export default function Users() {
         Users
       </h2>
 
-      <ul id="user-list">
-        {users.map(user => 
-          <li key={user.id}>
-            <Link to={`${user.id}`}>
-              {user.name} - {user.projectRoles}
-            </Link>
-          </li>
-        )}
-      </ul>
+      {users.map(user => 
+        <Link to={`${user.id}`} key={user.id}>
+          {user.name} - {user.projectRoles}
+        </Link>
+      )}
 
       <div>
         <Outlet />
