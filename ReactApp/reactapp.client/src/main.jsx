@@ -10,9 +10,7 @@ import ProjectRoles from './routes/ProjectRoles';
 import Users from './routes/Users';
 import User from './components/User.jsx';
 import EditUser from './components/EditUser.jsx';
-import usersLoader, { 
-  userLoader, updateUserAction 
-} from './components/userService.js';
+import usersLoader, { userLoader } from './components/userService.js';
 import ErrorPage from './error-page';
 import './index.css'
 
@@ -48,7 +46,6 @@ const router = createBrowserRouter([
         path: "users/:userId/edit",
         element: <EditUser />,
         loader: userLoader,
-        action: updateUserAction,
         errorElement: <ErrorPage />,
       },
     ]

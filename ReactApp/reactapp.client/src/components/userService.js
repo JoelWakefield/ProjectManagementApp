@@ -1,5 +1,3 @@
-import { redirect } from "react-router-dom";
-
 export default async function usersLoader() {
   const response = await fetch('/user');
   return response.json();
@@ -10,24 +8,19 @@ export async function userLoader({ params }) {
   return response.json();
 }
 
-export async function updateUserAction({ request, params }) {
-  const formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-
+export async function updateUser(user) {
   // Map the roles back into an array
-  const formattedData = formatProjectRoles(updates);
+  const formattedData = formatProjectRoles(user);
   console.log(formattedData);
 
   // Make the PUT request using the fetch API
-  await fetch(`/user/${params.userId}`, {
+  await fetch(`/user/${user.id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(formattedData)
   });
-
-  return redirect(`/users/${params.userId}`);
 }
 
 function formatProjectRoles(raw) {
