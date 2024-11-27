@@ -48,7 +48,9 @@ namespace ReactApp.Server.Controllers
         {
             try
             {
-                var user = await dbContext.Users.SingleOrDefaultAsync(u => u.Id == id);
+                var user = await dbContext.Users
+                    .Include(u => u.ProjectRoles)
+                    .SingleOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                 {
                     return NotFound(new { message = $"User with id ({id}) not found." });
@@ -58,19 +60,18 @@ namespace ReactApp.Server.Controllers
                 user.Name = request.Name;
 
                 //  update projected user data
-                foreach(EditUserProjectRole role in request.ProjectRoles)
+                foreach(ProjectRole projectRole in dbContext.ProjectRoles)
                 {
-                    var projectRole = dbContext.ProjectRoles.Single(r => r.Name == role.Name);
-                    if (projectRole == null)
+                    var roleRequested = request.ProjectRoles.Any(r => r.Name == projectRole.Name);
+                    var userHasRole = user.ProjectRoles.Any(r => r.Name == projectRole.Name);
+                    if (roleRequested && !userHasRole)
                     {
-                        return NotFound(new { message = $"Project Role ({role.Name}) not found." });
-                    }
-
-                    if (role.Value && !user.ProjectRoles.Any(r => r.Name == role.Name)) {
-                        //  add role if requested and not currently listed
+                        //  add role if requested and user doesn't have it
                         user.ProjectRoles.Add(projectRole);
-                    } else if (!role.Value && user.ProjectRoles.Any(r => r.Name == role.Name)) {
-                        //  remove role if requested and currently listed
+                    }
+                    else if (!roleRequested && userHasRole)
+                    {
+                        //  remove role if not requested (only submits true values) and user has it
                         user.ProjectRoles.Remove(projectRole);
                     }
                 }

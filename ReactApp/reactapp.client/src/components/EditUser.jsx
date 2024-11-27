@@ -37,7 +37,7 @@ export default function EditUser() {
               aria-label={`project-role-${role.name}`}
               type="checkbox"
               name={`role-${role.name}`}
-              checked={role?.value}
+              defaultChecked={role?.value}
               //  need a way to toggle checked value safely
             />
           </p>
