@@ -2,7 +2,6 @@ import { useLoaderData, useNavigate } from 'react-router-dom'
 
 export default function User() {
   const user = useLoaderData();
-  console.log(user);
   const navigate = useNavigate();
 
   const handleClick = () => {

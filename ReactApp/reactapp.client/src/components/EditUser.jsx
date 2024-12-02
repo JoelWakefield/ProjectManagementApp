@@ -1,6 +1,7 @@
 import { Form, useLoaderData, useNavigate, useSubmit } from "react-router-dom";
 import { updateUser } from "./userService";
 import { useState } from "react";
+import { Checkbox } from './Checkbox';
 
 export default function EditUser() {
   const user = useLoaderData();
@@ -8,8 +9,14 @@ export default function EditUser() {
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  const handleRoleChange = (event) => {
-    console.log(event.currentTarget);
+  const updateCheckStatus = index => {
+    setEditedUser({...editedUser,
+      projectRoles: editedUser.projectRoles.map((role, currentIndex) =>
+        currentIndex === index
+          ? { ...role, value: !role.value }
+          : role
+      )
+    });
   }
 
   const handleSubmit = (event) => {
@@ -45,19 +52,14 @@ export default function EditUser() {
       </p>
       <div>
         <h3>Project Roles</h3>
-        {editedUser.projectRoles.map(role => 
-          <p key={role.name}>
-            <span>{role.name}</span>
-            <input
-              placeholder={`project-role-${role.name}`}
-              aria-label={`project-role-${role.name}`}
-              type="checkbox"
-              name={`role-${role.name}`}
-              defaultChecked={role?.value}
-              onChange={handleRoleChange}
-              //  need a way to toggle checked value safely
-            />
-          </p>
+        {editedUser.projectRoles.map((role, index) => 
+          <Checkbox
+            key={role.name}
+            isChecked={role.value}
+            checkHandler={() => updateCheckStatus(index)}
+            label={role.name}
+            index={index}
+          />
         )}
       </div>
       <p>

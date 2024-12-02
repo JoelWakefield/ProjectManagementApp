@@ -10,8 +10,7 @@ export async function userLoader({ params }) {
 
 export async function updateUser(user) {
   // Map the roles back into an array
-  const formattedData = formatProjectRoles(user);
-  console.log(formattedData);
+  console.log(user);
 
   // Make the PUT request using the fetch API
   await fetch(`/user/${user.id}`, {
@@ -19,28 +18,6 @@ export async function updateUser(user) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(formattedData)
+    body: JSON.stringify(user)
   });
-}
-
-function formatProjectRoles(raw) {
-  let roles = [];
-  Object.keys(raw)
-    .filter(key => key.includes("role"))
-    .reduce((_, key) => {
-      const newKey = key.replace("role-", "");
-      roles = [...roles, { 
-        "name": newKey, 
-        "value": raw[key] === "on"
-      }];
-    }, {});
-  
-  const notRoles = Object.keys(raw)
-  .filter(key => !key.includes("role"))
-  .reduce((obj, key) => {
-    obj[key] = raw[key];
-    return obj;
-  }, {});
-
-  return { ...notRoles, projectRoles: roles };
 }

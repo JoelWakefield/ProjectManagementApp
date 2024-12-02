@@ -32,7 +32,7 @@ namespace ReactApp.Server.Controllers
 
             //  add non-listed roles as "false" to the edit user data
             var roles = dbContext.ProjectRoles;
-            foreach(var role in roles)
+            foreach(ProjectRole role in roles)
             {
                 if (!editUser.ProjectRoles.Any(r => r.Name == role.Name))
                 {
@@ -48,6 +48,7 @@ namespace ReactApp.Server.Controllers
         {
             try
             {
+                //  get user data
                 var user = await dbContext.Users
                     .Include(u => u.ProjectRoles)
                     .SingleOrDefaultAsync(u => u.Id == id);
@@ -60,24 +61,30 @@ namespace ReactApp.Server.Controllers
                 user.Name = request.Name;
 
                 //  update projected user data
-                foreach(ProjectRole projectRole in dbContext.ProjectRoles)
+                foreach(EditUserProjectRole requestedRole in request.ProjectRoles)
                 {
-                    var roleRequested = request.ProjectRoles.Any(r => r.Name == projectRole.Name);
-                    var userHasRole = user.ProjectRoles.Any(r => r.Name == projectRole.Name);
-                    if (roleRequested && !userHasRole)
+                    ProjectRole? projectRole = dbContext.ProjectRoles.FirstOrDefault(r => r.Name == requestedRole.Name);
+                    if (projectRole == null)
+                    {
+                        return NotFound(new { message = $"Project Role ({requestedRole.Name}) not found." });
+                    }
+
+                    var userHasRole = user.ProjectRoles.Any(r => r.Name == requestedRole.Name);
+                    if (!userHasRole && requestedRole.Value)
                     {
                         //  add role if requested and user doesn't have it
                         user.ProjectRoles.Add(projectRole);
                     }
-                    else if (!roleRequested && userHasRole)
+                    else if (userHasRole && !requestedRole.Value)
                     {
                         //  remove role if not requested (only submits true values) and user has it
                         user.ProjectRoles.Remove(projectRole);
                     }
                 }
 
+                //  save user data
                 await dbContext.SaveChangesAsync();
-                return Ok(new { message = $" Todo Item  with id ({id}) successfully updated" });
+                return Ok(new { message = $" User with id ({id}) successfully updated" });
             }
             catch (Exception ex)
             {

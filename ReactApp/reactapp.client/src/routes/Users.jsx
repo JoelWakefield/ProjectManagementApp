@@ -1,4 +1,5 @@
 import { Link, Outlet, useLoaderData } from "react-router-dom";
+import "./Users.css";
 
 export default function Users() {
   const users = useLoaderData();
@@ -9,11 +10,13 @@ export default function Users() {
         Users
       </h2>
 
-      {users.map(user => 
-        <Link to={`${user.id}`} key={user.id}>
-          {user.name} - {user.projectRoles}
-        </Link>
-      )}
+      <div id="user-list">
+        {users.map(user => 
+          <Link to={`${user.id}`} key={user.id}>
+            {user.name} - {user.projectRoles}
+          </Link>
+        )}
+      </div>
 
       <div>
         <Outlet />
