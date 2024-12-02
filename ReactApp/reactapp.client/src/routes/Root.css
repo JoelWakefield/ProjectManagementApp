@@ -1,4 +1,4 @@
-.root-layout nav {
+#root-layout nav {
   display: flex;
   justify-content: space-around;
 }
