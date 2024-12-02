@@ -8,7 +8,9 @@ import Root from './routes/Root.jsx';
 import Home from './routes/Home.jsx'
 import ProjectRoles from './routes/ProjectRoles';
 import Users from './routes/Users';
-import User, { loader as userLoader } from './components/User';
+import User from './components/User.jsx';
+import EditUser from './components/EditUser.jsx';
+import usersLoader, { userLoader } from './components/userService.js';
 import ErrorPage from './error-page';
 import './index.css'
 
@@ -31,15 +33,20 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <Users />,
+        loader: usersLoader,
         errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "users/:userId",
-            element: <User />,
-            loader: userLoader,
-            errorElement: <ErrorPage />,
-          },
-        ],
+      },
+      {
+        path: "users/:userId",
+        element: <User />,
+        loader: userLoader,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "users/:userId/edit",
+        element: <EditUser />,
+        loader: userLoader,
+        errorElement: <ErrorPage />,
       },
     ]
   },

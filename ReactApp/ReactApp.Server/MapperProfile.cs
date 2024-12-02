@@ -8,10 +8,18 @@ namespace ReactApp.Server
     {
         public MapperProfile()
         {
-            CreateMap<AppUser, UserDetails>()
+            CreateMap<AppUser, UserVm>()
                 .ForMember(
                     dest => dest.ProjectRoles, 
                     opt => opt.MapFrom(src => String.Join(", ", src.ProjectRoles.Select(r => r.Name)))
+                );
+
+            CreateMap<AppUser, EditUserVm>()
+                .ForMember(
+                    dest => dest.ProjectRoles,
+                    opt => opt.MapFrom(src => src.ProjectRoles.Select(
+                        role => new EditUserProjectRole { Name = role.Name, Value = true }
+                    ))
                 );
         }
     }
