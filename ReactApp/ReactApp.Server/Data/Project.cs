@@ -5,7 +5,7 @@ namespace ReactApp.Server.Data
     /// <summary>
     /// The Project entity keeps track of broad data which isn't likely to change and whose changes aren't worth tracking.
     /// </summary>
-    [Table("AspNetUsers")]
+    [Table("Projects")]
     public class Project
     {
         public string? Id { get; set; }

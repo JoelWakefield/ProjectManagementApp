@@ -24,8 +24,7 @@ namespace ReactApp.Server.Data
             modelBuilder.Entity<Project>()
                 .HasOne(p => p.Owner)
                 .WithMany(u => u.OwnedProjects)
-                .HasForeignKey(p => p.OwnerId)
-                .HasPrincipalKey(nameof(AppUser.Id));
+                .HasForeignKey(p => p.OwnerId);
         }
     }
 }

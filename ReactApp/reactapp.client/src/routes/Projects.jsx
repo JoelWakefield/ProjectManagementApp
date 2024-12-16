@@ -1,4 +1,5 @@
 import { Link, Outlet, useLoaderData } from "react-router-dom";
+import "./Projects.css";
 
 export default function Projects() {
   const projects = useLoaderData();

@@ -22,3 +22,8 @@ Accept: application/json
 
 GET {{ReactApp.Server_HostAddress}}/project/
 Accept: application/json
+
+###
+
+GET {{ReactApp.Server_HostAddress}}/project/{id}
+Accept: application/json
