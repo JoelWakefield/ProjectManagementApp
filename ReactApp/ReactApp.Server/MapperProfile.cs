@@ -21,6 +21,12 @@ namespace ReactApp.Server
                         role => new EditUserProjectRole { Name = role.Name, Value = true }
                     ))
                 );
+
+            CreateMap<Project, ProjectVm>()
+                .ForMember(
+                    dest => dest.OwnerName,
+                    opt => opt.MapFrom(src => src.Owner.Name)
+                );
         }
     }
 }

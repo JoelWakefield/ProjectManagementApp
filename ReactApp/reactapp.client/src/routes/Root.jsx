@@ -9,6 +9,7 @@ function Root() {
 					<NavLink to="/">Home</NavLink>
 					<NavLink to="users">Users</NavLink>
 					<NavLink to="roles">ProjectRoles</NavLink>
+					<NavLink to="projects">Projects</NavLink>
 				</nav>
 			</header>
 
