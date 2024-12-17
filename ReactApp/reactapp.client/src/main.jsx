@@ -13,9 +13,12 @@ import Project from './components/Project.jsx';
 import User from './components/User.jsx';
 import EditUser from './components/EditUser.jsx';
 import usersLoader, { userLoader } from './services/userService.js';
-import projectsLoader, { projectLoader } from './services/projectService.js';
+import projectsLoader, { 
+  projectDetailsLoader, projectEditLoader, updateProject 
+} from './services/projectService.js';
 import ErrorPage from './error-page';
 import './index.css'
+import EditProject from './components/EditProject';
 
 const router = createBrowserRouter([
   {
@@ -60,7 +63,14 @@ const router = createBrowserRouter([
       {
         path: "projects/:projectId",
         element: <Project />,
-        loader: projectLoader,
+        loader: projectDetailsLoader,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "projects/:projectId/edit",
+        element: <EditProject />,
+        loader: projectEditLoader,
+        action: updateProject,
         errorElement: <ErrorPage />,
       }
     ]

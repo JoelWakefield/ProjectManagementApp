@@ -59,7 +59,11 @@ export default defineConfig({
                 target,
                 secure: false
             },
-            '^/project/{id}': {
+            '^/project/details/{id}': {
+                target,
+                secure: false
+            },
+            '^/project/edit/{id}': {
                 target,
                 secure: false
             }

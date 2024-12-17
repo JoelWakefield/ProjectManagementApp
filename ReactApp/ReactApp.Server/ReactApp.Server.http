@@ -25,5 +25,15 @@ Accept: application/json
 
 ###
 
-GET {{ReactApp.Server_HostAddress}}/project/{id}
+GET {{ReactApp.Server_HostAddress}}/project/details/{id}
+Accept: application/json
+
+###
+
+GET {{ReactApp.Server_HostAddress}}/project/edit/{id}
+Accept: application/json
+
+###
+
+PUT {{ReactApp.Server_HostAddress}}/project/edit/{id}
 Accept: application/json

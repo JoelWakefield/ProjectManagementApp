@@ -27,6 +27,15 @@ namespace ReactApp.Server
                     dest => dest.OwnerName,
                     opt => opt.MapFrom(src => src.Owner.Name)
                 );
+            CreateMap<Project, EditProjectVm>()
+                .ForMember(
+                    dest => dest.ProjectedStart,
+                    opt => opt.MapFrom(src => src.ProjectedStart)
+                )
+                .ForMember(
+                    dest => dest.ProjectedEnd,
+                    opt => opt.MapFrom(src => src.ProjectedEnd)
+                );
         }
     }
 }
