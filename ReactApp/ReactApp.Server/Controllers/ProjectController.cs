@@ -58,8 +58,9 @@ namespace ReactApp.Server.Controllers
                 //  update flat project data
                 project.Name = projectVm.Name;
                 project.Description = projectVm.Description;
-                project.ProjectedStart = projectVm.ProjectedStart;
-                project.ProjectedEnd = projectVm.ProjectedEnd;
+
+                project.ProjectedStart = FlipFlop(projectVm.ProjectedStart);
+                project.ProjectedEnd = FlipFlop(projectVm.ProjectedEnd);
 
                 //  save project data
                 await dbContext.SaveChangesAsync();
@@ -69,6 +70,11 @@ namespace ReactApp.Server.Controllers
             {
                 return StatusCode(500, new { message = $"An error occurred while updating project with id ({id})", error = ex.Message });
             }
+        }
+
+        private static DateTime FlipFlop(DateTime datetime)
+        {
+            return DateTime.Parse(datetime.ToLocalTime().ToString()).ToUniversalTime();
         }
     }
 }

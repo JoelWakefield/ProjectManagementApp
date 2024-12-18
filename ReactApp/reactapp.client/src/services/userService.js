@@ -9,9 +9,6 @@ export async function userLoader({ params }) {
 }
 
 export async function updateUser(user) {
-  // Map the roles back into an array
-  console.log(user);
-
   // Make the PUT request using the fetch API
   await fetch(`/user/${user.id}`, {
     method: 'PUT',

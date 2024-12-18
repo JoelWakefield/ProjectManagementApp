@@ -1,15 +1,23 @@
-import { useLoaderData, useNavigate, Form } from "react-router-dom";
-// import { updateProject } from "../services/projectService";
+import { useLoaderData, useNavigate, Form, useSubmit } from "react-router-dom";
+import { updateProject } from "../services/projectService";
+import { useState } from "react";
 
 export default function EditProject() {
   const project = useLoaderData();
+  const [editedProject,setEditedProject] = useState(project);
+  const submit = useSubmit();
   const navigate = useNavigate();
-  console.log("raw: ", project?.projectedStart);
-  console.log("utc: ", new Date(project?.projectedStart).toUTCString());
-  console.log("local: ", new Date(project?.projectedStart).toLocaleString());
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    updateProject(editedProject);
+    submit(editedProject, { 
+      action: `/projects/${project.id}`
+    });
+  }
 
   return (
-    <Form method="post" action={`/projects/${project.id}`}>
+    <Form method="post" onSubmit={handleSubmit}>
       <h2>{project.name}</h2>
       <p>
         <input
@@ -28,6 +36,10 @@ export default function EditProject() {
           aria-label="name"
           type="text"
           name="name"
+          onInput={(e) => setEditedProject({
+            ...editedProject, 
+            name: e.target.value
+          })}
           defaultValue={project?.name}
         />
       </p>
@@ -38,6 +50,10 @@ export default function EditProject() {
           aria-label="description"
           type="text-area"
           name="description"
+          onInput={(e) => setEditedProject({
+            ...editedProject, 
+            description: e.target.value
+          })}
           defaultValue={project?.description}
         />
       </p>
@@ -48,8 +64,12 @@ export default function EditProject() {
           aria-label="projected-start-date"
           type="datetime-local"
           name="projectedStart"
+          onInput={(e) => setEditedProject({
+            ...editedProject, 
+            projectedStart: e.target.value
+          })}
           defaultValue={project?.projectedStart.replace("Z","")}
-        />
+          />
       </p>
       <p>
         <span>Projected End Date </span>
@@ -58,6 +78,10 @@ export default function EditProject() {
           aria-label="projected-end-date"
           type="datetime-local"
           name="projectedEnd"
+          onInput={(e) => setEditedProject({
+            ...editedProject, 
+            projectedEnd: e.target.value
+          })}
           defaultValue={project?.projectedEnd.replace("Z","")}
         />
       </p>
