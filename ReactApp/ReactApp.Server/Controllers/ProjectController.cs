@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactApp.Server.Data;
 using ReactApp.Server.ViewModels;
+using System;
 
 namespace ReactApp.Server.Controllers
 {
@@ -59,8 +60,8 @@ namespace ReactApp.Server.Controllers
                 project.Name = projectVm.Name;
                 project.Description = projectVm.Description;
 
-                project.ProjectedStart = FlipFlop(projectVm.ProjectedStart);
-                project.ProjectedEnd = FlipFlop(projectVm.ProjectedEnd);
+                project.ProjectedStart = projectVm.ProjectedStart;
+                project.ProjectedEnd = projectVm.ProjectedEnd;
 
                 //  save project data
                 await dbContext.SaveChangesAsync();
@@ -70,11 +71,6 @@ namespace ReactApp.Server.Controllers
             {
                 return StatusCode(500, new { message = $"An error occurred while updating project with id ({id})", error = ex.Message });
             }
-        }
-
-        private static DateTime FlipFlop(DateTime datetime)
-        {
-            return DateTime.Parse(datetime.ToLocalTime().ToString()).ToUniversalTime();
         }
     }
 }

@@ -15,26 +15,18 @@ export default function Project() {
           <p>Owner: {project.ownerName}</p>
           <p>Description: {project.description}</p>
           <p>Projected Start: 
-            {new Date(project.projectedStart).toLocaleDateString()}
-            {` | `}
-            {new Date(project.projectedStart).toLocaleTimeString()}
+            {project.projectedStart}
           </p>
           <p>Projected End: 
-            {new Date(project.projectedEnd).toLocaleDateString()}
-            {` | `}
-            {new Date(project.projectedEnd).toLocaleTimeString()}
+            {project.projectedEnd}
           </p>
       </div>
       <div>
           <p>Actual Start: 
-            {new Date(project.actualStart).toLocaleDateString()}
-            {` | `}
-            {new Date(project.actualStart).toLocaleTimeString()}
+            {project.actualStart}
           </p>
           <p>Actual End: 
-            {new Date(project.actualEnd).toLocaleDateString()}
-            {` | `}
-            {new Date(project.actualEnd).toLocaleTimeString()}
+            {project.actualEnd}
           </p>
           <p>Total Hours: {project.totalHours}</p>
       </div>

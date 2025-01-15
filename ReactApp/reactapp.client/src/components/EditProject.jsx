@@ -68,7 +68,7 @@ export default function EditProject() {
             ...editedProject, 
             projectedStart: e.target.value
           })}
-          defaultValue={project?.projectedStart.replace("Z","")}
+          defaultValue={project?.projectedStart}
           />
       </p>
       <p>
@@ -82,7 +82,7 @@ export default function EditProject() {
             ...editedProject, 
             projectedEnd: e.target.value
           })}
-          defaultValue={project?.projectedEnd.replace("Z","")}
+          defaultValue={project?.projectedEnd}
         />
       </p>
       <p>
