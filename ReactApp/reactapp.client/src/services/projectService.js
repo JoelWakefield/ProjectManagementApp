@@ -20,7 +20,7 @@ export async function updateProject(project) {
   await fetch(`/project/edit/${project.id}`, {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json'     
     },
     body: JSON.stringify(project)
   });

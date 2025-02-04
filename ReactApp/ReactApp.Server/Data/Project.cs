@@ -14,10 +14,10 @@ namespace ReactApp.Server.Data
         public string? CreatedBy { get; set; }
         public string Name { get; set; } = "";
         public string? Description { get; set; }
-        public DateOnly ProjectedStart { get; set; }
-        public DateOnly ProjectedEnd { get; set; }
-        public DateOnly ActualStart { get; set; }
-        public DateOnly ActualEnd { get; set; }
+        public DateTime ProjectedStart { get; set; }
+        public DateTime ProjectedEnd { get; set; }
+        public DateTime ActualStart { get; set; }
+        public DateTime ActualEnd { get; set; }
         public float TotalWorkHours { get; set; }
 
         public string? OwnerId { get; set; }

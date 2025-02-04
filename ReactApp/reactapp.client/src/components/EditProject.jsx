@@ -62,7 +62,7 @@ export default function EditProject() {
         <input
           placeholder="projected-start-date"
           aria-label="projected-start-date"
-          type="datetime-local"
+          type="date"
           name="projectedStart"
           onInput={(e) => setEditedProject({
             ...editedProject, 
@@ -76,7 +76,7 @@ export default function EditProject() {
         <input
           placeholder="projected-end-date"
           aria-label="projected-end-date"
-          type="datetime-local"
+          type="date"
           name="projectedEnd"
           onInput={(e) => setEditedProject({
             ...editedProject, 

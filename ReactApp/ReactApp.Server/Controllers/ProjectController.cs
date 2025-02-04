@@ -60,8 +60,8 @@ namespace ReactApp.Server.Controllers
                 project.Name = projectVm.Name;
                 project.Description = projectVm.Description;
 
-                project.ProjectedStart = projectVm.ProjectedStart;
-                project.ProjectedEnd = projectVm.ProjectedEnd;
+                project.ProjectedStart = projectVm.ProjectedStart.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
+                project.ProjectedEnd = projectVm.ProjectedEnd.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
 
                 //  save project data
                 await dbContext.SaveChangesAsync();
