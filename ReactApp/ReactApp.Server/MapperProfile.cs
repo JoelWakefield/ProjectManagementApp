@@ -21,6 +21,37 @@ namespace ReactApp.Server
                         role => new EditUserProjectRole { Name = role.Name, Value = true }
                     ))
                 );
+
+            CreateMap<Project, ProjectVm>()
+                .ForMember(
+                    dest => dest.OwnerName,
+                    opt => opt.MapFrom(src => src.Owner.Name)
+                )
+                .ForMember(
+                    dest => dest.ProjectedStart,
+                    opt => opt.MapFrom(src => src.ProjectedStart.ToDateOnly())
+                )
+                .ForMember(
+                    dest => dest.ProjectedEnd,
+                    opt => opt.MapFrom(src => src.ProjectedEnd.ToDateOnly())
+                )
+                .ForMember(
+                    dest => dest.ActualStart,
+                    opt => opt.MapFrom(src => src.ActualStart.ToDateOnly())
+                )
+                .ForMember(
+                    dest => dest.ActualEnd,
+                    opt => opt.MapFrom(src => src.ActualEnd.ToDateOnly())
+                );
+            CreateMap<Project, EditProjectVm>()
+                .ForMember(
+                    dest => dest.ProjectedStart,
+                    opt => opt.MapFrom(src => src.ProjectedStart.ToDateOnly())
+                )
+                .ForMember(
+                    dest => dest.ProjectedEnd,
+                    opt => opt.MapFrom(src => src.ProjectedEnd.ToDateOnly())
+                );
         }
     }
 }

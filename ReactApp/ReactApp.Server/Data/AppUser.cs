@@ -10,5 +10,6 @@ namespace ReactApp.Server.Data
         public string Name { get; set; }
 
         public ICollection<ProjectRole> ProjectRoles { get; set; }
+        public ICollection<Project> OwnedProjects { get; set; }
     }
 }

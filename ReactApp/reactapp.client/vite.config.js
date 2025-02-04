@@ -55,6 +55,18 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/project': {
+                target,
+                secure: false
+            },
+            '^/project/details/{id}': {
+                target,
+                secure: false
+            },
+            '^/project/edit/{id}': {
+                target,
+                secure: false
+            }
         },
         port: 5173,
         https: {

@@ -1,5 +1,5 @@
 import { Form, useLoaderData, useNavigate, useSubmit } from "react-router-dom";
-import { updateUser } from "./userService";
+import { updateUser } from "../services/userService";
 import { useState } from "react";
 import { Checkbox } from './Checkbox';
 

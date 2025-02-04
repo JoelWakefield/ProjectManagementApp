@@ -17,3 +17,23 @@ Accept: application/json
 
 GET {{ReactApp.Server_HostAddress}}/projectrole/
 Accept: application/json
+
+###
+
+GET {{ReactApp.Server_HostAddress}}/project/
+Accept: application/json
+
+###
+
+GET {{ReactApp.Server_HostAddress}}/project/details/{id}
+Accept: application/json
+
+###
+
+GET {{ReactApp.Server_HostAddress}}/project/edit/{id}
+Accept: application/json
+
+###
+
+PUT {{ReactApp.Server_HostAddress}}/project/edit/{id}
+Accept: application/json

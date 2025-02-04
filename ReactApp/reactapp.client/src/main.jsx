@@ -8,11 +8,17 @@ import Root from './routes/Root.jsx';
 import Home from './routes/Home.jsx'
 import ProjectRoles from './routes/ProjectRoles';
 import Users from './routes/Users';
+import Projects from './routes/Projects.jsx';
+import Project from './components/Project.jsx';
 import User from './components/User.jsx';
 import EditUser from './components/EditUser.jsx';
-import usersLoader, { userLoader } from './components/userService.js';
+import usersLoader, { userLoader } from './services/userService.js';
+import projectsLoader, { 
+  projectDetailsLoader, projectEditLoader
+} from './services/projectService.js';
 import ErrorPage from './error-page';
 import './index.css'
+import EditProject from './components/EditProject';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +54,24 @@ const router = createBrowserRouter([
         loader: userLoader,
         errorElement: <ErrorPage />,
       },
+      {
+        path: "projects",
+        element: <Projects />,
+        loader: projectsLoader,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "projects/:projectId",
+        element: <Project />,
+        loader: projectDetailsLoader,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "projects/:projectId/edit",
+        element: <EditProject />,
+        loader: projectEditLoader,
+        errorElement: <ErrorPage />,
+      }
     ]
   },
 ]);

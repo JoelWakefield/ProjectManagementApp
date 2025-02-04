@@ -6,6 +6,7 @@ namespace ReactApp.Server.Data
     {
         public DbSet<AppUser> Users { get; set; }
         public DbSet<ProjectRole> ProjectRoles { get; set; }
+        public DbSet<Project> Projects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,6 +20,11 @@ namespace ReactApp.Server.Data
                     l => l.HasOne(typeof(ProjectRole)).WithMany().HasForeignKey("ProjectRolesId").HasPrincipalKey(nameof(ProjectRole.Id)),
                     r => r.HasOne(typeof(AppUser)).WithMany().HasForeignKey("UsersId").HasPrincipalKey(nameof(AppUser.Id)),
                     j => j.HasKey("ProjectRolesId", "UsersId"));
+
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Owner)
+                .WithMany(u => u.OwnedProjects)
+                .HasForeignKey(p => p.OwnerId);
         }
     }
 }
