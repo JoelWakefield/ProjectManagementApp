@@ -1,10 +1,8 @@
 ﻿@page "/projects/edit/{Id}"
-@using Microsoft.AspNetCore.Authorization
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IProjectRoleService ProjectRoleService
