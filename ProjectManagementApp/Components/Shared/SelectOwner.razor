@@ -3,7 +3,7 @@
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
 @inject IProjectRoleService ProjectRoleService
-@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext DbContext
 
 
 @if (Owners.Any() == false)
@@ -51,7 +51,7 @@ else
         if (FilterByRole ?? false)
             Owners = (await ProjectRoleService.GetUsersWithRoleAsync(RoleFilter)).ToList();
         else
-            Owners = UserManager.Users.ToList();
+            Owners = DbContext.Users.ToList();
 
 
         if (OwnerSelection == null && Owners.Any())
