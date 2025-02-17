@@ -1,15 +1,12 @@
 ﻿@page "/phases/owners"
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Identity
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
-@inject UserManager<ApplicationUser> UserManager
 @inject IPhaseOwnerService PhaseOwnerService
+@inject ApplicationDbContext DbContext
 
 
 <PageTitle>Phase Owners</PageTitle>
@@ -61,7 +58,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		//	Add the owner sections
-		IEnumerable<ApplicationUser> owners = UserManager.Users.ToList()!;
+		IEnumerable<ApplicationUser> owners = DbContext.Users.ToList()!;
 		//	TODO: handle a no user(owner) scenario
 
 		foreach (var owner in owners)
@@ -84,7 +81,7 @@
 			info.Item.Category = ownerName;
 
 			//	Update the Phase owner
-			string? ownerId = UserManager.Users.FirstOrDefault(u => u.UserName == info.Item.Category)?.Id;
+			string? ownerId = DbContext.Users.FirstOrDefault(u => u.UserName == info.Item.Category)?.Id;
 
 			if (ownerId == null)
 				Errors = $"Cannot find owner Id: {ownerName}. Try checking your 'AspNetUsers' data.";

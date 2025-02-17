@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
 using ProjectManagementApp.ViewModels;
 
@@ -11,16 +10,15 @@ namespace ProjectManagementApp.Services
 		Task CreatePhaseAssignmentAsync(string phaseId, string userId, bool assigned);
 	}
 
-	public class PhaseAssignmentService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IPhaseAssignmentService
+	public class PhaseAssignmentService(ApplicationDbContext dbContext) : IPhaseAssignmentService
 	{
         private ApplicationDbContext dbContext = dbContext;
-		private UserManager<ApplicationUser> userManager = userManager;
 
 		public async Task<Dictionary<string,PhaseAssignedRecord>> GetPhaseAssignedRecordsAsync()
 		{
 			Dictionary<string,PhaseAssignedRecord> records = new Dictionary<string, PhaseAssignedRecord>();
 
-			IEnumerable<ApplicationUser> users = await userManager.Users.ToListAsync();
+			IEnumerable<ApplicationUser> users = await dbContext.Users.ToListAsync();
 			IEnumerable<Phase> phases = await dbContext.Phases.ToListAsync();
 
 			foreach (var phase in phases)

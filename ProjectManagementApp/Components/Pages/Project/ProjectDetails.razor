@@ -1,9 +1,7 @@
 ﻿@page "/projects/details/{Id}"
-@using Microsoft.AspNetCore.Authorization
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IProjectService ProjectService

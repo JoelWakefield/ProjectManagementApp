@@ -1,11 +1,9 @@
 ﻿@page "/phases/stages"
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using System.ComponentModel.DataAnnotations
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseStageService PhaseStageService
 @inject IStageService StageService
@@ -50,7 +48,7 @@
 	const string UNSTAGED_SECTION_NAME = "UNSTAGED";
 
 	private IEnumerable<Phase>? PhaseList { get; set; }
-	private List<Stage?> Stages { get; set; } = new List<Stage>();
+	private List<Stage?> Stages { get; set; } = new List<Stage?>();
 
 	private List<KanBanSection> _sections { get; set; } = new List<KanBanSection>()
 {

@@ -1,11 +1,9 @@
 ﻿@page "/projects/create"
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IProjectRoleService ProjectRoleService
 @inject IProjectOwnerService ProjectOwnerService

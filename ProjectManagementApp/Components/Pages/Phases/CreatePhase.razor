@@ -1,10 +1,8 @@
 ﻿@page "/phases/create/{ProjectId}"
-@using Microsoft.AspNetCore.Authorization
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
-@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IPhaseService PhaseService
 @inject IProjectService ProjectService

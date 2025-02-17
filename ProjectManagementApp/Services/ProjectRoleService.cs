@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.Data;
 
 namespace ProjectManagementApp.Services
@@ -16,10 +15,9 @@ namespace ProjectManagementApp.Services
         Task CreateRoleAsync(string name);
 	}
 
-	public class ProjectRoleService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IProjectRoleService
+	public class ProjectRoleService(ApplicationDbContext dbContext) : IProjectRoleService
     {
         private ApplicationDbContext dbContext { get; set; } = dbContext;
-        private UserManager<ApplicationUser> userManager { get; set; } = userManager;
 
         public IEnumerable<ProjectRole> GetAllRoles() => dbContext.ProjectRoles;
 
@@ -83,7 +81,7 @@ namespace ProjectManagementApp.Services
                 .Select(r => r.UserId)
                 .AsEnumerable();
 
-            return userManager.Users.Where(u => userIds.Contains(u.Id));
+            return dbContext.Users.Where(u => userIds.Contains(u.Id));
         }
 
         public async Task CreateRoleAsync(string name)

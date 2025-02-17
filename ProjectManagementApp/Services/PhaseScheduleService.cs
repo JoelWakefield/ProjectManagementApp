@@ -43,7 +43,6 @@ namespace ProjectManagementApp.Services
         public async Task<PhaseSchedule?> GetScheduleAsync(string phaseId)
         {
             return await dbContext.PhaseSchedules
-                .OrderByDescending(s => s.CreatedOn)
                 .FirstOrDefaultAsync(s => s.PhaseId == phaseId);
         }
 

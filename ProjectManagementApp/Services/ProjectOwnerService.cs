@@ -11,10 +11,9 @@ namespace ProjectManagementApp.Services
         Task AssignOwnerAsync(string projectId, string userId);
     }
 
-    public class ProjectOwnerService(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IProjectOwnerService
+    public class ProjectOwnerService(ApplicationDbContext dbContext) : IProjectOwnerService
     {
         private ApplicationDbContext dbContext = dbContext;
-        private UserManager<ApplicationUser> userManager = userManager;
 
         public async Task<ApplicationUser?> GetOwnerAsync(string projectId) {
             ProjectOwner? owner = await dbContext.ProjectOwners 
@@ -23,7 +22,7 @@ namespace ProjectManagementApp.Services
 
             if (owner == null) { return null; }
 
-            return await userManager.Users.FirstOrDefaultAsync(u => u.Id == owner!.UserId)!;
+            return await dbContext.Users.FirstOrDefaultAsync(u => u.Id == owner!.UserId)!;
         }
 
         public async Task AssignOwnerAsync(string projectId, string userId)
