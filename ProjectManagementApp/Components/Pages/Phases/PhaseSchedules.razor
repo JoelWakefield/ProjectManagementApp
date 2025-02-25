@@ -1,4 +1,5 @@
 ﻿@page "/phases/schedules"
+@using MudBlazor
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
@@ -48,9 +49,11 @@
                 <MudSpacer />
             }
             <MudItem Class="pa-0" xs="item.Duration(StartDate, DAYS_DISPLAYED)">
-                <MudPaper Class="d-flex align-center justify-center mud-width-full pa-3" Style="word-break:break-word;">
-                    <MudText Typo="Typo.body1" Align="Align.Center">@item.Name</MudText>
-                </MudPaper>
+                <MudLink @onclick="(() => SelectPhase(item.PhaseId))">
+                    <MudPaper Class="d-flex align-center justify-center mud-width-full pa-3" Style="word-break:break-word;">
+                        <MudText Typo="Typo.body1" Align="Align.Center">@item.Name</MudText>
+                    </MudPaper>
+                </MudLink>
             </MudItem>
             @for (int i = 0; i < item.ToEnd(StartDate, DAYS_DISPLAYED); i++)
             {
@@ -102,4 +105,7 @@
             Dates.Add(StartDate.AddDays(i));
         }
     }
+
+    private void SelectPhase(string phaseId) => NavigationManager.NavigateTo($"/phases/details/{phaseId}", true);
+
 }
