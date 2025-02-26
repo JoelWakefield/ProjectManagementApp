@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ProjectManagementApp.Components;
 using ProjectManagementApp.Data;
 using MudBlazor.Services;
 using ProjectManagementApp.SampleData;
@@ -43,10 +42,10 @@ await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+app.MapStaticAssets();
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
+app.MapRazorComponents<ProjectManagementApp.Components.App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
