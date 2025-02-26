@@ -48,15 +48,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (String.IsNullOrEmpty(Id))
-        {
-            NavigationManager.NavigateTo($"/phases", true);
-        }
-        else
-        {
+        try {
             Phase = await PhaseService.GetPhaseAsync(Id);
-            if (Phase == null)
-                NavigationManager.NavigateTo($"/phases", true);
+            var user = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
+            CurrentOwnerSelection = new OwnerSelection(user.Id,user.UserName);
+        } catch {
+            NavigationManager.NavigateTo($"/phases", true);
         }
     }
 
