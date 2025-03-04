@@ -1,5 +1,4 @@
 ﻿using ReactApp.Server.ViewModels;
-using System.Text.Json;
 
 namespace ProjectManagementApp.HttpClients
 {
@@ -23,8 +22,7 @@ namespace ProjectManagementApp.HttpClients
 
             if (response.IsSuccessStatusCode)
             {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<string>(responseStream);
+                return await response.Content.ReadAsStringAsync();
             }
             else
             {

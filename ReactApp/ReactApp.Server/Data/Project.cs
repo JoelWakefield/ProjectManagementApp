@@ -9,7 +9,7 @@ namespace ReactApp.Server.Data
     [Table("Projects")]
     public class Project
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public string? CreatedBy { get; set; }
         public string Name { get; set; } = "";

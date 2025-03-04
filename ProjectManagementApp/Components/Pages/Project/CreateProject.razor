@@ -62,12 +62,15 @@
         {
             try
             {
+                project.ProjectedStart = start.ToDateOnly();
+                project.ProjectedEnd = start.ToDateOnly();
+                project.OwnerId = CurrentOwnerSelection.Id;
                 var projectId = await Http.CreateProjectAsync(project);
                 if (String.IsNullOrEmpty(projectId)) {
                     throw new Exception("Failed to create a new project.");
                 } else {
                     await ProjectOwnerService.AssignOwnerAsync(projectId, CurrentOwnerSelection.Id);
-                    NavigationManager.NavigateTo($"/projects/edit/{projectId}", true);
+                    NavigationManager.NavigateTo($"/projects/details/{projectId}", true);
 
                 }
             }

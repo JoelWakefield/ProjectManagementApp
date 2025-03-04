@@ -24,15 +24,10 @@
 <MudPaper Class="pa-8">
     @if (project != null)
     {
-        <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Editable Values</MudText>
-        <MudContainer Class="pa-4 align-start">
-            <MudTextField Label="Name" @bind-Value="project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
-            <MudTextField Label="Description" @bind-Value="project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
-        </MudContainer>
-        <MudContainer Class="pa-4 align-start">
-            <MudDatePicker Label="Projected Start Date" @bind-Date="start" ShowToolbar="false" Required="true"/>
-            <MudDatePicker Label="Projected End Date" @bind-Date="end" ShowToolbar="false" Required="true" />
-        </MudContainer>
+        <MudTextField Label="Name" @bind-Value="project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
+        <MudTextField Label="Description" @bind-Value="project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
+        <MudDatePicker Label="Projected Start Date" @bind-Date="start" ShowToolbar="false" Required="true"/>
+        <MudDatePicker Label="Projected End Date" @bind-Date="end" ShowToolbar="false" Required="true" />
         <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" FilterByRole="true" />
     }
 </MudPaper>

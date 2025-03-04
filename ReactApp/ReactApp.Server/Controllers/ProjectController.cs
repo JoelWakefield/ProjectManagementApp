@@ -24,11 +24,31 @@ namespace ReactApp.Server.Controllers
         [HttpPost("create")]
         public async Task<string> CreateProjectAsync(CreateProjectVm projectVm)
         {
-            Project project = mapper.Map<CreateProjectVm, Project>(projectVm);
-            await dbContext.Projects.AddAsync(project);
-            await dbContext.SaveChangesAsync();
+            try
+            {
+                Project project = new();
 
-            return project.Id.ToString();
+                //  set flat project data
+                project.CreatedBy = "Create Projects API";
+
+                project.Name = projectVm.Name;
+                project.Description = projectVm.Description;
+
+                project.ProjectedStart = projectVm.ProjectedStart.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
+                project.ProjectedEnd = projectVm.ProjectedEnd.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
+
+                project.OwnerId = projectVm.OwnerId;
+                project.Owner = dbContext.Users.FirstOrDefault(u => u.Id == projectVm.OwnerId);
+
+                await dbContext.Projects.AddAsync(project);
+                await dbContext.SaveChangesAsync();
+
+                return project.Id;
+            } 
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
         }
 
         [HttpGet("details/{id}")]
@@ -36,7 +56,7 @@ namespace ReactApp.Server.Controllers
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)
-                .SingleAsync(p => p.Id == Guid.Parse(id));
+                .SingleAsync(p => p.Id == id);
 
             return mapper.Map<ProjectVm>(project);
         }
@@ -46,7 +66,7 @@ namespace ReactApp.Server.Controllers
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)
-                .SingleAsync(p => p.Id == Guid.Parse(id));
+                .SingleAsync(p => p.Id == id);
 
             var vm = mapper.Map<EditProjectVm>(project);
             return vm;
@@ -59,7 +79,7 @@ namespace ReactApp.Server.Controllers
             {
                 //  get project data
                 var project = await dbContext.Projects
-                    .SingleOrDefaultAsync(p => p.Id == Guid.Parse(id));
+                    .SingleOrDefaultAsync(p => p.Id == id);
                 if (project == null)
                 {
                     return NotFound(new { message = $"Project with id ({id}) not found." });
