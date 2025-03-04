@@ -25,6 +25,11 @@ Accept: application/json
 
 ###
 
+POST {{ReactApp.Server_HostAddress}}/project/create
+Accept: application/json
+
+###
+
 GET {{ReactApp.Server_HostAddress}}/project/details/{id}
 Accept: application/json
 

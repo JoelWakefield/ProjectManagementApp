@@ -6,12 +6,13 @@
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IProjectRoleService ProjectRoleService
-@inject IProjectService ProjectService
+@* @inject IProjectService ProjectService *@
+@inject ProjectHttpClient Http
 
 
-<PageTitle>@Project?.Name - Edit</PageTitle>
+<PageTitle>@project?.Name - Edit</PageTitle>
 
-<MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
+<MudText Typo="Typo.h1" Class="px-6">@project?.Name</MudText>
 
 @if (Errors != null)
 {
@@ -21,22 +22,13 @@
 }
 
 <MudPaper Class="pa-8">
-    @if (Project != null)
+    @if (project != null)
     {
-        <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Editable Values</MudText>
-        <MudContainer Class="pa-4 align-start">
-            <MudTextField Label="Name" @bind-Value="Project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
-            <MudTextField Label="Description" @bind-Value="Project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
-        </MudContainer>
-        <DateTimePicker DateTimeValue="@Project!.ProjectedStart" Label="Projected Start Date" OnDateTimeChanged="ProjectedStartChanged" />
-        <DateTimePicker DateTimeValue="@Project!.ProjectedEnd" Label="Projected End Date" OnDateTimeChanged="ProjectedEndChanged" />
+        <MudTextField Label="Name" @bind-Value="project!.Name" T="string" Required="true" RequiredError="A project must have a name." />
+        <MudTextField Label="Description" @bind-Value="project!.Description" T="string" Required="true" RequiredError="A project must have a description." />
+        <MudDatePicker Label="Projected Start Date" @bind-Date="start" ShowToolbar="false" Required="true"/>
+        <MudDatePicker Label="Projected End Date" @bind-Date="end" ShowToolbar="false" Required="true" />
         <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="ProjectOwnerChanged" FilterByRole="true" />
-        
-        <MudDivider />
-        <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="px-6">Auto-Filled Values</MudText>
-        <LabeledText Label="Actual Start Date" Text="@Project?.ActualStart.ToString()" />
-        <LabeledText Label="Actual End Date" Text="@Project?.ActualEnd.ToString()" />
-        <LabeledText Label="Total Work Hours" Text="@Project?.TotalWorkHours.ToString()" />
     }
 </MudPaper>
 
@@ -47,7 +39,10 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Project? Project { get; set; }
+    private EditProjectVm? project;
+    private DateTime? start;
+    private DateTime? end;
+    // public Project? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
@@ -60,13 +55,18 @@
         }
         else
         {
-            Project = await ProjectService.GetProjectAsync(Id);
-            if (Project == null)
+            // Project = await ProjectService.GetProjectAsync(Id);
+            project = await Http.GetProjectEditAsync(Id);
+            if (project == null)
             {
                 NavigationManager.NavigateTo($"/projects", true);
             }
 
-            ApplicationUser? user = await ProjectOwnerService.GetOwnerAsync(Project?.Id);
+            //  set the dates
+            start = project!.ProjectedStart.ToDateTime(new TimeOnly());
+            end = project!.ProjectedEnd.ToDateTime(new TimeOnly());
+
+            ApplicationUser? user = await ProjectOwnerService.GetOwnerAsync(Id);
             if (user != null)
             {
                 OldOwnerSelection = new OwnerSelection(user!.Id, user.UserName);
@@ -75,12 +75,10 @@
         }
     }
 
-    private void ProjectedStartChanged(DateTime dateTime) => Project!.ProjectedStart = dateTime;
-    private void ProjectedEndChanged(DateTime dateTime) => Project!.ProjectedEnd = dateTime;
     private void ProjectOwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
 
     public async Task SaveAsync() {
-        if (String.IsNullOrEmpty(Project!.Name) || CurrentOwnerSelection == null)
+        if (String.IsNullOrEmpty(project!.Name) || CurrentOwnerSelection == null)
         {
             Errors = "Required fields are missing.";
         }
@@ -88,9 +86,13 @@
         {
             try
             {
-                if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
-                    await ProjectOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
-                await ProjectService.UpdateProjectAsync(Project);
+                if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id) {
+                    await ProjectOwnerService.AssignOwnerAsync(project.Id!, CurrentOwnerSelection.Id);
+                }
+
+                project.ProjectedStart = start.ToDateOnly();
+                project.ProjectedEnd = end.ToDateOnly();
+                await Http.UpdateProjectAsync(Id!, project);
                 NavigationManager.NavigateTo($"/projects/details/{Id}", true);
             }
             catch (Exception ex)

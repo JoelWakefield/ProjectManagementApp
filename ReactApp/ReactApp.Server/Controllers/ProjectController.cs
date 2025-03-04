@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactApp.Server.Data;
 using ReactApp.Server.ViewModels;
-using System;
 
 namespace ReactApp.Server.Controllers
 {
@@ -20,6 +19,36 @@ namespace ReactApp.Server.Controllers
             return dbContext.Projects
                 .Include(p => p.Owner)
                 .Select(p => mapper.Map<Project, ProjectVm>(p));
+        }
+
+        [HttpPost("create")]
+        public async Task<string> CreateProjectAsync(CreateProjectVm projectVm)
+        {
+            try
+            {
+                Project project = new();
+
+                //  set flat project data
+                project.CreatedBy = "Create Projects API";
+
+                project.Name = projectVm.Name;
+                project.Description = projectVm.Description;
+
+                project.ProjectedStart = projectVm.ProjectedStart.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
+                project.ProjectedEnd = projectVm.ProjectedEnd.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
+
+                project.OwnerId = projectVm.OwnerId;
+                project.Owner = dbContext.Users.FirstOrDefault(u => u.Id == projectVm.OwnerId);
+
+                await dbContext.Projects.AddAsync(project);
+                await dbContext.SaveChangesAsync();
+
+                return project.Id;
+            } 
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
         }
 
         [HttpGet("details/{id}")]
