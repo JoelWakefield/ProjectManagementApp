@@ -4,24 +4,25 @@
 @using ProjectManagementApp.Services
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
-@inject IProjectService ProjectService
+@* @inject IProjectService ProjectService *@
 @inject IPhaseService PhaseService
+@inject ProjectHttpClient Http
 
 
-<PageTitle>@Project?.Name - Details</PageTitle>
+<PageTitle>@project?.Name - Details</PageTitle>
 
-<MudText Typo="Typo.h1" Class="px-6">@Project?.Name</MudText>
+<MudText Typo="Typo.h1" Class="px-6">@project?.Name</MudText>
 
 <MudPaper Class="my-6 pa-8">
     <MudText Typo="Typo.h2" Class="pa-4">Details</MudText>
-    @if (Project != null)
+    @if (project != null)
     {
-        <LabeledText Label="Description" Text="@Project!.Description" />
-        <LabeledText Label="ProjectedStart" Text="@Project!.ProjectedStart.ToString()" />
-        <LabeledText Label="ProjectedEnd" Text="@Project!.ProjectedEnd.ToString()" />
+        <LabeledText Label="Description" Text="@project.Description" />
+        <LabeledText Label="ProjectedStart" Text="@project.ProjectedStart.ToString()" />
+        <LabeledText Label="ProjectedEnd" Text="@project.ProjectedEnd.ToString()" />
         <LabeledText Label="Owner" Text="@(User?.UserName ?? "")" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(project.Id!))">Update</MudButton>
     }
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="(() => Update(Project?.Id))">Update</MudButton>
 </MudPaper>
 <MudPaper Class="my-6 pa-6">
     <MudText Typo="Typo.h2" Class="pa-4">Phases</MudText>
@@ -35,7 +36,8 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Project? Project { get; set; }
+    // public Project? Project { get; set; }
+    private ProjectVm? project;
     public ApplicationUser? User { get; set; }
     private IEnumerable<Phase>? PhaseList { get; set; }
 
@@ -47,12 +49,13 @@
         }
         else
         {
-            Project = await ProjectService.GetProjectAsync(Id);
+            project = await Http.GetProjectDetailsAsync(Id);
+            // Project = await ProjectService.GetProjectAsync(Id);
             User = await ProjectOwnerService.GetOwnerAsync(Id);
             PhaseList = PhaseService.GetProjectPhases(Id);
         }
     }
 
     public void Update(string id) => NavigationManager.NavigateTo($"/projects/edit/{id}");
-    public void AddPhase() => NavigationManager.NavigateTo($"/phases/create/{Project?.Id}");
+    public void AddPhase() => NavigationManager.NavigateTo($"/phases/create/{Id}");
 }

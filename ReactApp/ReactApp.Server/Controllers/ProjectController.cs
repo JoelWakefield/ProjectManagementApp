@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactApp.Server.Data;
 using ReactApp.Server.ViewModels;
-using System;
 
 namespace ReactApp.Server.Controllers
 {
@@ -22,12 +21,22 @@ namespace ReactApp.Server.Controllers
                 .Select(p => mapper.Map<Project, ProjectVm>(p));
         }
 
+        [HttpPost("create")]
+        public async Task<string> CreateProjectAsync(CreateProjectVm projectVm)
+        {
+            Project project = mapper.Map<CreateProjectVm, Project>(projectVm);
+            await dbContext.Projects.AddAsync(project);
+            await dbContext.SaveChangesAsync();
+
+            return project.Id.ToString();
+        }
+
         [HttpGet("details/{id}")]
         public async Task<ProjectVm> GetProjectDetails(string id)
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)
-                .SingleAsync(p => p.Id == id);
+                .SingleAsync(p => p.Id == Guid.Parse(id));
 
             return mapper.Map<ProjectVm>(project);
         }
@@ -37,7 +46,7 @@ namespace ReactApp.Server.Controllers
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)
-                .SingleAsync(p => p.Id == id);
+                .SingleAsync(p => p.Id == Guid.Parse(id));
 
             var vm = mapper.Map<EditProjectVm>(project);
             return vm;
@@ -50,7 +59,7 @@ namespace ReactApp.Server.Controllers
             {
                 //  get project data
                 var project = await dbContext.Projects
-                    .SingleOrDefaultAsync(p => p.Id == id);
+                    .SingleOrDefaultAsync(p => p.Id == Guid.Parse(id));
                 if (project == null)
                 {
                     return NotFound(new { message = $"Project with id ({id}) not found." });

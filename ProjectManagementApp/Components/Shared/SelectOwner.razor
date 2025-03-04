@@ -12,7 +12,7 @@
 }
 else
 {
-    <MudSelect T="OwnerSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+    <MudSelect T="OwnerSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled">
         @foreach (var user in Owners)
         {
             <MudSelectItem Value="@(new OwnerSelection(user!.Id, user.UserName))" />

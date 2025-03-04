@@ -1,8 +1,6 @@
 ﻿@page "/projects"
-@using ProjectManagementApp.Data
-@using ProjectManagementApp.Services
 @inject NavigationManager NavigationManager
-@inject IProjectService ProjectService
+@inject ProjectHttpClient Http
 
 
 <PageTitle>Projects</PageTitle>
@@ -11,7 +9,7 @@
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="my-4" @onclick="CreateNew">New Project</MudButton>
 
-<MudTable Items="@ProjectList" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+<MudTable Items="@projects" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Description</MudTh>
@@ -22,8 +20,8 @@
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Description">@context.Description</MudTd>
-        <MudTd DataLabel="Projected Start">@context.ProjectedStart.ToLocalTime()</MudTd>
-        <MudTd DataLabel="Projected End">@context.ProjectedEnd.ToLocalTime()</MudTd>
+        <MudTd DataLabel="Projected Start">@context.ProjectedStart</MudTd>
+        <MudTd DataLabel="Projected End">@context.ProjectedEnd</MudTd>
         <MudTd DataLabel="Details">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="(() => Details(context.Id!))">Details</MudButton>
         </MudTd>
@@ -32,11 +30,10 @@
 
 
 @code {
-    private IEnumerable<Project>? ProjectList { get; set; }
+    private ProjectVm[]? projects;
 
-    protected override void OnInitialized()
-    {
-        ProjectList = ProjectService.GetProjects();
+    protected override async Task OnInitializedAsync() {
+        projects = await Http.GetProjectsAsync();
     }
 
     public void CreateNew() => NavigationManager.NavigateTo("/projects/create", true);

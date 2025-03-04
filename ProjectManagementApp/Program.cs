@@ -3,6 +3,7 @@ using ProjectManagementApp.Data;
 using MudBlazor.Services;
 using ProjectManagementApp.SampleData;
 using ProjectManagementApp.Services;
+using ProjectManagementApp.HttpClients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddMudServices();
 
+var apiUri = new Uri("http://localhost:5030");
+builder.Services.AddHttpClient<ProjectHttpClient>(client =>
+    client.BaseAddress = apiUri);
 
 var app = builder.Build();
 

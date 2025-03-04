@@ -52,6 +52,15 @@ namespace ReactApp.Server
                     dest => dest.ProjectedEnd,
                     opt => opt.MapFrom(src => src.ProjectedEnd.ToDateOnly())
                 );
+            CreateMap<CreateProjectVm, Project>()
+                .ForMember(
+                    dest => dest.ProjectedStart,
+                    opt => opt.MapFrom(src => src.ProjectedStart.ToDateTime(new TimeOnly()))
+                )
+                .ForMember(
+                    dest => dest.ProjectedEnd,
+                    opt => opt.MapFrom(src => src.ProjectedEnd.ToDateTime(new TimeOnly()))
+                );
         }
     }
 }
