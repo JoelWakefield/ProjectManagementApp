@@ -1,5 +1,4 @@
 ﻿@page "/phases/schedules"
-@using MudBlazor
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
@@ -18,9 +17,12 @@
     </MudPaper>
 }
 
-
 <MudGrid Class="my-3">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="ShiftBack" IconSize="Size.Large" StartIcon="@Icons.Material.Filled.ArrowBackIos" />
+    <MudItem Class="pa-0" xs="1">
+        <MudPaper Elevation="0" Height="64px" Class="d-flex justify-center">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="ShiftBack" IconSize="Size.Large" StartIcon="@Icons.Material.Filled.ArrowBackIos" />
+        </MudPaper>
+    </MudItem>
 
     @foreach (var date in Dates)
     {
@@ -34,14 +36,18 @@
         </MudItem>
     }
 
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="ShiftForward" IconSize="Size.Large" EndIcon="@Icons.Material.Filled.ArrowForwardIos" />
+    <MudItem Class="pa-0" xs="1">
+        <MudPaper Elevation="0" Height="64px" Class="d-flex justify-center">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="ShiftForward" IconSize="Size.Large" EndIcon="@Icons.Material.Filled.ArrowForwardIos" />
+        </MudPaper>
+    </MudItem>
 </MudGrid>
 
 @foreach (var item in GanttItems)
 {
-    <MudSpacer />
-
     <MudGrid Class="my-3">
+        <MudSpacer />
+
         @if (item.OnChart(StartDate, DAYS_DISPLAYED))
         {
             @for (int i = 0; i < item.FromStart(StartDate); i++)
@@ -67,9 +73,9 @@
                 <MudSpacer />
             }
         }
-    </MudGrid>
 
-    <MudSpacer />
+        <MudSpacer />
+    </MudGrid>
 }
 
 

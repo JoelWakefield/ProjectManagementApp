@@ -1,10 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
-
 <MudThemeProvider IsDarkMode />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
@@ -12,7 +12,7 @@
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/JoelWakefield/ProjectManagementApp" Target="_blank" />
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Breakpoint="@Breakpoint.Md" Variant="@DrawerVariant.Mini">
-        <NavBar/>
+        <NavBar />
     </MudDrawer>
     <MudMainContent Class="mt-16 pa-16">
         @Body
