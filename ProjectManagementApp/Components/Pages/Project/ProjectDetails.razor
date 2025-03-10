@@ -2,9 +2,9 @@
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
-@* @inject IProjectService ProjectService *@
 @inject IPhaseService PhaseService
 @inject ProjectHttpClient Http
 
@@ -27,7 +27,7 @@
 <MudPaper Class="my-6 pa-6">
     <MudText Typo="Typo.h2" Class="pa-4">Phases</MudText>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-6" @onclick="AddPhase">Add Phase</MudButton>
-    <PhaseTable PhaseList="@PhaseList" />
+    @* <PhaseTable PhaseList="@PhaseList" /> *@
 </MudPaper>
 
 
@@ -39,7 +39,7 @@
     // public Project? Project { get; set; }
     private ProjectVm? project;
     public ApplicationUser? User { get; set; }
-    private IEnumerable<Phase>? PhaseList { get; set; }
+    // private IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,9 +50,8 @@
         else
         {
             project = await Http.GetProjectDetailsAsync(Id);
-            // Project = await ProjectService.GetProjectAsync(Id);
             User = await ProjectOwnerService.GetOwnerAsync(Id);
-            PhaseList = PhaseService.GetProjectPhases(Id);
+            // PhaseList = PhaseService.GetProjectPhases(Id);
         }
     }
 

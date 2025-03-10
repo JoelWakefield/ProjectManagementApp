@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ReactApp.Server.Data;
+using ReactApp.Server.Models;
 using ReactApp.Server.ViewModels;
 
 namespace ReactApp.Server.Controllers
@@ -37,8 +37,10 @@ namespace ReactApp.Server.Controllers
                 project.ProjectedStart = projectVm.ProjectedStart.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
                 project.ProjectedEnd = projectVm.ProjectedEnd.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
 
+                project.Owner = dbContext.Users
+                    .FirstOrDefault(u => u.Id == projectVm.OwnerId)
+                    ?? throw new Exception($"Cannot find user with id: {project.OwnerId}");
                 project.OwnerId = projectVm.OwnerId;
-                project.Owner = dbContext.Users.FirstOrDefault(u => u.Id == projectVm.OwnerId);
 
                 await dbContext.Projects.AddAsync(project);
                 await dbContext.SaveChangesAsync();
@@ -52,7 +54,7 @@ namespace ReactApp.Server.Controllers
         }
 
         [HttpGet("details/{id}")]
-        public async Task<ProjectVm> GetProjectDetails(string id)
+        public async Task<ProjectVm> GetProjectDetailsAsync(string id)
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ReactApp.Server.Data
+namespace ReactApp.Server.Models
 {
     [Table("AspNetUsers")]
     public class AppUser

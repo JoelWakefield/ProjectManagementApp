@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ReactApp.Server.Data
+namespace ReactApp.Server.Models
 {
     /// <summary>
     /// The Project entity keeps track of broad data which isn't likely to change and whose changes aren't worth tracking.
@@ -22,5 +22,7 @@ namespace ReactApp.Server.Data
 
         public string? OwnerId { get; set; }
         public AppUser? Owner { get; set; }
+
+        public ICollection<Phase>? Phases { get; set; }
     }
 }

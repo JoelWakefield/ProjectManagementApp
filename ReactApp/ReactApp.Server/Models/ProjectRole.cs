@@ -1,7 +1,6 @@
-﻿using ReactApp.Server.Data;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ReactApp.Server
+namespace ReactApp.Server.Models
 {
     /// <summary>
     /// Project roles allow the team to make adjustments without having access to AspNet Identity roles, which should be managed outside the app.

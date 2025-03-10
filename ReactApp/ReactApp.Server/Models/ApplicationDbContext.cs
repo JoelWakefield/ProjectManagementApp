@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReactApp.Server.Models;
 
-namespace ReactApp.Server.Data
+namespace ReactApp.Server.Models
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<AppUser> Users { get; set; }
         public DbSet<ProjectRole> ProjectRoles { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<Phase> Phases { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +27,11 @@ namespace ReactApp.Server.Data
                 .HasOne(p => p.Owner)
                 .WithMany(u => u.OwnedProjects)
                 .HasForeignKey(p => p.OwnerId);
+
+            modelBuilder.Entity<Phase>()
+                .HasOne(ph => ph.Project)
+                .WithMany(p => p.Phases)
+                .HasForeignKey(ph => ph.ProjectId);
         }
     }
 }

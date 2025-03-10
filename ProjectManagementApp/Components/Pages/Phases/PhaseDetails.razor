@@ -2,17 +2,24 @@
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
+@inject PhaseHttpClient phaseClient
 @inject IPhaseOwnerService PhaseOwnerService
 
 
-<PageTitle>@Phase?.Name - Details</PageTitle>
-
-<MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
+@if (Errors != null)
+{
+    <MudPaper Class="my-6 pa-8">
+        <MudText Typo="Typo.caption" Class="px-6">@Errors</MudText>
+    </MudPaper>
+}
 
 @if (Phase != null)
 {
+    <PageTitle>@Phase?.Name - Details</PageTitle>
+    <MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
+
     <MudPaper Class="my-6 pa-8">
             <LabeledText Label="Description" Text="@Phase!.Description" />
             <LabeledText Label="Priority" Text="@Phase!.Priority.ToString()" />
@@ -30,20 +37,23 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Phase? Phase { get; set; }
+    public PhaseVm? Phase { get; set; }
     public ApplicationUser? User { get; set; }
+    public string? Errors { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         if (String.IsNullOrEmpty(Id)){
             NavigationManager.NavigateTo("/phases", true);
         }
-        else {
-            Phase = await PhaseService.GetPhaseAsync(Id);
-            if (Phase == null)
-                throw new Exception($"Could not find phase with id: {Id}");
-
-            User = await PhaseOwnerService.GetOwnerAsync(Id);
+        else 
+        {
+            Phase = await phaseClient.GetPhaseDetailsAsync(Id);
+            if (Phase == null) {
+                Errors = $"Could not find phase with id: {Id}";
+            } else {
+                User = await PhaseOwnerService.GetOwnerAsync(Id);
+            }
         }
     }
 

@@ -1,16 +1,17 @@
 ﻿@page "/phases/edit/{Id}"
 @using ProjectManagementApp.Components.Shared
-@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
+@using ReactApp.Server.Models
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
+@inject PhaseHttpClient phaseClient
 @inject IPhaseOwnerService PhaseOwnerService
 
 
-<PageTitle>@Phase?.Name - Edit</PageTitle>
+<PageTitle>@(Phase?.Name ?? "Error") - Edit</PageTitle>
 
-<MudText Typo="Typo.h1" Class="px-6">@Phase?.Name</MudText>
+<MudText Typo="Typo.h1" Class="px-6">@(Phase?.Name ?? "Error")</MudText>
 
 @if (Errors != null)
 {
@@ -41,19 +42,25 @@
     [Parameter]
     public string? Id { get; set; }
 
-    public Phase? Phase { get; set; }
+    public EditPhaseVm? Phase { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
+        if (string.IsNullOrEmpty(Id)) {
+            NavigationManager.NavigateTo($"/phases", true);
+        }
+
         try {
-            Phase = await PhaseService.GetPhaseAsync(Id);
+            Phase = await phaseClient.GetPhaseEditAsync(Id)
+                ?? throw new Exception($"Phase ({Id}) could not be found.");
+
             var user = await PhaseOwnerService.GetOwnerAsync(Phase.Id);
             CurrentOwnerSelection = new OwnerSelection(user.Id,user.UserName);
-        } catch {
-            NavigationManager.NavigateTo($"/phases", true);
+        } catch (Exception ex) {
+            Errors = ex.ToString();
         }
     }
 
@@ -71,7 +78,7 @@
             {
                 if (OldOwnerSelection == null || CurrentOwnerSelection.Id != OldOwnerSelection!.Id)
                     await PhaseOwnerService.AssignOwnerAsync(Phase.Id!, CurrentOwnerSelection.Id);
-                await PhaseService.UpdatePhaseAsync(Phase);
+                await phaseClient.UpdatePhaseAsync(Id, Phase);
                 NavigationManager.NavigateTo($"/phases/details/{Id}", true);
             }
             catch (Exception ex)

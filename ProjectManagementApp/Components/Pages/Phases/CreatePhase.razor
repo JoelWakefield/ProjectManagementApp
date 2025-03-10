@@ -1,10 +1,12 @@
 ﻿@page "/phases/create/{ProjectId}"
 @using ProjectManagementApp.Components.Shared
-@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
+@using ReactApp.Server.Models
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
+@inject PhaseHttpClient phaseClient;
+@inject ProjectHttpClient projectClient;
 @inject IProjectService ProjectService
 @inject IPhaseOwnerService PhaseOwnerService
 
@@ -44,8 +46,8 @@
     [Parameter]
     public string? ProjectId { get; set; }
 
-    public Phase? Phase { get; set; }
-    public Project? Project { get; set; }
+    public CreatePhaseVm? Phase { get; set; }
+    public ProjectVm? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
 
@@ -57,12 +59,12 @@
         }
         else
         {
-            Project = await ProjectService.GetProjectAsync(ProjectId);
+            Project = await projectClient.GetProjectDetailsAsync(ProjectId);
 
             if (Project == null)
                 NavigationManager.NavigateTo($"/projects", true);
             else
-                Phase = new Phase
+                Phase = new CreatePhaseVm
                 {
                     ProjectId = ProjectId,
                 };
@@ -81,9 +83,19 @@
         {
             try
             {
-                await PhaseService.UpdatePhaseAsync(Phase);
-                await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
-                NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);
+                HttpResponseMessage response = await phaseClient.CreatePhaseAsync(Phase);
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    //  if success, the content will be the ID
+                    await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                    NavigationManager.NavigateTo($"/phases/details/{content}", true);
+                }
+                else
+                {
+                    //  if failed, print errors to user
+                    Errors = $"{response.StatusCode.ToString()}: {content}";
+                }
             }
             catch (Exception ex)
             {
