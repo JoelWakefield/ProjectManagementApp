@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ReactApp.Server.Data
+namespace ReactApp.Server.Models
 {
     [Table("AspNetUsers")]
     public class AppUser
@@ -11,5 +11,6 @@ namespace ReactApp.Server.Data
 
         public ICollection<ProjectRole> ProjectRoles { get; set; }
         public ICollection<Project> OwnedProjects { get; set; }
+        public ICollection<Phase> OwnedPhases { get; set; }
     }
 }

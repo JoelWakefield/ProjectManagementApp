@@ -4,6 +4,7 @@
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
 @inject IProjectRoleService ProjectRoleService
 @inject IProjectOwnerService ProjectOwnerService
@@ -71,7 +72,6 @@
                 } else {
                     await ProjectOwnerService.AssignOwnerAsync(projectId, CurrentOwnerSelection.Id);
                     NavigationManager.NavigateTo($"/projects/details/{projectId}", true);
-
                 }
             }
             catch (Exception ex)

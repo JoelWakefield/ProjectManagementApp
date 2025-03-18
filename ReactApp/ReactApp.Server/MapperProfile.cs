@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ReactApp.Server.Data;
+using ReactApp.Server.Models;
 using ReactApp.Server.ViewModels;
 
 namespace ReactApp.Server
@@ -52,6 +52,9 @@ namespace ReactApp.Server
                     dest => dest.ProjectedEnd,
                     opt => opt.MapFrom(src => src.ProjectedEnd.ToDateOnly())
                 );
+
+            CreateMap<Phase, PhaseVm>();
+            CreateMap<Phase, EditPhaseVm>();
         }
     }
 }

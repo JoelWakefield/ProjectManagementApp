@@ -1,0 +1,61 @@
+﻿@using ProjectManagementApp.Data
+@using ProjectManagementApp.Services
+@using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
+@inject IStageService StageService
+
+
+@if (Stages.Any() == false)
+{
+    <MudText Typo="Typo.subtitle2" Color="Color.Warning">There are no stages; the phases need stages - go make some stages!</MudText>
+}
+else
+{
+    <MudSelect T="StageSelection" Label="Owner" @bind-Value="@Selection" Required="true" Variant="Variant.Filled">
+        @foreach (var stage in Stages)
+        {
+            <MudSelectItem Value="@(new StageSelection(stage.Id, stage.OrderId, stage.Name))" />
+        }
+    </MudSelect>
+}
+
+
+@code {
+    [Parameter]
+    public StageSelection? StageSelection { get; set; }
+    [Parameter]
+    public EventCallback<StageSelection> OnStageChanged { get; set; }
+
+    private StageSelection? selection;
+    private StageSelection? Selection
+    {
+        get => selection;
+        set
+        {
+            selection = value;
+            StageSelection = selection;
+            OnStageChanged.InvokeAsync(StageSelection);
+        }
+    }
+
+    private IEnumerable<StageVm?> Stages { get; set; } = new List<StageVm>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Stages = StageService.GetAllStages().Select(s => new StageVm { 
+            Id = s.Id, 
+            Name = s.Name, 
+            OrderId = s.OrderId 
+        });
+
+        if (StageSelection == null && Stages.Any())
+        {
+            Stage? stage = StageService.GetAllStages().FirstOrDefault();
+            Selection = new StageSelection(stage!.Id, stage.OrderId, stage.Name);
+        }
+        else
+        {
+            Selection = StageSelection;
+        }
+    }
+}

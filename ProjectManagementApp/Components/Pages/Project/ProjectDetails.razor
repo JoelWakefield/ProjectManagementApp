@@ -2,11 +2,11 @@
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
-@* @inject IProjectService ProjectService *@
 @inject IPhaseService PhaseService
-@inject ProjectHttpClient Http
+@inject ProjectHttpClient projectClient
 
 
 <PageTitle>@project?.Name - Details</PageTitle>
@@ -31,7 +31,6 @@
 </MudPaper>
 
 
-
 @code {
     [Parameter]
     public string? Id { get; set; }
@@ -39,7 +38,7 @@
     // public Project? Project { get; set; }
     private ProjectVm? project;
     public ApplicationUser? User { get; set; }
-    private IEnumerable<Phase>? PhaseList { get; set; }
+    private IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,10 +48,9 @@
         }
         else
         {
-            project = await Http.GetProjectDetailsAsync(Id);
-            // Project = await ProjectService.GetProjectAsync(Id);
+            project = await projectClient.GetProjectDetailsAsync(Id);
             User = await ProjectOwnerService.GetOwnerAsync(Id);
-            PhaseList = PhaseService.GetProjectPhases(Id);
+            PhaseList = await projectClient.GetProjectPhasesAsync(Id);
         }
     }
 

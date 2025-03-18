@@ -28,8 +28,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddMudServices();
 
 var apiUri = new Uri("http://localhost:5030");
-builder.Services.AddHttpClient<ProjectHttpClient>(client =>
-    client.BaseAddress = apiUri);
+builder.Services.AddHttpClient<ProjectHttpClient>(client => client.BaseAddress = apiUri);
+builder.Services.AddHttpClient<PhaseHttpClient>(client => client.BaseAddress = apiUri);
 
 var app = builder.Build();
 
@@ -41,8 +41,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//  SWAPPING TO SERVER FOR BACKEND
 // Setup initial data for the projects 
-await app.BuildFakeProject();
+//await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 

@@ -1,4 +1,5 @@
 ﻿@using ProjectManagementApp.Data
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
 
 
@@ -22,7 +23,7 @@
 
 @code {
     [Parameter]
-    public IEnumerable<Phase>? PhaseList { get; set; }
+    public IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     public void Details(string id) => NavigationManager.NavigateTo($"/phases/details/{id}", true);
 }

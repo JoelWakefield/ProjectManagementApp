@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ReactApp.Server.Data;
+using ReactApp.Server.Models;
 using ReactApp.Server.ViewModels;
 
 namespace ReactApp.Server.Controllers

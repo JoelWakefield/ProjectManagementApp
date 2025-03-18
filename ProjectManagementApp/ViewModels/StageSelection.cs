@@ -1,27 +1,29 @@
 ﻿namespace ProjectManagementApp.ViewModels
 {
-    public class OwnerSelection
+    public class StageSelection
     {
-        public OwnerSelection(string id, string? name)
+        public StageSelection(string id, int orderId, string? name)
         {
             Id = id;
-            Name = name ?? "NO USERNAME";
+            Name = name ?? "NO STAGE NAME";
+            OrderId = orderId;
         }
 
         public readonly string Id;
         public readonly string Name;
+        public readonly int OrderId;
 
-        // Note: this is important so the MudSelect can compare owners
+        // Note: this is important so the MudSelect can compare Stages
         public override bool Equals(object o)
         {
-            var other = o as OwnerSelection;
-            return other?.Name == Name;
+            var other = o as StageSelection;
+            return other?.Id == Id;
         }
 
         // Note: this is important too - I have no idea why!
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
 
-        // Implement this for the Owner to display correctly in MudSelect
+        // Implement this for the Stage to display correctly in MudSelect
         public override string ToString() => Name;
     }
 }

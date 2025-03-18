@@ -29,5 +29,8 @@ namespace ProjectManagementApp.HttpClients
                 return String.Empty;
             }
         }
+
+        public async Task<IEnumerable<PhaseVm>> GetProjectPhasesAsync(string id) =>
+            await http.GetFromJsonAsync<IEnumerable<PhaseVm>>($"project/phases/{id}") ?? [];
     }
 }

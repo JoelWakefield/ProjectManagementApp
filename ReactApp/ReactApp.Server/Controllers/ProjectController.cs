@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ReactApp.Server.Data;
+using ReactApp.Server.Models;
 using ReactApp.Server.ViewModels;
 
 namespace ReactApp.Server.Controllers
@@ -37,8 +37,10 @@ namespace ReactApp.Server.Controllers
                 project.ProjectedStart = projectVm.ProjectedStart.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
                 project.ProjectedEnd = projectVm.ProjectedEnd.ToDateTime(new TimeOnly(), DateTimeKind.Utc);
 
+                project.Owner = dbContext.Users
+                    .FirstOrDefault(u => u.Id == projectVm.OwnerId)
+                    ?? throw new Exception($"Cannot find user with id: {project.OwnerId}");
                 project.OwnerId = projectVm.OwnerId;
-                project.Owner = dbContext.Users.FirstOrDefault(u => u.Id == projectVm.OwnerId);
 
                 await dbContext.Projects.AddAsync(project);
                 await dbContext.SaveChangesAsync();
@@ -52,7 +54,7 @@ namespace ReactApp.Server.Controllers
         }
 
         [HttpGet("details/{id}")]
-        public async Task<ProjectVm> GetProjectDetails(string id)
+        public async Task<ProjectVm> GetProjectDetailsAsync(string id)
         {
             var project = await dbContext.Projects
                 .Include(p => p.Owner)
@@ -99,6 +101,19 @@ namespace ReactApp.Server.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"An error occurred while updating project with id ({id})", error = ex.Message });
+            }
+        }
+
+        [HttpGet("phases/{id}")]
+        public IEnumerable<Phase> GetProjectPhases(string id)
+        {
+            if (!dbContext.Projects.Any(p => p.Id == id))
+            {
+                return new List<Phase>().AsEnumerable();
+            }
+            else
+            {
+                return dbContext.Phases.Where(p => p.ProjectId == id);
             }
         }
     }

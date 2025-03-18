@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ReactApp.Server.Data;
+using ReactApp.Server.Models;
 
 namespace ReactApp.Server.Controllers
 {

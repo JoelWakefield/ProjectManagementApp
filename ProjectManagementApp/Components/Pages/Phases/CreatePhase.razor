@@ -1,12 +1,13 @@
 ﻿@page "/phases/create/{ProjectId}"
 @using ProjectManagementApp.Components.Shared
-@using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
+@using ReactApp.Server.Models
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
-@inject IProjectService ProjectService
-@inject IPhaseOwnerService PhaseOwnerService
+@inject PhaseHttpClient phaseClient
+@inject ProjectHttpClient projectClient
+@* @inject IPhaseOwnerService PhaseOwnerService *@
 
 
 <PageTitle>Create Phase</PageTitle>
@@ -32,7 +33,10 @@
             }
         </MudSelect>
         <MudContainer Class="pa-4">
-            <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="PhaseOwnerChanged" />
+            <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="OwnerChanged" />
+        </MudContainer>
+        <MudContainer Class="pa-4">
+            <SelectStage StageSelection="CurrentStageSelection" OnStageChanged="StageChanged" />
         </MudContainer>
     }
 </MudPaper>
@@ -44,9 +48,10 @@
     [Parameter]
     public string? ProjectId { get; set; }
 
-    public Phase? Phase { get; set; }
-    public Project? Project { get; set; }
+    public CreatePhaseVm? Phase { get; set; }
+    public ProjectVm? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
+    public StageSelection CurrentStageSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
@@ -57,19 +62,20 @@
         }
         else
         {
-            Project = await ProjectService.GetProjectAsync(ProjectId);
+            Project = await projectClient.GetProjectDetailsAsync(ProjectId);
 
             if (Project == null)
                 NavigationManager.NavigateTo($"/projects", true);
             else
-                Phase = new Phase
+                Phase = new CreatePhaseVm
                 {
                     ProjectId = ProjectId,
                 };
         }
     }
 
-    private void PhaseOwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
+    private void OwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
+    private void StageChanged(StageSelection selection) => CurrentStageSelection = selection;
 
     public async Task SaveAsync()
     {
@@ -81,9 +87,21 @@
         {
             try
             {
-                await PhaseService.UpdatePhaseAsync(Phase);
-                await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
-                NavigationManager.NavigateTo($"/phases/details/{Phase.Id}", true);
+                Phase.OwnerId = CurrentOwnerSelection.Id;
+                Phase.StageId = CurrentStageSelection.Id;
+                HttpResponseMessage response = await phaseClient.CreatePhaseAsync(Phase);
+                string content = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    //  if success, the content will be the ID
+                    // await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                    NavigationManager.NavigateTo($"/phases/details/{content}", true);
+                }
+                else
+                {
+                    //  if failed, print errors to user
+                    Errors = $"{response.StatusCode.ToString()}: {content}";
+                }
             }
             catch (Exception ex)
             {

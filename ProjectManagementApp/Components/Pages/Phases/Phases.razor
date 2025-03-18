@@ -2,8 +2,9 @@
 @using ProjectManagementApp.Components.Shared
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
-@inject IPhaseService PhaseService
+@inject PhaseHttpClient phaseClient
 
 
 <PageTitle>Phases</PageTitle>
@@ -14,11 +15,11 @@
 
 
 @code {
-    private IEnumerable<Phase>? PhaseList { get; set; }
+    private IEnumerable<PhaseVm>? PhaseList { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        PhaseList = PhaseService.GetAllPhases();
+        PhaseList = await phaseClient.GetPhasesAsync();
     }
 
     public void Details(string id) => NavigationManager.NavigateTo($"/phases/details/{id}", true);

@@ -3,10 +3,10 @@
 @using ProjectManagementApp.Data
 @using ProjectManagementApp.Services
 @using ProjectManagementApp.ViewModels
+@using ReactApp.Server.ViewModels
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IProjectRoleService ProjectRoleService
-@* @inject IProjectService ProjectService *@
 @inject ProjectHttpClient Http
 
 
@@ -42,7 +42,7 @@
     private EditProjectVm? project;
     private DateTime? start;
     private DateTime? end;
-    // public Project? Project { get; set; }
+
     public OwnerSelection? CurrentOwnerSelection { get; set; }
     public OwnerSelection? OldOwnerSelection { get; set; }
     public string? Errors { get; set; } = null;
@@ -55,7 +55,6 @@
         }
         else
         {
-            // Project = await ProjectService.GetProjectAsync(Id);
             project = await Http.GetProjectEditAsync(Id);
             if (project == null)
             {
