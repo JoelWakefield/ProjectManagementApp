@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject PhaseHttpClient phaseClient
 @inject ProjectHttpClient projectClient
-@inject IPhaseOwnerService PhaseOwnerService
+@* @inject IPhaseOwnerService PhaseOwnerService *@
 
 
 <PageTitle>Create Phase</PageTitle>
@@ -33,7 +33,10 @@
             }
         </MudSelect>
         <MudContainer Class="pa-4">
-            <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="PhaseOwnerChanged" />
+            <SelectOwner OwnerSelection="CurrentOwnerSelection" OnOwnerChanged="OwnerChanged" />
+        </MudContainer>
+        <MudContainer Class="pa-4">
+            <SelectStage StageSelection="CurrentStageSelection" OnStageChanged="StageChanged" />
         </MudContainer>
     }
 </MudPaper>
@@ -48,6 +51,7 @@
     public CreatePhaseVm? Phase { get; set; }
     public ProjectVm? Project { get; set; }
     public OwnerSelection? CurrentOwnerSelection { get; set; }
+    public StageSelection CurrentStageSelection { get; set; }
     public string? Errors { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
@@ -70,7 +74,8 @@
         }
     }
 
-    private void PhaseOwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
+    private void OwnerChanged(OwnerSelection selection) => CurrentOwnerSelection = selection;
+    private void StageChanged(StageSelection selection) => CurrentStageSelection = selection;
 
     public async Task SaveAsync()
     {
@@ -82,12 +87,14 @@
         {
             try
             {
+                Phase.OwnerId = CurrentOwnerSelection.Id;
+                Phase.StageId = CurrentStageSelection.Id;
                 HttpResponseMessage response = await phaseClient.CreatePhaseAsync(Phase);
                 string content = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
                     //  if success, the content will be the ID
-                    await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
+                    // await PhaseOwnerService.AssignOwnerAsync(Project.Id!, CurrentOwnerSelection.Id);
                     NavigationManager.NavigateTo($"/phases/details/{content}", true);
                 }
                 else

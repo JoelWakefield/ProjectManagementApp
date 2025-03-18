@@ -20,7 +20,7 @@ namespace ReactApp.Server.Controllers
             );
         }
 
-        [HttpPost(Name = "create")]
+        [HttpPost("create")]
         public async Task<string> CreatePhaseAsync(CreatePhaseVm phaseVm)
         {
             try
@@ -36,6 +36,16 @@ namespace ReactApp.Server.Controllers
                     .FirstOrDefault(p => p.Id == phaseVm.ProjectId)
                     ?? throw new Exception($"Cannot find project with id: {phaseVm.ProjectId}");
                 phase.ProjectId = phaseVm.ProjectId;
+
+                phase.Owner = dbContext.Users
+                    .FirstOrDefault(p => p.Id == phaseVm.OwnerId)
+                    ?? throw new Exception($"Cannot find owner with id: {phaseVm.OwnerId}");
+                phase.OwnerId = phaseVm.OwnerId;
+
+                phase.Stage = dbContext.Stages
+                    .FirstOrDefault(s => s.Id == phaseVm.StageId)
+                    ?? throw new Exception($"Cannot find stage with id: {phaseVm.StageId}");
+                phase.StageId = phaseVm.StageId;
 
                 await dbContext.Phases.AddAsync(phase);
                 await dbContext.SaveChangesAsync();

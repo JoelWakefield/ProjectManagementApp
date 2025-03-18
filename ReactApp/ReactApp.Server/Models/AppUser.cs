@@ -11,5 +11,6 @@ namespace ReactApp.Server.Models
 
         public ICollection<ProjectRole> ProjectRoles { get; set; }
         public ICollection<Project> OwnedProjects { get; set; }
+        public ICollection<Phase> OwnedPhases { get; set; }
     }
 }

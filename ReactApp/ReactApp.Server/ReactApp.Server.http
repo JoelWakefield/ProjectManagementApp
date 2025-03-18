@@ -47,3 +47,8 @@ Accept: application/json
 
 GET {{ReactApp.Server_HostAddress}}/project/phases/{id}
 Accept: application/json
+
+###
+
+PUT {{ReactApp.Server_HostAddress}}/phase/create
+Accept: application/json
