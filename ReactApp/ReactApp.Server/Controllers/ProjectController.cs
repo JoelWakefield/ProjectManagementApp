@@ -103,5 +103,18 @@ namespace ReactApp.Server.Controllers
                 return StatusCode(500, new { message = $"An error occurred while updating project with id ({id})", error = ex.Message });
             }
         }
+
+        [HttpGet("phases/{id}")]
+        public IEnumerable<Phase> GetProjectPhases(string id)
+        {
+            if (!dbContext.Projects.Any(p => p.Id == id))
+            {
+                return new List<Phase>().AsEnumerable();
+            }
+            else
+            {
+                return dbContext.Phases.Where(p => p.ProjectId == id);
+            }
+        }
     }
 }

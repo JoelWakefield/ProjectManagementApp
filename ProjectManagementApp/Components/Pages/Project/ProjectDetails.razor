@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject IProjectOwnerService ProjectOwnerService
 @inject IPhaseService PhaseService
-@inject ProjectHttpClient Http
+@inject ProjectHttpClient projectClient
 
 
 <PageTitle>@project?.Name - Details</PageTitle>
@@ -27,9 +27,8 @@
 <MudPaper Class="my-6 pa-6">
     <MudText Typo="Typo.h2" Class="pa-4">Phases</MudText>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-6" @onclick="AddPhase">Add Phase</MudButton>
-    @* <PhaseTable PhaseList="@PhaseList" /> *@
+    <PhaseTable PhaseList="@PhaseList" />
 </MudPaper>
-
 
 
 @code {
@@ -39,7 +38,7 @@
     // public Project? Project { get; set; }
     private ProjectVm? project;
     public ApplicationUser? User { get; set; }
-    // private IEnumerable<PhaseVm>? PhaseList { get; set; }
+    private IEnumerable<PhaseVm>? PhaseList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,9 +48,9 @@
         }
         else
         {
-            project = await Http.GetProjectDetailsAsync(Id);
+            project = await projectClient.GetProjectDetailsAsync(Id);
             User = await ProjectOwnerService.GetOwnerAsync(Id);
-            // PhaseList = PhaseService.GetProjectPhases(Id);
+            PhaseList = await projectClient.GetProjectPhasesAsync(Id);
         }
     }
 

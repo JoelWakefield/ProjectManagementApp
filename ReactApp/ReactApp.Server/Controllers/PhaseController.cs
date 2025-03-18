@@ -90,8 +90,5 @@ namespace ReactApp.Server.Controllers
                 });
             }
         }
-        
-        //  TODO: move to a project-phases API
-        //public IEnumerable<PhaseVm> GetProjectPhases(string projectId);
     }
 }
