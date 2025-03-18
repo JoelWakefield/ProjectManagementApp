@@ -41,8 +41,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//  SWAPPING TO SERVER FOR BACKEND
 // Setup initial data for the projects 
-await app.BuildFakeProject();
+//await app.BuildFakeProject();
 
 app.UseHttpsRedirection();
 
